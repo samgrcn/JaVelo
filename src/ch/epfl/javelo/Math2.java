@@ -15,5 +15,42 @@ public final class Math2 {
         return fma(a, x, y0);
     }
 
+    int clamp(int min, int v, int max) {
+        if (v < min) { v = min; }
+        else if (v > min) { v = max; }
+        Preconditions.checkArgument(min > max);
+        return v;
+    }
+
+    double clamp(double min, double v, double max) {
+        if (v < min) { v = min; }
+        else if (v > min) { v = max; }
+        Preconditions.checkArgument(min > max);
+        return v;
+    }
+
+    double asinh(double x) {
+        return log(x + sqrt(1 + pow(x, 2)));
+    }
+
+    double dotProduct(double uX, double uY, double vX, double vY) {
+        return uX * uY + vX * vY;
+    }
+
+    double squaredNorm(double uX, double uY) {
+        return pow(uX, 2) + pow(uY, 2);
+    }
+
+    double norm(double uX, double uY) {
+        return sqrt(squaredNorm(uX, uY));
+    }
+
+    double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
+        double apX = pX - aX;
+        double apY = pY - aY;
+        double abX = bX - aX;
+        double abY = bY - aY;
+        return dotProduct(apX, apY, abX, abY)/norm(abX, abY);
+    }
 
 }
