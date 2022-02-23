@@ -1,6 +1,7 @@
 package ch.epfl.javelo.projection;
 
 import ch.epfl.javelo.Math2;
+import java.util.Objects;
 
 /**
  * Represents a point in the Swiss coordinate system.
@@ -17,6 +18,27 @@ public record PointCh(double e, double n){
         public Complex {
             if (!SwissBounds.containsEN(e, n))
                 throw new IllegalArgumentException();
+        }
+
+        @Override
+        public String toString() {
+            return "Complex{" +
+                    "e=" + e +
+                    ", n=" + n +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Complex complex = (Complex) o;
+            return Double.compare(complex.e, e) == 0 && Double.compare(complex.n, n) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(e, n);
         }
 
         /**
