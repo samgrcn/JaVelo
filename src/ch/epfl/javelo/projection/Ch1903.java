@@ -1,12 +1,17 @@
 package ch.epfl.javelo.projection;
 
+/**
+ * Offre des méthodes statiques permettant de convertir entre les coordonnées WGS 84 et les coordonnées suisses.
+ *
+ * @author Quentin Chappuis (339517)
+ */
 public final class Ch1903 {
     private Ch1903(){};
 
     /**
      * Retourne la coordonnée E (est) du point de longitude lon et latitude lat dans le système WGS84.
-     * @param lon
-     * @param lat
+     * @param lon longitude
+     * @param lat latitude
      * @return la coordonnée E
      */
     public static double e(double lon, double lat) {
@@ -19,8 +24,8 @@ public final class Ch1903 {
 
     /**
      *Retourne la coordonnée N (nord) du point de longitude lon et latitude lat dans le système WGS84.
-     * @param lon
-     * @param lat
+     * @param lon longitude
+     * @param lat latitude
      * @return la coordonnée N
      */
     public static double n(double lon, double lat) {
@@ -33,8 +38,8 @@ public final class Ch1903 {
 
     /**
      * Retourne la longitude dans le système WGS84 du point dont les coordonnées sont e et n dans le système suisse.
-     * @param e
-     * @param n
+     * @param e coordonnée Est
+     * @param n coordonnée Nord
      * @return la longitude
      */
     public static double lon(double e, double n) {
@@ -46,8 +51,8 @@ public final class Ch1903 {
 
     /**
      * Retourne la latitude dans le système WGS84 du point dont les coordonnées sont e et n dans le système suisse.
-     * @param e
-     * @param n
+     * @param e coordonnée Est
+     * @param n coordonnée Nord
      * @return la latitude
      */
     public static double lat(double e, double n) {

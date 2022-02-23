@@ -2,7 +2,16 @@ package ch.epfl.javelo.projection;
 
 import ch.epfl.javelo.Math2;
 
+/**
+ * Représente un point dans le système de coordonnées suisse.
+ *
+ * @author Samuel Garcin (345633)
+ */
 public record PointCh(double e, double n){
+    public PointCh {
+        if (!SwissBounds.containsEN(e, n))
+            throw new IllegalArgumentException();
+    }
 
     public record Complex(double e, double n) {
         public Complex {
@@ -12,7 +21,7 @@ public record PointCh(double e, double n){
 
         /**
          * Retourne le carré de la distance en mètres séparant le récepteur (this) de l'argument that.
-         * @param that
+         * @param that argument that
          * @return le carré de la distance
          */
         double squaredDistanceTo(PointCh that) {
@@ -23,7 +32,7 @@ public record PointCh(double e, double n){
 
         /**
          * Retourne la distance en mètres séparant le récepteur (this) de l'argument that.
-         * @param that
+         * @param that argument that
          * @return la distance
          */
         double distanceTo(PointCh that) {
@@ -45,6 +54,5 @@ public record PointCh(double e, double n){
         double lat() { return Ch1903.lat(this.e, this.n); }
 
     }
-
 }
 
