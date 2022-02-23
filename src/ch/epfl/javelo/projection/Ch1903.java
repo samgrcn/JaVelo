@@ -32,4 +32,5 @@ public final class Ch1903 {
         double phi0 = 16.9023892 + 3.238272 * y - 0.270978 * Math.pow(x, 2) - 0.002528 * Math.pow(y, 2) - 0.0447 * Math.pow(x, 2) * y - 0.0140 * Math.pow(y, 3);
         return Math.toRadians(phi0 * 100 / 36);
     }
+
 }
