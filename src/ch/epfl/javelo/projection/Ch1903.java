@@ -1,7 +1,7 @@
 package ch.epfl.javelo.projection;
 
 /**
- * Offre des méthodes statiques permettant de convertir entre les coordonnées WGS 84 et les coordonnées suisses.
+ * Provides static methods to convert between WGS 84 and Swiss coordinates.
  *
  * @author Quentin Chappuis (339517)
  */
@@ -9,10 +9,10 @@ public final class Ch1903 {
     private Ch1903(){};
 
     /**
-     * Retourne la coordonnée E (est) du point de longitude lon et latitude lat dans le système WGS84.
+     * Returns the E (east) coordinate of the longitude lon and latitude lat point in the WGS84 system.
      * @param lon longitude
      * @param lat latitude
-     * @return la coordonnée E
+     * @return East coordinate
      */
     public static double e(double lon, double lat) {
         lon = Math.toDegrees(lon);
@@ -23,10 +23,10 @@ public final class Ch1903 {
     };
 
     /**
-     *Retourne la coordonnée N (nord) du point de longitude lon et latitude lat dans le système WGS84.
+     * Returns the N (north) coordinate of the longitude lon and latitude lat point in the WGS84 system.
      * @param lon longitude
      * @param lat latitude
-     * @return la coordonnée N
+     * @return North coordinate
      */
     public static double n(double lon, double lat) {
         lon = Math.toDegrees(lon);
@@ -37,10 +37,10 @@ public final class Ch1903 {
     };
 
     /**
-     * Retourne la longitude dans le système WGS84 du point dont les coordonnées sont e et n dans le système suisse.
-     * @param e coordonnée Est
-     * @param n coordonnée Nord
-     * @return la longitude
+     * Returns the longitude in the WGS84 system of the point whose coordinates are e and n in the Swiss system.
+     * @param e East coordinate
+     * @param n North coordinate
+     * @return the longitude
      */
     public static double lon(double e, double n) {
         double x = 1e-6 * (e - 2600000);
@@ -50,10 +50,10 @@ public final class Ch1903 {
     }
 
     /**
-     * Retourne la latitude dans le système WGS84 du point dont les coordonnées sont e et n dans le système suisse.
-     * @param e coordonnée Est
-     * @param n coordonnée Nord
-     * @return la latitude
+     * Returns the latitude in the WGS84 system of the point whose coordinates are e and n in the Swiss system.
+     * @param e East coordinate
+     * @param n North coordinate
+     * @return the latitude
      */
     public static double lat(double e, double n) {
         double x = 1e-6 * (e - 2600000);

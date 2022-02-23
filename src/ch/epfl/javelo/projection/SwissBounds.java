@@ -1,7 +1,7 @@
 package ch.epfl.javelo.projection;
 
 /**
- * Contient les limites de la Suisse.
+ * Contains the bounds of Switzerland.
  *
  * @author Quentin Chappuis (339517)
  */
@@ -16,10 +16,10 @@ public final class SwissBounds {
     private SwissBounds() {};
 
     /**
-     * Retourne vrai si et seulement si les coordonnées E et N données sont dans les limites de la Suisse.
-     * @param e coordonnée Est
-     * @param n coordonnée Nord
-     * @return true si contenu ou false si pas contenu dans la Suisse
+     * Returns true if and only if the given E and N coordinates are within Switzerland.
+     * @param e East coordinate
+     * @param n North coordinate
+     * @return true if contained or false if not contained in Switzerland
      */
     public static boolean containsEN(double e, double n) {
       return e >= MIN_E && e <= MAX_E && n >= MIN_N && n <= MAX_N;
