@@ -4,17 +4,38 @@ import static java.lang.Math.*;
 public final class Math2 {
     private Math2() {}
 
+    /**
+     * Retourne la partie entière par excès de la division de x par y, ou lève IllegalArgumentException si x est négatif ou si y est négatif ou nul.
+     * @param x
+     * @param y
+     * @return la partie entière de x/y
+     */
     public static int ceilDiv(int x, int y) {
         Preconditions.checkArgument(x < 0);
         Preconditions.checkArgument(y <= 0);
         return (x+y-1)/y ;
     }
 
+    /**
+     * Retourne la coordonnée y du point se trouvant sur la droite passant par (0,y0) et (1,y1) et de coordonnée x.
+     * @param y0
+     * @param y1
+     * @param x
+     * @return la coordonnée y
+     */
     public static double interpolate(double y0, double y1, double x) {
         double a = (y0 - y1)/(-1);
         return fma(a, x, y0);
     }
 
+    /**
+     * Limite la valeur v à l'intervalle allant de min à max, en retournant min si v est inférieure à min, max si v est supérieure à max, et v sinon;
+     * lève IllegalArgumentException si min est strictement supérieur à max.
+     * @param min
+     * @param v
+     * @param max
+     * @return soit min soit max
+     */
     public static int clamp(int min, int v, int max) {
         if (v < min) { v = min; }
         else if (v > min) { v = max; }
@@ -22,6 +43,13 @@ public final class Math2 {
         return v;
     }
 
+    /**
+     * Même méthode, mais qui prend des doubles en arguments.
+     * @param min
+     * @param v
+     * @param max
+     * @return soit min soit max
+     */
     public static double clamp(double min, double v, double max) {
         if (v < min) { v = min; }
         else if (v > min) { v = max; }
@@ -29,22 +57,57 @@ public final class Math2 {
         return v;
     }
 
+    /**
+     * Retourne le sinus hyperbolique inverse de son argument x.
+     * @param x
+     * @return sinus hyperbolique inverse de x
+     */
     public static double asinh(double x) {
         return log(x + sqrt(1 + pow(x, 2)));
     }
 
+    /**
+     * Retourne le produit scalaire entre le vecteur u (de composantes uX et uY) et le vecteur v.
+     * @param uX
+     * @param uY
+     * @param vX
+     * @param vY
+     * @return le produit scalaire
+     */
     public static double dotProduct(double uX, double uY, double vX, double vY) {
         return uX * uY + vX * vY;
     }
 
+    /**
+     * Retourne le carré de la norme du vecteur u.
+     * @param uX
+     * @param uY
+     * @return le carré de la norme du vecteur
+     */
     public static double squaredNorm(double uX, double uY) {
         return pow(uX, 2) + pow(uY, 2);
     }
 
+    /**
+     * Retourne la norme du vecteur u.
+     * @param uX
+     * @param uY
+     * @return la norme du vecteur
+     */
     public static double norm(double uX, double uY) {
         return sqrt(squaredNorm(uX, uY));
     }
 
+    /**
+     * Retourne la longueur de la projection du vecteur allant du point A (de coordonnées aX et aY) au point P (de coordonnées pX et pY) sur le vecteur allant du point A au point B (de composantes bY et bY).
+     * @param aX
+     * @param aY
+     * @param bX
+     * @param bY
+     * @param pX
+     * @param pY
+     * @return la longueur de la projection
+     */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
         double apX = pX - aX;
         double apY = pY - aY;
@@ -52,5 +115,4 @@ public final class Math2 {
         double abY = bY - aY;
         return dotProduct(apX, apY, abX, abY)/norm(abX, abY);
     }
-
 }

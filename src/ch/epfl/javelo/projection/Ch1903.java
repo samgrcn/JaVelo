@@ -3,6 +3,12 @@ package ch.epfl.javelo.projection;
 public final class Ch1903 {
     private Ch1903(){};
 
+    /**
+     * Retourne la coordonnée E (est) du point de longitude lon et latitude lat dans le système WGS84.
+     * @param lon
+     * @param lat
+     * @return la coordonnée E
+     */
     public static double e(double lon, double lat) {
         lon = Math.toDegrees(lon);
         lat = Math.toDegrees(lat);
@@ -11,6 +17,12 @@ public final class Ch1903 {
         return 2600072.37 + 211455.93 * delta1 - 10938.51 * delta1 * phi1 - 0.36 * delta1 * Math.pow(phi1, 2) - 44.54 * Math.pow(delta1, 3);
     };
 
+    /**
+     *Retourne la coordonnée N (nord) du point de longitude lon et latitude lat dans le système WGS84.
+     * @param lon
+     * @param lat
+     * @return la coordonnée N
+     */
     public static double n(double lon, double lat) {
         lon = Math.toDegrees(lon);
         lat = Math.toDegrees(lat);
@@ -19,6 +31,12 @@ public final class Ch1903 {
         return 1200147.07 + 308807.95 * phi1 - 3745.25 * Math.pow(delta1, 2) + 76.63 * Math.pow(phi1, 2) - 194.56 * Math.pow(delta1, 2) * phi1 + 119.79 * Math.pow(phi1, 3);
     };
 
+    /**
+     * Retourne la longitude dans le système WGS84 du point dont les coordonnées sont e et n dans le système suisse.
+     * @param e
+     * @param n
+     * @return la longitude
+     */
     public static double lon(double e, double n) {
         double x = 1e-6 * (e - 2600000);
         double y = 1e-6 * (n - 1200000);
@@ -26,11 +44,16 @@ public final class Ch1903 {
         return Math.toRadians(delta0 * 100 / 36);
     }
 
+    /**
+     * Retourne la latitude dans le système WGS84 du point dont les coordonnées sont e et n dans le système suisse.
+     * @param e
+     * @param n
+     * @return la latitude
+     */
     public static double lat(double e, double n) {
         double x = 1e-6 * (e - 2600000);
         double y = 1e-6 * (n - 1200000);
         double phi0 = 16.9023892 + 3.238272 * y - 0.270978 * Math.pow(x, 2) - 0.002528 * Math.pow(y, 2) - 0.0447 * Math.pow(x, 2) * y - 0.0140 * Math.pow(y, 3);
         return Math.toRadians(phi0 * 100 / 36);
     }
-
 }
