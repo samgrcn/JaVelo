@@ -49,7 +49,7 @@ public record PointCh(double e, double n) {
      *
      * @return the longitude
      */
-    double lon() {
+    public double lon() {
         return Ch1903.lon(this.e, this.n);
     }
 
@@ -58,7 +58,7 @@ public record PointCh(double e, double n) {
      *
      * @return the latitude
      */
-    double lat() {
+    public double lat() {
         return Ch1903.lat(this.e, this.n);
     }
 }
