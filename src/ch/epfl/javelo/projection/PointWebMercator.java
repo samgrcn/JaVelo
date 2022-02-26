@@ -24,9 +24,7 @@ public record PointWebMercator(double x, double y) {
         return new PointWebMercator(WebMercator.x(lon), WebMercator.y(lat));
     }
 
-    public double xAtZoomLevel(int zoomLevel) {
-        return Math.scalb(x, 8 + zoomLevel);
-    }
+    public double xAtZoomLevel(int zoomLevel) { return Math.scalb(x, 8 + zoomLevel); }
 
     public double yAtZoomLevel(int zoomLevel) {
         return Math.scalb(y, 8 + zoomLevel);
