@@ -1,6 +1,12 @@
 package ch.epfl.javelo;
 import java.util.function.DoubleUnaryOperator;
 
+/**
+ * Implements some functions.
+ *
+ * @author Samuel Garcin (345633)
+ */
+
 public final class Functions {
 
     private Functions() {}
@@ -32,11 +38,7 @@ public final class Functions {
 
         private int bound(double x) {
             double intervalLength = xMax/samples.length;
-            while (x > xMax) {
-                x = x - intervalLength;
-                lowerBound++;
-            }
-            return lowerBound;
+            return (int)(x/intervalLength);
         }
 
         @Override
