@@ -28,8 +28,6 @@ public final class Functions {
     }
     private record Sampled(float[] samples, double xMax) implements DoubleUnaryOperator {
 
-        static int lowerBound = 0;
-
         public Sampled {
             if(samples.length < 2 || xMax <= 0) {
                 throw new IllegalArgumentException();
@@ -37,13 +35,14 @@ public final class Functions {
         }
 
         private int bound(double x) {
-            double intervalLength = xMax/samples.length;
+            double intervalLength = xMax/(samples.length - 1);
             return (int)(x/intervalLength);
         }
 
         @Override
         public double applyAsDouble(double x) {
-            return Math2.interpolate(samples[bound(x)], samples[bound(x) + 1], x) ;
+            if(x > xMax) { return xMax; }
+            return Math2.interpolate(samples[bound(x)], samples[bound(x) + 1], x - bound(x)) ;
         }
     }
 }

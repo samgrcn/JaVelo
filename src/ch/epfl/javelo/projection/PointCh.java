@@ -2,10 +2,6 @@ package ch.epfl.javelo.projection;
 
 import ch.epfl.javelo.Math2;
 
-import java.util.Objects;
-
-import java.util.Objects;
-
 /**
  * Represents a point in the Swiss coordinate system.
  *
