@@ -1,29 +1,47 @@
 package ch.epfl.javelo.projection;
 
+import ch.epfl.javelo.Math2;
+
 /**
- * Permet de convertir entre les coordonnées WGS 84 et les coordonnées Web Mercator.
+ * Converts between WGS 84 and Web Mercator coordinates.
  *
  * @author Quentin Chappuis (339517)
  */
 public final class WebMercator {
     private WebMercator(){};
 
-    private static double asinh(double x) {
-        return Math.log(x + Math.sqrt(x*x + 1.0));
-    }
-
+    /**
+     * Returns the x-coordinate of the projection of a point at longitude lon, given in radians.
+     * @param lon longitude
+     * @return the x-coordinate
+     */
     public static double x(double lon) {
         return 1 / (2 * Math.PI) * (lon + Math.PI);
     }
 
+    /**
+     * Returns the y-coordinate of the projection of a point at latitude lat, given in radians.
+     * @param lat latitude
+     * @return the y-coordinate
+     */
     public static double y(double lat) {
-        return 1 / (2 * Math.PI) * (Math.PI - asinh(Math.tan(lat)));
+        return 1 / (2 * Math.PI) * (Math.PI - Math2.asinh(Math.tan(lat)));
     }
 
+    /**
+     * Returns the longitude, in radians, of a point whose projection is at the given x-coordinate.
+     * @param x x-coordinate
+     * @return the longitude
+     */
     public static double lon(double x) {
         return 2 * Math.PI * x - Math.PI;
     }
 
+    /**
+     * Returns the latitude, in radians, of a point whose projection is at the given y-coordinate.
+     * @param y y-coordinate
+     * @return the latitude
+     */
     public static double lat(double y) {
         return Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y));
     }
