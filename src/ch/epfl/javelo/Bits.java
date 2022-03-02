@@ -17,7 +17,7 @@ public final class Bits {
      * if the length is equal to zero
      * @return the extracted 32-bit vector
      */
-    public int extractSigned(int value, int start, int length) {
+    public static int extractSigned(int value, int start, int length) {
         if (start < 0 || start + length >= 32 || length == 0) {
             throw new IllegalArgumentException();
         }
@@ -34,7 +34,7 @@ public final class Bits {
      * if the length is equal to zero or the length equal to 32
      * @return the extracted 32-bit vector
      */
-    public int extractUnsigned(int value, int start, int length) {
+    public static int extractUnsigned(int value, int start, int length) {
         if (start < 0 || start + length >= 32 || length == 32 || length == 0) {
             throw new IllegalArgumentException();
         }
