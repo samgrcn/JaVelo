@@ -11,17 +11,17 @@ public record AttributeSet(long bits) {
     }
 
     public static AttributeSet of(Attribute... attributes) {
-        long newBits = 0L;
+        long modifiedBits = 0L;
         for (Attribute a : attributes) {
-            newBits |= (1L << (a.ordinal() - 1));
+            modifiedBits |= (1L << (a.ordinal()));
         }
-        return new AttributeSet(newBits);
+        return new AttributeSet(modifiedBits);
     }
 
     public boolean contains(Attribute attribute) {
-        long modifiedBit = bits;
-        modifiedBit >>>= attribute.ordinal();
-        return (modifiedBit & 1L) == 1L;
+        long modifiedBits = this.bits;
+        modifiedBits >>>= attribute.ordinal();
+        return (modifiedBits & 1L) == 1L;
     }
 
     public boolean intersects(AttributeSet that) {
@@ -30,16 +30,14 @@ public record AttributeSet(long bits) {
 
     @Override
     public String toString() {
-        long tempBits = bits;
-        StringJoiner j = new StringJoiner(",", "{", "}");
+        long modifiedBits = this.bits;
+        StringJoiner j = new StringJoiner(", ", "{", "}");
         for (int i = 0; i < (Attribute.COUNT + 1); i++) {
-            if((tempBits & 1L) == 1L) {
-                j.add(Integer.toString(i));
+            if ((modifiedBits & 1L) == 1L) {
+                j.add(Attribute.ALL.get(i).toString());
             }
-            tempBits <<= 1;
+            modifiedBits >>= 1;
         }
-        return "AttributeSet{" +
-                "bits=" + tempBits +
-                '}';
+        return j.toString();
     }
 }

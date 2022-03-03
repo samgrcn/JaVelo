@@ -8,21 +8,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public final class FunctionsTest {
 
- static void constantWorksForEachDouble() {
-     DoubleUnaryOperator actualValue = constant(5);
-     System.out.println(actualValue);
- }
- static void sampledWorksforEachDouble(double x) {
-     float [] samples = {10, 0, 10, 5, 2 , 1};
-     double actualValue = sampled(samples, 2).applyAsDouble(x);
-     //double expectedValue = ;
-     System.out.println(actualValue);
- }
-
-    public static void main(String[] args) {
-        sampledWorksforEachDouble( 1);
+    static void constantWorksForEachDouble() {
+        DoubleUnaryOperator actualValue = constant(5);
+        System.out.println(actualValue);
     }
 
+    static void sampledWorksforEachDouble(double x) {
+        float[] samples = {10, -10, 10, 5, 2, 1};
+        double actualValue = sampled(samples, 10).applyAsDouble(x);
+        //double expectedValue = ;
+        System.out.println(actualValue);
+    }
+
+    public static void main(String[] args) {
+        sampledWorksforEachDouble(10);
+    }
 
 
 }
