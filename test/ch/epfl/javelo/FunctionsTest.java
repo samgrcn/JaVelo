@@ -14,14 +14,13 @@ public final class FunctionsTest {
     }
 
     static void sampledWorksforEachDouble(double x) {
-        float[] samples = {10, -10, 10, 5, 2, 1};
+        float[] samples = {0, 2, 4, 6, 10};
         double actualValue = sampled(samples, 10).applyAsDouble(x);
-        //double expectedValue = ;
         System.out.println(actualValue);
     }
 
     public static void main(String[] args) {
-        sampledWorksforEachDouble(10);
+        sampledWorksforEachDouble(3.5);
     }
 
 

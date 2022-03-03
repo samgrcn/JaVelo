@@ -5,7 +5,7 @@ import static java.lang.Math.*;
 /**
  * Provides static methods for performing certain mathematical calculations.
  *
- * @author Samuel Garcin (345633)
+ * @author
  */
 public final class Math2 {
     private Math2() {
