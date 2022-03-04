@@ -13,7 +13,7 @@ import java.util.StringJoiner;
 public record AttributeSet(long bits) {
 
     /**
-     * @throws IllegalArgumentException if there's elements in the bit than in the list of attribute (Attribute)
+     * @throws IllegalArgumentException if there are elements in the bit than in the list of attribute (Attribute)
      */
 
     public AttributeSet {
