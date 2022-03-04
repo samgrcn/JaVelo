@@ -5,7 +5,7 @@ import ch.epfl.javelo.Preconditions;
 import java.util.StringJoiner;
 
 /**
- * Converts numbers between the Q28.4 representation and other representations.
+ * Allows the representation of a list of attributes by a long bits
  *
  * @author Samuel Garcin (345633)
  */
