@@ -20,4 +20,14 @@ public class BitsTest {
     void testExtractUnsigned() {
         assertEquals(0b00000000000000000000000000001010, Bits.extractUnsigned(0b11001010111111101011101010111110, 8, 4));
     }
+
+    @Test
+    void testExtractSigned2() {
+        assertEquals(0b00000000000000000000000000000111, Bits.extractSigned(0b11001010111111101011101010111110, 11, 4));
+    }
+
+    @Test
+    void testExtractUnsigned3() {
+        assertEquals(0b00000000000000000000000000000111, Bits.extractUnsigned(0b11001010111111101011101010111110, 11, 4));
+    }
 }
