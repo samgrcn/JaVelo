@@ -1,5 +1,7 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Preconditions;
+
 import java.util.StringJoiner;
 
 /**
@@ -15,9 +17,7 @@ public record AttributeSet(long bits) {
      */
 
     public AttributeSet {
-        if (bits > Math.pow(2, Attribute.COUNT)) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument((bits < Math.pow(2, Attribute.COUNT)));
     }
 
     /**

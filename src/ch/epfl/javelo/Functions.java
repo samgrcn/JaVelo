@@ -70,16 +70,15 @@ public final class Functions {
     private record Sampled(float[] samples, double xMax) implements DoubleUnaryOperator {
 
         /**
-         * Constructor checking whether there are at least 2 values in samples, and if xMax is positive.
+         * Constructor checking whether there are at least 2 values in samples, and if xMax is strictly positive.
          *
          * @throws IllegalArgumentException if it's not the case.
          * @param samples [] an array of y values spaced by a same interval.
          * @param xMax the maximum x value of the big interval containing all values of samples [].
          */
         public Sampled {
-            if (samples.length < 2 | xMax <= 0) {
-                throw new IllegalArgumentException();
-            }
+            Preconditions.checkArgument(samples.length >= 2 || xMax > 0);
+
         }
 
         /**
@@ -120,7 +119,8 @@ public final class Functions {
             }
 
             double intervalLength = xMax / (samples.length - 1);
-            return Math2.interpolate(samples[bound(x)], samples[bound(x) + 1], (x - intervalLength * bound(x)) / intervalLength);
+            return Math2.interpolate(samples[bound(x)], samples[bound(x) + 1],
+                    (x - intervalLength * bound(x)) / intervalLength);
 
         }
     }
