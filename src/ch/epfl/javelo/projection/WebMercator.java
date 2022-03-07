@@ -16,7 +16,7 @@ public final class WebMercator {
      * @return the x-coordinate
      */
     public static double x(double lon) {
-        return 1 / (2 * Math.PI) * (lon + Math.PI);
+        return (lon + Math.PI) / (2 * Math.PI);
     }
 
     /**
@@ -25,7 +25,7 @@ public final class WebMercator {
      * @return the y-coordinate
      */
     public static double y(double lat) {
-        return 1 / (2 * Math.PI) * (Math.PI - Math2.asinh(Math.tan(lat)));
+        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI);
     }
 
     /**
