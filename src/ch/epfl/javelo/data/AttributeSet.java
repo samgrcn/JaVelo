@@ -1,5 +1,6 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.Preconditions;
 
 import java.util.StringJoiner;
@@ -17,7 +18,7 @@ public record AttributeSet(long bits) {
      */
 
     public AttributeSet {
-        Preconditions.checkArgument((bits < Math.pow(2, Attribute.COUNT)));
+        Preconditions.checkArgument((bits >> Attribute.COUNT) == 0L);
     }
 
     /**
@@ -69,7 +70,7 @@ public record AttributeSet(long bits) {
     @Override
     public String toString() {
         long modifiedBits = this.bits;
-        StringJoiner j = new StringJoiner(", ", "{", "}");
+        StringJoiner j = new StringJoiner(",", "{", "}");
         for (int i = 0; i < (Attribute.COUNT + 1); i++) {
             if ((modifiedBits & 1L) == 1L) {
                 j.add(Attribute.ALL.get(i).keyValue());
