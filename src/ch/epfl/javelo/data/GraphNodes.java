@@ -1,6 +1,8 @@
 package ch.epfl.javelo.data;
 
 
+import ch.epfl.javelo.Bits;
+
 import java.nio.IntBuffer;
 
 public record GraphNodes(IntBuffer buffer) {
@@ -25,10 +27,10 @@ public record GraphNodes(IntBuffer buffer) {
     }
 
     public int outDegree(int nodeId) {
-        return buffer.get(nodeId + OFFSET_OUT_EDGES) >> 28;
+        return Bits.extractSigned(nodeId + OFFSET_OUT_EDGES, 28, 4);
     }
 
     int edgeId(int nodeId, int edgeIndex) {
-        return nodeId;
+        return Bits.extractSigned(nodeId + OFFSET_OUT_EDGES, 0, 28) + edgeIndex;
     }
 }
