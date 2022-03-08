@@ -25,17 +25,15 @@ public record GraphSectors(ByteBuffer buffer) {
         double yMin = SwissBounds.MAX_N - (center.n() - distance);
         double yMax = SwissBounds.MAX_N - (center.n() + distance);
 
-        double sectorLengthX = SwissBounds.MAX_E / 128;
-        double sectorWidthY  = SwissBounds.MAX_N / 128;
+        double sectorWidth = SwissBounds.MAX_E / 128;
+        double sectorHeight = SwissBounds.MAX_N / 128;
 
-        double sectorInSquareX = (int)(xMin / sectorLengthX);
-        double sectorInSquareY = (int)(yMin / sectorWidthY);
-
-        List<Sector> listOfSectorsInSquare = new ArrayList<>();
+        ArrayList<Sector> listOfSectorsInSquare = new ArrayList<>();
 
         for (int y = 0; y < 128; y++) {
             for (int x = 0; x < 128; x++) {
-                if(x * sectorLengthX >= xMin) {
+                if(x * sectorWidth >= xMin && (x-1) * sectorHeight <= xMax) {
+                    if(y * sectorHeight >= yMin && (y-1) * sectorHeight <= yMax) {}
                     int selectedNode = x * OFFSET_NEXT_SECTOR;
                     listOfSectorsInSquare.add(new Sector(
                                     buffer.get(buffer.getInt(selectedNode)),
