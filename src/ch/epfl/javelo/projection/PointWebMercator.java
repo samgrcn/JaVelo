@@ -24,8 +24,8 @@ public record PointWebMercator(double x, double y) {
      * @return the Web Mercator point
      */
     public static PointWebMercator of(int zoomLevel, double x, double y) {
-        x = Math.scalb(x, 8 + zoomLevel);
-        y = Math.scalb(y, 8 + zoomLevel);
+        x = x / Math.pow(2, 8 + zoomLevel);
+        y = y / Math.pow(2, 8 + zoomLevel);
         return new PointWebMercator(x, y);
     }
 

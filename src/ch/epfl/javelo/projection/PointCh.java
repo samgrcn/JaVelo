@@ -18,7 +18,6 @@ public record PointCh(double e, double n) {
             throw new IllegalArgumentException();
     }
 
-
     /**
      * Returns the square of the distance in metres from the receiver (this) to the argument that.
      *

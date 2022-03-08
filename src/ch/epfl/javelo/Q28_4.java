@@ -23,17 +23,7 @@ public final class Q28_4 {
      * @return the double corresponding
      */
     public static double asDouble(int q28_4) {
-        double res = 0.0;
-        char[] numbers = Integer.toBinaryString(q28_4).toCharArray();
-        for (int i = numbers.length - 1; i >= 0; i--) {
-            if (i == 0 && numbers[i] == '1') {
-                res -= Math.pow(2, (numbers.length - 5));
-            }
-            else if (numbers[i] == '1') {
-                res += Math.pow(2, (numbers.length - i - 5));
-            }
-        }
-        return res;
+        return Math.scalb((double) q28_4, -4);
     }
 
     /**
@@ -42,16 +32,6 @@ public final class Q28_4 {
      * @return the float corresponding
      */
     public static float asFloat(int q28_4) {
-        float res = 0.0f;
-        char[] numbers = Integer.toBinaryString(q28_4).toCharArray();
-        for (int i = numbers.length - 1; i >= 0; i--) {
-            if (i == 0 && numbers[i] == '1') {
-                res -= Math.pow(2, (numbers.length - 5));
-            }
-            else if (numbers[i] == '1') {
-                res += Math.pow(2, (numbers.length - i - 5));
-            }
-        }
-        return res;
+        return Math.scalb((float) q28_4, -4);
     }
 }
