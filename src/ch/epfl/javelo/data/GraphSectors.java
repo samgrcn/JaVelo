@@ -33,11 +33,12 @@ public record GraphSectors(ByteBuffer buffer) {
         for (int y = 0; y < 128; y++) {
             for (int x = 0; x < 128; x++) {
                 if(x * sectorWidth >= xMin && (x-1) * sectorHeight <= xMax) {
-                    if(y * sectorHeight >= yMin && (y-1) * sectorHeight <= yMax) {}
-                    int selectedNode = x * OFFSET_NEXT_SECTOR;
-                    listOfSectorsInSquare.add(new Sector(
-                                    buffer.get(buffer.getInt(selectedNode)),
-                                    buffer.get(buffer.getInt(selectedNode + OFFSET_BYTE_NODE_NUMBER))));
+                    if(y * sectorHeight >= yMin && (y-1) * sectorHeight <= yMax) {
+                        int selectedNode = x * OFFSET_NEXT_SECTOR;
+                        listOfSectorsInSquare.add(new Sector(
+                                buffer.get(buffer.getInt(selectedNode)),
+                                buffer.get(buffer.getInt(selectedNode + OFFSET_BYTE_NODE_NUMBER))));
+                    }
                 }
             }
         }
