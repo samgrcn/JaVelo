@@ -8,11 +8,20 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ch.epfl.javelo.Math2.clamp;
+
 public record GraphSectors(ByteBuffer buffer) {
 
-    private static final int OFFSET_BYTE_NODE_NUMBER = 4;
-    private static final int OFFSET_NEXT_SECTOR = 6;
+    private static final int OFFSET_TO_NODE_NUMBER = Integer.BYTES;
+    private static final int OFFSET_TO_NEXT_SECTOR = OFFSET_TO_NODE_NUMBER + Short.BYTES;
     private static final int SECTOR_NUMBER = 128;
+
+    private static final double SwissE = SwissBounds.MAX_E - SwissBounds.MIN_E;
+    private static final double SwissN = SwissBounds.MAX_N - SwissBounds.MIN_N;
+
+
+    private static final double SECTOR_WIDTH = SwissE / SECTOR_NUMBER;
+    private static final double SECTOR_HEIGHT = SwissN / SECTOR_NUMBER;
 
 
     public record Sector(int startNodeId, int endNodeId) {
@@ -20,27 +29,30 @@ public record GraphSectors(ByteBuffer buffer) {
 
     public List<Sector> sectorsInArea(PointCh center, double distance) {
 
+        assert SwissBounds.containsEN(center.e(), center.n());
 
-        double xMin = SwissBounds.MAX_E - (center.e() - distance);
-        double xMax = SwissBounds.MAX_E - (center.e() + distance);
-        double yMin = SwissBounds.MAX_N - (center.n() - distance);
-        double yMax = SwissBounds.MAX_N - (center.n() + distance);
+        double xMin = clamp(0, (center.e() - SwissBounds.MIN_E) - distance, SwissE - SECTOR_WIDTH);
+        double xMax = clamp(0, (center.e() - SwissBounds.MIN_E) + distance, SwissE - SECTOR_WIDTH);
 
-        double sectorWidth = SwissBounds.MAX_E / SECTOR_NUMBER;
-        double sectorHeight = SwissBounds.MAX_N / SECTOR_NUMBER;
+        double yMin = clamp(0, (center.n() - SwissBounds.MIN_N) - distance, SwissN - SECTOR_HEIGHT);
+        double yMax = clamp(0, (center.n() - SwissBounds.MIN_N) + distance, SwissN - SECTOR_HEIGHT);
+
+        int xMinSectorInSquare = (int) (xMin / SECTOR_WIDTH);
+        int xMaxSectorInSquare = (int) (xMax / SECTOR_WIDTH);
+        int yMinSectorInSquare = (int) (yMin / SECTOR_HEIGHT);
+        int yMaxSectorInSquare = (int) (yMax / SECTOR_HEIGHT);
+
+        int firstNodeId;
+        int lastNodeId;
 
         ArrayList<Sector> listOfSectorsInSquare = new ArrayList<>();
 
-        for (int y = 0; y < SECTOR_NUMBER; y++) {
-            for (int x = 0; x < SECTOR_NUMBER; x++) {
-                if(x * sectorWidth >= xMin && (x - 1) * sectorHeight <= xMax) {
-                    if(y * sectorHeight >= yMin && (y - 1) * sectorHeight <= yMax) {
-                        int selectedNode = x * OFFSET_NEXT_SECTOR;
-                        listOfSectorsInSquare.add(new Sector(
-                                buffer.get(buffer.getInt(selectedNode)),
-                                buffer.get(buffer.getShort(selectedNode + OFFSET_BYTE_NODE_NUMBER))));
-                    }
-                }
+        for(int y = yMinSectorInSquare; y <= yMaxSectorInSquare; y++) {
+            for(int x = xMinSectorInSquare; x <= xMaxSectorInSquare; x++) {
+                int sectorId = y * SECTOR_NUMBER + x;
+                firstNodeId = buffer.get(buffer.getInt(sectorId * OFFSET_TO_NEXT_SECTOR ));
+                lastNodeId = buffer.get(buffer.getShort( sectorId * OFFSET_TO_NEXT_SECTOR + OFFSET_TO_NODE_NUMBER));
+                listOfSectorsInSquare.add(new Sector(firstNodeId, lastNodeId));
             }
         }
 

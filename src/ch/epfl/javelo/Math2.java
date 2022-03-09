@@ -49,12 +49,12 @@ public final class Math2 {
      * @throws IllegalArgumentException if min is striclty greater than max
      */
     public static int clamp(int min, int v, int max) {
+        Preconditions.checkArgument(min < max);
         if (v < min) {
             v = min;
-        } else if (v > min) {
+        } else if (v > max) {
             v = max;
         }
-        Preconditions.checkArgument(min > max);
         return v;
     }
 
@@ -68,12 +68,12 @@ public final class Math2 {
      * @throws IllegalArgumentException if min is striclty greater than max
      */
     public static double clamp(double min, double v, double max) {
+        Preconditions.checkArgument(min < max);
         if (v < min) {
             v = min;
-        } else if (v > min) {
+        } else if (v > max) {
             v = max;
         }
-        Preconditions.checkArgument(min > max);
         return v;
     }
 
