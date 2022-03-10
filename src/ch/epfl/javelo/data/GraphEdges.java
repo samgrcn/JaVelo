@@ -14,7 +14,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private static final int OFFSET_LENGTH = OFFSET_DIRECTION_IDENTITY + 4;
     private static final int OFFSET_ALTITUDE_DIFF = OFFSET_LENGTH + 2;
     private static final int OFFSET_OSM_ATTRIBUTES = OFFSET_ALTITUDE_DIFF + 2;
-    private static final int EDGES_INTS = OFFSET_OSM_ATTRIBUTES + 1;
 
     public boolean isInverted(int edgeId) {
         return edgesBuffer.get(edgeId + OFFSET_DIRECTION_IDENTITY) < 0;
@@ -39,20 +38,42 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         return profile == 3 || profile == 4;
     }
 
+    private float[] reverseFloatArray(float[] array) {
+        int len = array.length;
+        float[] newArray = new float[len];
+        for (int i = 0; i < array.length; i++) {
+            newArray[i] = array[len - 1];
+            --len;
+        }
+        return newArray;
+    }
+
     public float[] profileSamples(int edgeId) {
         int identity = Bits.extractUnsigned(profileIds.get(edgeId), 0, 30);
         int samplesNumber = 1 + (int)Math.ceil(length(edgeId) / 2);
         int iterNumber = (int)Math.ceil((samplesNumber - 1) / 4.0) + 1;
 
         float[] res = new float[samplesNumber];
+        int indexFilled = 0;
         for (int i = 0; i < iterNumber; ++i) {
-            if (i == 0) res[i] = elevations.get(identity - 1 + i);
-            else res[i] = elevations.get(identity + i);
+            if (i == 0) {
+                res[i] = elevations.get(identity + i)/16.0f;
+                ++indexFilled;
+            }
+            else {
+                int hexNumber = elevations.get(identity + i);
+                for (int j = 12; j >= 0; j -= 4) {
+                    if (indexFilled < samplesNumber) {
+                        res[indexFilled] = Q28_4.asFloat(Bits.extractSigned(hexNumber, j, 4)) + res[indexFilled - 1];
+                        ++indexFilled;
+                    }
+                }
+            }
         }
-        return res;
+        return reverseFloatArray(res);
     }
 
     public int attributesIndex(int edgeId) {
-        return 0;
+        return edgesBuffer.getShort(edgeId + OFFSET_OSM_ATTRIBUTES);
     }
 }
