@@ -20,8 +20,8 @@ public final class Math2 {
      * @throws IllegalArgumentException if x is negative or if y is negative or zero
      */
     public static int ceilDiv(int x, int y) {
-        Preconditions.checkArgument(x < 0);
-        Preconditions.checkArgument(y <= 0);
+        Preconditions.checkArgument(x >= 0);
+        Preconditions.checkArgument(y > 0);
         return (x + y - 1) / y;
     }
 
