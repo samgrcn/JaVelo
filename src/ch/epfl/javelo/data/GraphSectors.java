@@ -16,13 +16,9 @@ public record GraphSectors(ByteBuffer buffer) {
     private static final int OFFSET_TO_NEXT_SECTOR = OFFSET_TO_NODE_NUMBER + Short.BYTES;
     private static final int SECTOR_NUMBER = 128;
 
-    private static final double SwissE = SwissBounds.MAX_E - SwissBounds.MIN_E;
-    private static final double SwissN = SwissBounds.MAX_N - SwissBounds.MIN_N;
 
-
-    private static final double SECTOR_WIDTH = SwissE / SECTOR_NUMBER;
-    private static final double SECTOR_HEIGHT = SwissN / SECTOR_NUMBER;
-
+    private static final double SECTOR_WIDTH = SwissBounds.WIDTH / SECTOR_NUMBER;
+    private static final double SECTOR_HEIGHT = SwissBounds.HEIGHT / SECTOR_NUMBER;
 
     public record Sector(int startNodeId, int endNodeId) {
     }
@@ -31,11 +27,11 @@ public record GraphSectors(ByteBuffer buffer) {
 
         assert SwissBounds.containsEN(center.e(), center.n());
 
-        double xMin = clamp(0, (center.e() - SwissBounds.MIN_E) - distance, SwissE - SECTOR_WIDTH);
-        double xMax = clamp(0, (center.e() - SwissBounds.MIN_E) + distance, SwissE - SECTOR_WIDTH);
+        double xMin = clamp(0, (center.e() - SwissBounds.MIN_E) - distance, SwissBounds.WIDTH - SECTOR_WIDTH);
+        double xMax = clamp(0, (center.e() - SwissBounds.MIN_E) + distance, SwissBounds.WIDTH - SECTOR_WIDTH);
 
-        double yMin = clamp(0, (center.n() - SwissBounds.MIN_N) - distance, SwissN - SECTOR_HEIGHT);
-        double yMax = clamp(0, (center.n() - SwissBounds.MIN_N) + distance, SwissN - SECTOR_HEIGHT);
+        double yMin = clamp(0, (center.n() - SwissBounds.MIN_N) - distance, SwissBounds.HEIGHT - SECTOR_HEIGHT);
+        double yMax = clamp(0, (center.n() - SwissBounds.MIN_N) + distance, SwissBounds.HEIGHT - SECTOR_HEIGHT);
 
         int xMinSectorInSquare = (int) (xMin / SECTOR_WIDTH);
         int xMaxSectorInSquare = (int) (xMax / SECTOR_WIDTH);
@@ -44,12 +40,13 @@ public record GraphSectors(ByteBuffer buffer) {
 
         int firstNodeId;
         int lastNodeId;
+        int sectorId;
 
         ArrayList<Sector> listOfSectorsInSquare = new ArrayList<>();
 
         for(int y = yMinSectorInSquare; y <= yMaxSectorInSquare; y++) {
             for(int x = xMinSectorInSquare; x <= xMaxSectorInSquare; x++) {
-                int sectorId = y * SECTOR_NUMBER + x;
+                sectorId = y * SECTOR_NUMBER + x;
                 firstNodeId = buffer.get(buffer.getInt(sectorId * OFFSET_TO_NEXT_SECTOR ));
                 lastNodeId = buffer.get(buffer.getShort( sectorId * OFFSET_TO_NEXT_SECTOR + OFFSET_TO_NODE_NUMBER));
                 listOfSectorsInSquare.add(new Sector(firstNodeId, lastNodeId));
