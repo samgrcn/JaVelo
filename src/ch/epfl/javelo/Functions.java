@@ -77,7 +77,9 @@ public final class Functions {
          * @param xMax the maximum x value of the big interval containing all values of samples [].
          */
         public Sampled {
-            Preconditions.checkArgument(samples.length > 2 || xMax > 0); }
+            Preconditions.checkArgument(xMax > 0);
+            Preconditions.checkArgument(samples.length >= 2);
+        }
 
         /**
          * Private method used for applyAsDouble later, for a better understanding.
