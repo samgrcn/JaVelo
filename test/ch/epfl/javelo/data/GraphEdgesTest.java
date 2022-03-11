@@ -53,7 +53,7 @@ class GraphEdgesTest {
     void graphEdgesTest2() {
         ByteBuffer edgesBuffer = ByteBuffer.allocate(10);
         // Sens : inversé. Nœud destination : 24.
-        edgesBuffer.putInt(0, ~24);
+        edgesBuffer.putInt(0, ~-24);
         // Longueur :
         edgesBuffer.putShort(4, (short) 0x1f_e);
         // Dénivelé :
@@ -75,8 +75,8 @@ class GraphEdgesTest {
         GraphEdges edges =
                 new GraphEdges(edgesBuffer, profileIds, elevations);
 
-        assertTrue(edges.isInverted(0));
-        assertEquals(24, edges.targetNodeId(0));
+        assertFalse(edges.isInverted(0));
+        assertEquals(23, edges.targetNodeId(0));
         assertEquals(31.8, edges.length(0), 0.1);
         assertEquals(31.0, edges.elevationGain(0));
         assertFalse(edges.hasProfile(0));
@@ -126,7 +126,7 @@ class GraphEdgesTest {
         assertEquals(0.0, edges.length(1), 0.1);
         assertEquals(255, edges.elevationGain(1), 0.01);
         assertFalse(edges.hasProfile(1));
-        assertEquals(-34, edges.attributesIndex(1));
+        assertEquals(65502, edges.attributesIndex(1));
         float[] expectedSamples = new float[0];
         assertArrayEquals(expectedSamples, edges.profileSamples(1));
     }

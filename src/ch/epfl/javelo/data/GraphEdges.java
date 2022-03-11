@@ -56,7 +56,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return the vertical drop
      */
     public double elevationGain(int edgeId) {
-        return Q28_4.asDouble(edgesBuffer.getShort(edgeId * NUMBER_OF_EDGES + OFFSET_ALTITUDE_DIFF));
+        return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(edgeId * NUMBER_OF_EDGES + OFFSET_ALTITUDE_DIFF)));
+
     }
 
     /**
@@ -65,8 +66,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return true or false
      */
     public boolean hasProfile(int edgeId) {
-        int profile = Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
-        return profile != 0;
+        return getProfile(edgeId) != 0;
     }
 
     /**
@@ -193,6 +193,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return the identity
      */
     public int attributesIndex(int edgeId) {
-        return edgesBuffer.getShort(edgeId * NUMBER_OF_EDGES + OFFSET_OSM_ATTRIBUTES);
+        return Short.toUnsignedInt(edgesBuffer.getShort(edgeId * NUMBER_OF_EDGES + OFFSET_OSM_ATTRIBUTES));
     }
 }
