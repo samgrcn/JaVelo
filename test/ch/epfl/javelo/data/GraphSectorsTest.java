@@ -19,10 +19,10 @@ class GraphSectorsTest {
             buffer.putInt(i).putShort((short)1);
         }
         GraphSectors graph = new GraphSectors(buffer);
-        List<GraphSectors.Sector> sectors = graph.sectorsInArea(new PointCh(SwissBounds.MAX_E, SwissBounds.MAX_N),10000000);
+            List<GraphSectors.Sector> sectors = graph.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N),2000);
         int actual=sectors.size();
         int expected = 2;
-        //assertEquals(expected, actual);
+        assertEquals(expected, actual);
         System.out.println(actual);
 
     }

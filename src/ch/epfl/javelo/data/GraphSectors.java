@@ -1,6 +1,7 @@
 package ch.epfl.javelo.data;
 
 
+import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.SwissBounds;
 
@@ -41,10 +42,10 @@ public record GraphSectors(ByteBuffer buffer) {
      * @param center the center of the square (must be in Switzerland)
      * @param distance half the length of a side
      * @return the list of all sectors in switzerland having at least one point in the square.
+     * @throws IllegalArgumentException if the center is outside Switzerland
      */
     public List<Sector> sectorsInArea(PointCh center, double distance) {
 
-        assert SwissBounds.containsEN(center.e(), center.n());
 
         double xMinSquare = center.e() - SwissBounds.MIN_E - distance; //minimum coordinates of the square on the x-Axis
         double xMaxSquare = center.e() - SwissBounds.MIN_E + distance; //maximum coordinates of the square on the x-Axis
