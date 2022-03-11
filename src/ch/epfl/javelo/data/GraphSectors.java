@@ -27,29 +27,34 @@ public record GraphSectors(ByteBuffer buffer) {
 
         assert SwissBounds.containsEN(center.e(), center.n());
 
-        double xMin = clamp(0, (center.e() - SwissBounds.MIN_E) - distance, SwissBounds.WIDTH - SECTOR_WIDTH);
-        double xMax = clamp(0, (center.e() - SwissBounds.MIN_E) + distance, SwissBounds.WIDTH - SECTOR_WIDTH);
+        double xMin = center.e() - SwissBounds.MIN_E - distance;
+        double xMax = center.e() - SwissBounds.MIN_E + distance;
+        double yMin = center.n() - SwissBounds.MIN_N - distance;
+        double yMax = center.n() - SwissBounds.MIN_N + distance;
 
-        double yMin = clamp(0, (center.n() - SwissBounds.MIN_N) - distance, SwissBounds.HEIGHT - SECTOR_HEIGHT);
-        double yMax = clamp(0, (center.n() - SwissBounds.MIN_N) + distance, SwissBounds.HEIGHT - SECTOR_HEIGHT);
 
-        int xMinSectorInSquare = (int) (xMin / SECTOR_WIDTH);
-        int xMaxSectorInSquare = (int) (xMax / SECTOR_WIDTH);
-        int yMinSectorInSquare = (int) (yMin / SECTOR_HEIGHT);
-        int yMaxSectorInSquare = (int) (yMax / SECTOR_HEIGHT);
+        double xMinSectorInSquare = clamp(0, xMin / SECTOR_WIDTH, SECTOR_NUMBER - 1);
+        double xMaxSectorInSquare = clamp(0, xMax / SECTOR_WIDTH, SECTOR_NUMBER - 1);
+        double yMinSectorInSquare = clamp(0, yMin / SECTOR_HEIGHT, SECTOR_NUMBER - 1);
+        double yMaxSectorInSquare = clamp(0, yMax / SECTOR_HEIGHT, SECTOR_NUMBER - 1);
+
+        int axMinSectorInSquare = (int) xMinSectorInSquare;
+        int axMaxSectorInSquare = (int) xMaxSectorInSquare;
+        int ayMinSectorInSquare = (int) yMinSectorInSquare;
+        int ayMaxSectorInSquare = (int) yMaxSectorInSquare;
 
         int firstNodeId;
-        int lastNodeId;
+        int endNodeId;
         int sectorId;
 
         ArrayList<Sector> listOfSectorsInSquare = new ArrayList<>();
 
-        for(int y = yMinSectorInSquare; y <= yMaxSectorInSquare; y++) {
-            for(int x = xMinSectorInSquare; x <= xMaxSectorInSquare; x++) {
+        for(int y = ayMinSectorInSquare; y <= ayMaxSectorInSquare; y++) {
+            for(int x = axMinSectorInSquare; x <= axMaxSectorInSquare; x++) {
                 sectorId = y * SECTOR_NUMBER + x;
-                firstNodeId = buffer.get(buffer.getInt(sectorId * OFFSET_TO_NEXT_SECTOR ));
-                lastNodeId = buffer.get(buffer.getShort( sectorId * OFFSET_TO_NEXT_SECTOR + OFFSET_TO_NODE_NUMBER));
-                listOfSectorsInSquare.add(new Sector(firstNodeId, lastNodeId));
+                firstNodeId = buffer.getInt(sectorId * OFFSET_TO_NEXT_SECTOR);
+                endNodeId = firstNodeId + Short.toUnsignedInt(buffer.getShort(sectorId + OFFSET_TO_NODE_NUMBER));
+                listOfSectorsInSquare.add(new Sector(firstNodeId, endNodeId));
             }
         }
 

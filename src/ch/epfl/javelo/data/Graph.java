@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Graph {
 
-    public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets),
+    public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets) {}
 
     public static Graph loadFrom(Path basePath) throws IOException {
 
