@@ -47,7 +47,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return the length
      */
     public double length(int edgeId) {
-        return Q28_4.asDouble(edgesBuffer.getShort(edgeId * NUMBER_OF_EDGES + OFFSET_LENGTH));
+        return Q28_4.asDouble(Short.toUnsignedInt(edgesBuffer.getShort(edgeId * NUMBER_OF_EDGES + OFFSET_LENGTH)));
     }
 
     /**
@@ -102,12 +102,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     private float[] profileSamplesType1(float[] res, int samplesNumber, int identity) {
         for (int i = 0; i < samplesNumber; ++i) {
-            if (i == 0) {
-                res[i] = Q28_4.asFloat(elevations.get(identity + i));
-            }
-            else {
-                res[i] = Q28_4.asFloat(elevations.get(identity + i)) + res[i - 1];
-            }
+            res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
         }
         return res;
     }
@@ -124,7 +119,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         int indexFilled = 0;
         for (int i = 0; i < iterNumber; ++i) {
             if (i == 0) {
-                res[i] = Q28_4.asFloat(elevations.get(identity + i));
+                res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
                 ++indexFilled;
             }
             else {
@@ -152,7 +147,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         int indexFilled = 0;
         for (int i = 0; i < iterNumber; ++i) {
             if (i == 0) {
-                res[i] = Q28_4.asFloat(elevations.get(identity + i));
+                res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
                 ++indexFilled;
             }
             else {
@@ -183,8 +178,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         if (getProfile(edgeId) == 1) res = profileSamplesType1(res, samplesNumber, identity);
         if (getProfile(edgeId) == 2) res = profileSamplesType2(res, samplesNumber, identity);
         if (getProfile(edgeId) == 3) res = profileSamplesType3(res, samplesNumber, identity);
-
-        return reverseFloatArray(res);
+        
+        if (isInverted(edgeId)) return reverseFloatArray(res);
+        return res;
     }
 
     /**
