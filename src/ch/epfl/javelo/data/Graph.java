@@ -3,10 +3,7 @@ package ch.epfl.javelo.data;
 import ch.epfl.javelo.projection.PointCh;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,82 +12,47 @@ import java.util.function.DoubleUnaryOperator;
 
 public class Graph {
 
-    GraphNodes nodes;
-    GraphSectors sectors;
-    GraphEdges edges;
-    List<AttributeSet> attributeSets;
+    private final GraphNodes nodes;
+    private final GraphSectors sectors;
+    private final GraphEdges edges;
+    private final List<AttributeSet> attributeSets;
+
+
+
 
     public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets) {
         this.nodes = nodes;
         this.sectors = sectors;
         this.edges = edges;
-        this.attributeSets = attributeSets;
+        this.attributeSets = List.copyOf(attributeSets);
+    }
+
+    private static ByteBuffer pathBuffer(Path path) throws IOException {
+        ByteBuffer byteBuffer;
+        try (FileChannel channel = FileChannel.open(path)) {
+            byteBuffer = channel
+                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        }
+        return byteBuffer;
     }
 
     public static Graph loadFrom(Path basePath) throws IOException {
-        Path nodesPath = basePath.resolve("nodes.bin");
-        IntBuffer nodesIdBuffer;
-        try (FileChannel channel = FileChannel.open(nodesPath)) {
-            nodesIdBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer()
-                    .asIntBuffer();
-        }
+        IntBuffer nodesIdBuffer = pathBuffer(basePath.resolve("nodes.bin")).asIntBuffer();
+        ByteBuffer sectorsIdBuffer = pathBuffer(basePath.resolve("sectors.bin"));
+        ByteBuffer edgeIdBuffer = pathBuffer(basePath.resolve("edges.bin"));
+        IntBuffer profileIdBuffer = pathBuffer(basePath.resolve("profile_ids.bin")).asIntBuffer();
+        ShortBuffer elevationIdBuffer = pathBuffer(basePath.resolve("elevations.bin")).asShortBuffer();
+        LongBuffer attributeSetIdBuffer = pathBuffer(basePath.resolve("attributes.bin")).asLongBuffer();
 
-        Path sectorsPath = basePath.resolve("sectors.bin");
-        ByteBuffer sectorsIdBuffer;
-        try (FileChannel channel = FileChannel.open(sectorsPath)) {
-            sectorsIdBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer();
-        }
-
-        Path edgePath = basePath.resolve("edges.bin");
-        ByteBuffer edgeIdBuffer;
-        try (FileChannel channel = FileChannel.open(edgePath)) {
-            edgeIdBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer();
-        }
-
-        Path profilePath = basePath.resolve("profile_ids.bin");
-        IntBuffer profileIdBuffer;
-        try (FileChannel channel = FileChannel.open(profilePath)) {
-            profileIdBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer()
-                    .asIntBuffer();
-        }
-
-        Path elevationPath = basePath.resolve("elevations.bin");
-        ShortBuffer elevationIdBuffer;
-        try (FileChannel channel = FileChannel.open(elevationPath)) {
-            elevationIdBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer()
-                    .asShortBuffer();
-        }
-
-
-        Path attributeSetPath = basePath.resolve("attributes.bin");
-        LongBuffer attributeSetIdBuffer;
-        try (FileChannel channel = FileChannel.open(attributeSetPath)) {
-            attributeSetIdBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-                    .asReadOnlyBuffer()
-                    .asLongBuffer();
-        }
         List<AttributeSet> attributeSetList = new ArrayList<>();
         for (int i = 0; i < attributeSetIdBuffer.capacity(); i++) {
             attributeSetList.add(new AttributeSet(attributeSetIdBuffer.get(i)));
         }
 
-
-        new Graph(new GraphNodes(nodesIdBuffer),
+        return new Graph(new GraphNodes(nodesIdBuffer),
                 new GraphSectors(sectorsIdBuffer),
                 new GraphEdges(edgeIdBuffer, profileIdBuffer, elevationIdBuffer), attributeSetList);
     }
-
 
 
     public int nodeCount() {
@@ -98,17 +60,37 @@ public class Graph {
     }
 
     public PointCh nodePoint(int nodeId) {
-        //return nodes.buffer().get(nodeId);
+        return new PointCh(nodes.nodeE(nodeId), nodes.nodeN(nodeId));
     }
 
     public int nodeOutDegree(int nodeId) {
+        return nodes.outDegree(nodeId);
     }
 
-    public int nodeOutEdgeId(int nodeId, int edgeIndex {
+    public int nodeOutEdgeId(int nodeId, int edgeIndex) {
+        return nodes.edgeId(nodeId, edgeIndex);
     }
 
     public int nodeClosestTo(PointCh point, double searchDistance) {
-    }
+        List<GraphSectors.Sector> sectorsInArea = sectors.sectorsInArea(point, searchDistance);
+        int index = -1;
+        double min = Double.POSITIVE_INFINITY;
+        double distance;
+        for (GraphSectors.Sector sectorsinSquare : sectorsInArea) {
+                for(int i = 0; i < sectorsinSquare.endNodeId() - sectorsinSquare.startNodeId(); i++) {
+                    distance = point.squaredDistanceTo(i);
+                }
+                
+            }
+
+            if (distance < min) {
+                min = lowestDistance;
+                index = i;
+            }
+
+
+        }
+
 
     public int edgeTargetNodeId(int edgeId) {
     }
@@ -122,9 +104,9 @@ public class Graph {
     public double edgeLength(int edgeId) {
     }
 
-    // public double edgeElevationGain(int edgeId) {}
+    public double edgeElevationGain(int edgeId) {}
 
-    // public DoubleUnaryOperator edgeProfile(int edgeId) {}
+    public DoubleUnaryOperator edgeProfile(int edgeId) {}
 
 
 }
