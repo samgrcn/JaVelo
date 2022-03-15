@@ -1,5 +1,6 @@
 package ch.epfl.javelo.data;
 
+import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.projection.PointCh;
 
 import java.io.IOException;
@@ -109,8 +110,7 @@ public class Graph {
     }
 
     public DoubleUnaryOperator edgeProfile(int edgeId) {
-
-
+        return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
     }
 
 
