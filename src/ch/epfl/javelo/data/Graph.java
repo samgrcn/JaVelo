@@ -97,9 +97,7 @@ public class Graph {
         return edges.isInverted(edgeId);
     }
 
-    public AttributeSet edgeAttribute(int edgeId) {
-        return edges.attributesIndex(edgeId);
-    }
+    public AttributeSet edgeAttribute(int edgeId) { return attributeSets.get(edges.attributesIndex(edgeId)); }
 
     public double edgeLength(int edgeId) {
         return edges.length(edgeId);
