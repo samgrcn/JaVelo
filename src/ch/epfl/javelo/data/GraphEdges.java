@@ -94,7 +94,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Returns the array of profile samples for a edge of type 1.
+     * Returns the array of profile samples for an edge of type 1.
      * @param res the results array
      * @param samplesNumber the number of samples
      * @param identity the identity of the first elevation
@@ -108,7 +108,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Returns the array of profile samples for a edge of type 2.
+     * Returns the array of profile samples for an edge of type 2.
      * @param res the results array
      * @param samplesNumber the number of samples
      * @param identity the identity of the first elevation
@@ -136,7 +136,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Returns the array of profile samples for a edge of type 3.
+     * Returns the array of profile samples for an edge of type 3.
      * @param res the results array
      * @param samplesNumber the number of samples
      * @param identity the identity of the first elevation

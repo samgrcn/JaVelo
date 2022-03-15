@@ -18,8 +18,6 @@ public class Graph {
     private final List<AttributeSet> attributeSets;
 
 
-
-
     public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets) {
         this.nodes = nodes;
         this.sectors = sectors;
@@ -77,36 +75,43 @@ public class Graph {
         double min = Double.POSITIVE_INFINITY;
         double distance;
         for (GraphSectors.Sector sectorsinSquare : sectorsInArea) {
-                for(int i = 0; i < sectorsinSquare.endNodeId() - sectorsinSquare.startNodeId(); i++) {
-                    distance = point.squaredDistanceTo(i);
+            for (int i = sectorsinSquare.startNodeId(); i < sectorsinSquare.endNodeId(); i++) {
+                distance = point.squaredDistanceTo(nodePoint(i));
+                if (distance < min) {
+                    min = distance;
+                    index = i;
                 }
-                
             }
-
-            if (distance < min) {
-                min = lowestDistance;
-                index = i;
-            }
-
-
         }
+
+        return index;
+    }
 
 
     public int edgeTargetNodeId(int edgeId) {
+        return edges.targetNodeId(edgeId);
     }
 
     public boolean edgeIsInverted(int edgeId) {
+        return edges.isInverted(edgeId);
     }
 
     public AttributeSet edgeAttribute(int edgeId) {
+        return edges.attributesIndex(edgeId);
     }
 
     public double edgeLength(int edgeId) {
+        return edges.length(edgeId);
     }
 
-    public double edgeElevationGain(int edgeId) {}
+    public double edgeElevationGain(int edgeId) {
+        return edges.elevationGain(edgeId);
+    }
 
-    public DoubleUnaryOperator edgeProfile(int edgeId) {}
+    public DoubleUnaryOperator edgeProfile(int edgeId) {
+
+
+    }
 
 
 }
