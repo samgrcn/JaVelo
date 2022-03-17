@@ -46,7 +46,7 @@ public class ElevationProfile {
         float totalAscent = 0;
         for (int i = 0; i < elevationSamples.length - 1; i++) {
             if (elevationSamples[i] < elevationSamples[i + 1]) {
-                totalAscent = elevationSamples[i + 1] - elevationSamples[i];
+                totalAscent += elevationSamples[i + 1] - elevationSamples[i];
 
             }
         }
@@ -57,7 +57,7 @@ public class ElevationProfile {
         float totalDescent = 0;
         for (int i = 0; i < elevationSamples.length - 1; i++) {
             if (elevationSamples[i] > elevationSamples[i + 1]) {
-                    totalDescent = elevationSamples[i] - elevationSamples[i + 1];
+                    totalDescent += elevationSamples[i] - elevationSamples[i + 1];
             }
         }
         return totalDescent ;

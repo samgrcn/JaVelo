@@ -84,6 +84,7 @@ public record GraphNodes(IntBuffer buffer) {
      */
 
     public int edgeId(int nodeId, int edgeIndex) {
+        assert 0 <= edgeIndex && edgeIndex < outDegree(nodeId);
         return Bits.extractUnsigned(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_OUT_EDGES), 0, NUMBER_OF_ID_BITS) + edgeIndex;
     }
 }

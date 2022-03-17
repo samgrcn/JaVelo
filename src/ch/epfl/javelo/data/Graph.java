@@ -54,6 +54,7 @@ public class Graph {
     }
 
 
+
     public int nodeCount() {
         return nodes.count();
     }
@@ -75,8 +76,8 @@ public class Graph {
         int index = -1;
         double min = Double.POSITIVE_INFINITY;
         double distance;
-        for (GraphSectors.Sector sectorsinSquare : sectorsInArea) {
-            for (int i = sectorsinSquare.startNodeId(); i < sectorsinSquare.endNodeId(); i++) {
+        for (GraphSectors.Sector sectorsInSquare : sectorsInArea) {
+            for (int i = sectorsInSquare.startNodeId(); i < sectorsInSquare.endNodeId(); i++) {
                 distance = point.squaredDistanceTo(nodePoint(i));
                 if (distance < min) {
                     min = distance;
@@ -97,7 +98,7 @@ public class Graph {
         return edges.isInverted(edgeId);
     }
 
-    public AttributeSet edgeAttribute(int edgeId) { return attributeSets.get(edges.attributesIndex(edgeId)); }
+    public AttributeSet edgeAttributes(int edgeId) { return attributeSets.get(edges.attributesIndex(edgeId)); }
 
     public double edgeLength(int edgeId) {
         return edges.length(edgeId);
@@ -108,7 +109,10 @@ public class Graph {
     }
 
     public DoubleUnaryOperator edgeProfile(int edgeId) {
-        return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
+        if(!edges.hasProfile(edgeId)) { return Functions.constant(Double.NaN); }
+        else {
+            return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
+        }
     }
 
 
