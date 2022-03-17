@@ -29,8 +29,7 @@ public class Graph {
     private static ByteBuffer pathBuffer(Path path) throws IOException {
         ByteBuffer byteBuffer;
         try (FileChannel channel = FileChannel.open(path)) {
-            byteBuffer = channel
-                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+            byteBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
         }
         return byteBuffer;
     }

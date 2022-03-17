@@ -1,12 +1,16 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Functions;
+import ch.epfl.javelo.projection.Ch1903;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.SwissBounds;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.awt.*;
 import java.io.IOException;
+import java.nio.LongBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 
 public class GraphTest {
@@ -14,10 +18,26 @@ public class GraphTest {
     @Test
     void nodeClosestToWorks() throws IOException {
         Path basePath = Path.of("lausanne");
-        Graph myGraph = Graph.loadFrom(basePath);
-        int actual = myGraph.nodeOutEdgeId(10, 0);
-        int expected = myGraph.nodeOutDegree(10);
-        System.out.println(actual);
-        System.out.println(expected);
+        Graph graph = Graph.loadFrom(basePath);
+        double lat = Math.toRadians(46.518394);
+        double lon = Math.toRadians(6.568469);
+        double e = Ch1903.e(lon, lat);
+        double n = Ch1903.n(lon, lat);
+        int actual = graph.nodeClosestTo(new PointCh(e,n), 10000000);
+        int expected = 1;
+        assertEquals(expected, actual);
     }
+
+    @Test
+    void test() throws IOException {
+        Path filePath = Path.of("lausanne/nodes_osmid.bin");
+        LongBuffer osmIdBuffer;
+        try (FileChannel channel = FileChannel.open(filePath)) {
+            osmIdBuffer = channel
+                    .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
+                    .asLongBuffer();
+        }
+        System.out.println(osmIdBuffer.get(155038));
+    }
+
 }
