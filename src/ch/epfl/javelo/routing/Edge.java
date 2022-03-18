@@ -24,7 +24,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      * @return an instance of Edge
      */
     public static Edge of(Graph graph, int edgeId, int fromNodeId, int toNodeId) {
-        return new Edge(fromNodeId, toNodeId, graph.nodePoint(fromNodeId), graph.nodePoint(toNodeId), graph.edgeLength(edgeId),graph.edgeProfile(edgeId));
+        return new Edge(fromNodeId, toNodeId, graph.nodePoint(fromNodeId), graph.nodePoint(toNodeId), graph.edgeLength(edgeId), graph.edgeProfile(edgeId));
     }
 
     /**
@@ -33,7 +33,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      * @return the closest position
      */
     public double positionClosestTo(PointCh point) {
-        return Math2.projectionLength(WebMercator.x(fromPoint.lon()), WebMercator.y(fromPoint.lat()), WebMercator.x(toPoint.lon()), WebMercator.y(toPoint.lat()), WebMercator.x(point.lon()), WebMercator.y(point.lat()));
+        return Math2.projectionLength(fromPoint.e(), fromPoint.n(), toPoint.e(), toPoint.n(), point.e(), point.n());
     }
 
     /**
@@ -43,8 +43,8 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      */
     public PointCh pointAt(double position) {
         double ratio = position / length;
-        double e = Math.abs(toPoint.e() - fromPoint.e()) * ratio + Math.min(toPoint.e(), fromPoint.e());
-        double n = Math.abs(toPoint.n() - fromPoint.n()) * ratio + Math.min(toPoint.n(), fromPoint.n());
+        double e = Math2.interpolate(fromPoint.e(), toPoint.e(), ratio);
+        double n = Math2.interpolate(fromPoint.n(), toPoint.n(), ratio);
         return new PointCh(e, n);
     }
 
