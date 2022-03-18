@@ -80,7 +80,9 @@ public class Graph {
                 distance = point.squaredDistanceTo(nodePoint(i));
                 if (distance < min) {
                     min = distance;
-                    index = i;
+                    if(distance < searchDistance) {
+                        index = i;
+                    }
                 }
             }
         }

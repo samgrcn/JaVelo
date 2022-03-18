@@ -21,10 +21,10 @@ public class GraphTest {
         Graph graph = Graph.loadFrom(basePath);
         double lat = Math.toRadians(46.518394);
         double lon = Math.toRadians(6.568469);
-        double e = Ch1903.e(lon, lat);
+        double e= Ch1903.e(lon, lat);
         double n = Ch1903.n(lon, lat);
-        int actual = graph.nodeClosestTo(new PointCh(e,n), 10000000);
-        int expected = 1;
+        int actual = graph.nodeClosestTo(new PointCh(e + 1000,n + 1000), 100000000);
+        int expected = 143166;
         assertEquals(expected, actual);
     }
 
@@ -37,7 +37,16 @@ public class GraphTest {
                     .map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
                     .asLongBuffer();
         }
-        System.out.println(osmIdBuffer.get(155038));
+        System.out.println(osmIdBuffer.get(143166));
+    }
+
+    @Test
+    void attributeTest() throws IOException {
+        Path basePath = Path.of("lausanne");
+        Graph graph = Graph.loadFrom(basePath);
+        AttributeSet actual = graph.edgeAttributes(155038);
+        int expected = 155038;
+        System.out.println(actual);
     }
 
 }
