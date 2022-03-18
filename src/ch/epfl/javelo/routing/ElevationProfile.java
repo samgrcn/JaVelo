@@ -3,6 +3,8 @@ package ch.epfl.javelo.routing;
 import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.Preconditions;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.function.DoubleUnaryOperator;
 
@@ -15,7 +17,7 @@ public class ElevationProfile {
     public ElevationProfile(double length, float[] elevationSamples) {
         this.function = Functions.sampled(elevationSamples, length);
         this.length = length;
-        this.elevationSamples = elevationSamples;
+        this.elevationSamples = Arrays.copyOf(elevationSamples, elevationSamples.length);
     }
 
 
