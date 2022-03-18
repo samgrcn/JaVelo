@@ -138,6 +138,6 @@ public final class Math2 {
         double apY = pY - aY;
         double abX = bX - aX;
         double abY = bY - aY;
-        return dotProduct(apX, apY, abX, abY) / norm(abX, abY);
+        return dotProduct(apX, abX, apY, abY) / norm(abX, abY);
     }
 }
