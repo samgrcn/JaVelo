@@ -97,7 +97,7 @@ public final class Math2 {
      * @return the dot product
      */
     public static double dotProduct(double uX, double uY, double vX, double vY) {
-        return uX * uY + vX * vY;
+        return uX * vX + uY * vY;
     }
 
     /**
@@ -138,6 +138,6 @@ public final class Math2 {
         double apY = pY - aY;
         double abX = bX - aX;
         double abY = bY - aY;
-        return dotProduct(apX, abX, apY, abY) / norm(abX, abY);
+        return dotProduct(apX, apY, abX, abY) / norm(abX, abY);
     }
 }
