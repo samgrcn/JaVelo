@@ -44,8 +44,8 @@ public class GraphTest {
     void attributeTest() throws IOException {
         Path basePath = Path.of("lausanne");
         Graph graph = Graph.loadFrom(basePath);
-        AttributeSet actual = graph.edgeAttributes(155038);
-        int expected = 155038;
+        AttributeSet actual = graph.edgeAttributes(2022);
+        System.out.println(graph.edgeAttributes(graph.nodeOutEdgeId(2022,0)));
         System.out.println(actual);
     }
 
