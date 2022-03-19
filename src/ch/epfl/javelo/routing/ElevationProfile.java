@@ -30,9 +30,9 @@ public class ElevationProfile {
     }
 
     /**
-     *
-     * @param elevationSamples
-     * @return
+     * Private method to determine the lowest value of the array using DoubleSummaryStatistics.
+     * @param elevationSamples given array
+     * @return the lowest value of the array
      */
 
     private double maxValues(float[] elevationSamples) {
@@ -42,6 +42,12 @@ public class ElevationProfile {
         }
         return statistics.getMax();
     }
+
+    /**
+     * Private method to determine the highest value of the array using DoubleSummaryStatistics.
+     * @param elevationSamples given array
+     * @return the highest value of the array
+     */
 
     private double minValues(float[] elevationSamples) {
         DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
