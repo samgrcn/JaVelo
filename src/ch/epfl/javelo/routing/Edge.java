@@ -17,7 +17,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
 
     /**
      * Returns an instance of Edge whose attributes fromNodeId and toNodeId are those given, the others being those of the identity edgeId in the graph Graph.
-     * @param graph the graphe associated
+     * @param graph the graph associated
      * @param edgeId the edge identity
      * @param fromNodeId the first node id
      * @param toNodeId the last node id
