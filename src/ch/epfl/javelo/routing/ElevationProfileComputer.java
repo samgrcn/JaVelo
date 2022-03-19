@@ -10,10 +10,10 @@ public class ElevationProfileComputer {
     private ElevationProfileComputer() {}
 
     private int toNextExistingFloat(float[] elevationSamples, int from) {
-
+        int samplesNumber = elevationSamples.length;
         int existingFloat = -1;
 
-        for (int i = from; i < elevationSamples.length; i++) {
+        for (int i = from; i < samplesNumber; i++) {
             if(!Float.isNaN(elevationSamples[i])) {
                 existingFloat = i;
                 break;
@@ -23,8 +23,9 @@ public class ElevationProfileComputer {
     }
 
     private int toPreviousExistingFloat(float[] elevationSamples) {
+        int samplesNumber = elevationSamples.length;
         int existingFloat = 0;
-        for (int i = elevationSamples.length - 1; i > 0; i--) {
+        for (int i = samplesNumber - 1; i > 0; i--) {
             if(!Float.isNaN(elevationSamples[i])) {
                 existingFloat = i;
                 break;
@@ -34,20 +35,21 @@ public class ElevationProfileComputer {
     }
 
     private void checkSpecialCases(float[] elevationSamples) {
+        int samplesNumber = elevationSamples.length;
         if (Float.isNaN(elevationSamples[0])) {
             int i = toNextExistingFloat(elevationSamples, 0);
             if (i == -1) {
-                Arrays.fill(elevationSamples, 0, elevationSamples.length, Float.NaN);
+                Arrays.fill(elevationSamples, 0, samplesNumber, Float.NaN);
             }
             Arrays.fill(elevationSamples,
                         0,
                         i - 1,
                         elevationSamples[i]);
             }
-            if (Float.isNaN(elevationSamples[elevationSamples.length - 1])) {
+            if (Float.isNaN(elevationSamples[samplesNumber - 1])) {
                 int i = toPreviousExistingFloat(elevationSamples);
                 Arrays.fill(elevationSamples,
-                        elevationSamples.length - 1,
+                        samplesNumber - 1,
                         i + 1,
                         elevationSamples[i]);
             }
