@@ -24,6 +24,15 @@ public class Graph {
     private final GraphEdges edges;
     private final List<AttributeSet> attributeSets;
 
+    /**
+     * Returns an instance of the complete Graph with the desired nodes, sectors, edges, attributeSets entered
+     * in parameter.
+     * @param nodes nodes
+     * @param sectors sectors
+     * @param edges edges
+     * @param attributeSets attributeSets
+     */
+
 
     public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets) {
         this.nodes = nodes;
