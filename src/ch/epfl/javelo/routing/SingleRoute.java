@@ -1,5 +1,6 @@
 package ch.epfl.javelo.routing;
 
+import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ public final class SingleRoute implements Route {
     private List<Edge> edges;
 
     public SingleRoute(List<Edge> edges) {
-        if (edges.isEmpty()) throw new IllegalArgumentException();
-        this.edges = edges;
+        Preconditions.checkArgument(!edges.isEmpty());
+        this.edges = List.copyOf(edges);
     }
 
 

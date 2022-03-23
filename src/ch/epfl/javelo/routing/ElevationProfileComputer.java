@@ -9,7 +9,7 @@ public class ElevationProfileComputer {
 
     private ElevationProfileComputer() {}
 
-    private int toNextExistingFloat(float[] elevationSamples, int from) {
+    private static int toNextExistingFloat(float[] elevationSamples, int from) {
         int samplesNumber = elevationSamples.length;
         int existingFloat = -1;
 
@@ -22,7 +22,7 @@ public class ElevationProfileComputer {
         return existingFloat;
     }
 
-    private int toPreviousExistingFloat(float[] elevationSamples) {
+    private static int toPreviousExistingFloat(float[] elevationSamples) {
         int samplesNumber = elevationSamples.length;
         int existingFloat = 0;
         for (int i = samplesNumber - 1; i > 0; i--) {
@@ -34,7 +34,7 @@ public class ElevationProfileComputer {
         return existingFloat;
     }
 
-    private void checkSpecialCases(float[] elevationSamples) {
+    private static void checkSpecialCases(float[] elevationSamples) {
         int samplesNumber = elevationSamples.length;
         if (Float.isNaN(elevationSamples[0])) {
             int i = toNextExistingFloat(elevationSamples, 0);
@@ -56,7 +56,7 @@ public class ElevationProfileComputer {
         }
 
 
-    ElevationProfile elevationProfile(Route route, double maxStepLength) {
+    public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
         Preconditions.checkArgument(maxStepLength > 0);
         int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
         double lengthBetweenSamples = route.length() / samplesNumber;

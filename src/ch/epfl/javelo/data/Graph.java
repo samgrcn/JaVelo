@@ -140,7 +140,7 @@ public class Graph {
                 distance = point.squaredDistanceTo(nodePoint(i));
                 if (distance < min) {
                     min = distance;
-                    if(distance < searchDistance) {
+                    if(distance < Math.pow(searchDistance, 2)) {
                         index = i;
                     }
                 }
