@@ -51,7 +51,7 @@ public final class SingleRoute implements Route {
      */
     @Override
     public List<Edge> edges() {
-        return edges; // immuabilité ??!
+        return edges;
     }
 
     /**
@@ -137,7 +137,8 @@ public final class SingleRoute implements Route {
      * @return the closest point
      */
     @Override
-    public RoutePoint pointClosestTo(PointCh point) {
-        return new RoutePoint(point, )
+   public RoutePoint pointClosestTo(PointCh point) {
+        //return new RoutePoint(point, )
+        return null;
     }
 }

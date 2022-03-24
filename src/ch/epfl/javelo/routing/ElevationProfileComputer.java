@@ -38,8 +38,9 @@ public class ElevationProfileComputer {
         int samplesNumber = elevationSamples.length;
         if (Float.isNaN(elevationSamples[0])) {
             int i = toNextExistingFloat(elevationSamples, 0);
+            System.out.println(i);
             if (i == -1) {
-                Arrays.fill(elevationSamples, 0, samplesNumber, Float.NaN);
+                Arrays.fill(elevationSamples, 0, samplesNumber, 0);
             }
             Arrays.fill(elevationSamples,
                         0,
@@ -53,7 +54,8 @@ public class ElevationProfileComputer {
                         i + 1,
                         elevationSamples[i]);
             }
-        }
+
+    }
 
 
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
@@ -61,10 +63,9 @@ public class ElevationProfileComputer {
         int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
         double lengthBetweenSamples = route.length() / samplesNumber;
         float[] elevationSamples = new float[samplesNumber];
-
         checkSpecialCases(elevationSamples);
-
-        for (int i = 0; i < samplesNumber; i++) {
+        System.out.println(Arrays.toString(elevationSamples));
+        for (int i = 1; i < samplesNumber; i++) {
             if(Float.isNaN(elevationSamples[i])) {
                 int lowerBound = i - 1;
                 int higherBound = toNextExistingFloat(elevationSamples, i);
@@ -78,7 +79,6 @@ public class ElevationProfileComputer {
 
             }
         }
-
         for (int i = 0; i < samplesNumber; i++) {
             elevationSamples[i] = (float) route.elevationAt(lengthBetweenSamples * i);
         }

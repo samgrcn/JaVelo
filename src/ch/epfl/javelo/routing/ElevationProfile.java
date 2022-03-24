@@ -115,7 +115,9 @@ public class ElevationProfile {
      * @return the altitude of the profile at the position
      */
 
-    public double elevationAt(double position) { return function.applyAsDouble(position); }
+    public double elevationAt(double position) {
+        System.out.println(function.applyAsDouble(position));
+        return function.applyAsDouble(position);}
 
 
 
