@@ -21,21 +21,21 @@ class ElevationProfileComputerTest {
 
     ElevationProfileComputerTest() {
         PointCh point0 = new PointCh(E, N);
-        PointCh point1 = new PointCh(E+3, N+4);
-        PointCh point2 = new PointCh(E+3, N+6);
-        PointCh point3 = new PointCh(E+4.5, N+8);
+        PointCh point1 = new PointCh(E + 3, N + 4);
+        PointCh point2 = new PointCh(E + 3, N + 6);
+        PointCh point3 = new PointCh(E + 4.5, N + 8);
 
 
-        Edge edge0 = new Edge(0, 1, point0, point1, 5,
-                Functions.constant(5));
+    //    Edge edge0 = new Edge(0, 1, point0, point1, 5,
+    //            Functions.constant(5));
         Edge edge1 = new Edge(0, 1, point1, point2, 2,
                 Functions.constant(Double.NaN));
         Edge edge2 = new Edge(0, 1, point2, point3, 2.5,
                 Functions.constant(2));
         List<Edge> edges0 = new ArrayList<>();
-        edges0.add(edge0);
-        edges0.add(edge1);
+    //    edges0.add(edge0);
         edges0.add(edge2);
+        edges0.add(edge1);
 
         route0 = new TestRoute(edges0);
 
@@ -55,10 +55,18 @@ class ElevationProfileComputerTest {
 
     @Test
     void elevationProfileThrows() {
-        assertThrows(IllegalArgumentException.class, () -> {ElevationProfileComputer.elevationProfile(route0, -1);});
-        assertThrows(IllegalArgumentException.class, () -> {ElevationProfileComputer.elevationProfile(route0, -0.05);});
-        assertThrows(IllegalArgumentException.class, () -> {ElevationProfileComputer.elevationProfile(route0, -14343240);});
-        assertThrows(IllegalArgumentException.class, () -> {ElevationProfileComputer.elevationProfile(route0, 0);});
+        assertThrows(IllegalArgumentException.class, () -> {
+            ElevationProfileComputer.elevationProfile(route0, -1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            ElevationProfileComputer.elevationProfile(route0, -0.05);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            ElevationProfileComputer.elevationProfile(route0, -14343240);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            ElevationProfileComputer.elevationProfile(route0, 0);
+        });
     }
 
     @Test

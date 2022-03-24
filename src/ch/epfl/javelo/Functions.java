@@ -51,7 +51,7 @@ public final class Functions {
     /**
      * Public method to call the function applyAsDouble though a new instance of Constant.
      *
-     * @param xMax the maximum x value of the big interval containing all values of samples [].
+     * @param xMax    the maximum x value of the big interval containing all values of samples [].
      * @param samples [] an array of y values spaced by a same interval.
      * @return a new instance of Sampled.
      */
@@ -65,7 +65,7 @@ public final class Functions {
      * and xMax as a parameter.
      *
      * @param samples [] an array of y values spaced by a same interval.
-     * @param xMax the maximum x value of the big interval containing all values of samples [].
+     * @param xMax    the maximum x value of the big interval containing all values of samples [].
      */
 
     private record Sampled(float[] samples, double xMax) implements DoubleUnaryOperator {
@@ -73,9 +73,9 @@ public final class Functions {
         /**
          * Constructor checking whether there are at least 2 values in samples, and if xMax is strictly positive.
          *
-         * @throws IllegalArgumentException if it's not the case.
          * @param samples [] an array of y values spaced by a same interval.
-         * @param xMax the maximum x value of the big interval containing all values of samples [].
+         * @param xMax    the maximum x value of the big interval containing all values of samples [].
+         * @throws IllegalArgumentException if it's not the case.
          */
         public Sampled {
             Preconditions.checkArgument(xMax > 0);
@@ -95,8 +95,6 @@ public final class Functions {
         // which is the length in the X-axis between each point with a corresponding value on the Y-axis of samples.
         // Each point in samples has a value on the X-axis, spaced by intervalLength. There are (the number of elements
         // in samples - 1) intervals, and we want to find in which interval x is.
-
-
         private int bound(double x) {
             double intervalLength = xMax / (samples.length - 1);
             return (int) (x / intervalLength);
@@ -105,7 +103,6 @@ public final class Functions {
         /**
          * Given a double x, some values in samples, and an xMax, find the y value of that double x by interpolating.
          *
-
          * @param x x
          * @return the corresponding y of the x value
          */

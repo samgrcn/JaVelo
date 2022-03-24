@@ -23,6 +23,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns true if and only if the given identity edge goes in the opposite direction of the OSM path from which it comes.
+     *
      * @param edgeId the id of the concerned edge
      * @return true or false
      */
@@ -32,6 +33,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the identity of the destination node of the given identity edge.
+     *
      * @param edgeId the id of the concerned edge
      * @return the identity of the node
      */
@@ -43,6 +45,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the length, in metres, of the given identity edge.
+     *
      * @param edgeId the id of the concerned edge
      * @return the length
      */
@@ -52,6 +55,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the positive vertical drop, in metres, of the given identity edge.
+     *
      * @param edgeId the id of the concerned edge
      * @return the vertical drop
      */
@@ -62,6 +66,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns true if and only if the given identity edge has a profile.
+     *
      * @param edgeId the id of the concerned edge
      * @return true or false
      */
@@ -71,15 +76,17 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the value of the profile of a given edge.
+     *
      * @param edgeId the id of the concerned edge
      * @return the profile
      */
     private int getProfile(int edgeId) {
-        return Bits.extractUnsigned(profileIds.get(edgeId ), 30, 2);
+        return Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
     }
 
     /**
      * Manually reverses a given array.
+     *
      * @param array the array to reverse
      * @return the reversed array
      */
@@ -95,9 +102,10 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the array of profile samples for an edge of type 1.
-     * @param res the results array
+     *
+     * @param res           the results array
      * @param samplesNumber the number of samples
-     * @param identity the identity of the first elevation
+     * @param identity      the identity of the first elevation
      * @return the array of profil samples in reverse order
      */
     private float[] profileSamplesType1(float[] res, int samplesNumber, int identity) {
@@ -109,20 +117,20 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the array of profile samples for an edge of type 2.
-     * @param res the results array
+     *
+     * @param res           the results array
      * @param samplesNumber the number of samples
-     * @param identity the identity of the first elevation
+     * @param identity      the identity of the first elevation
      * @return the array of profil samples in reverse order
      */
     private float[] profileSamplesType2(float[] res, int samplesNumber, int identity) {
-        int iterNumber = (int)Math.ceil((samplesNumber - 1) / 2.0) + 1;
+        int iterNumber = (int) Math.ceil((samplesNumber - 1) / 2.0) + 1;
         int indexFilled = 0;
         for (int i = 0; i < iterNumber; ++i) {
             if (i == 0) {
                 res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
                 ++indexFilled;
-            }
-            else {
+            } else {
                 int hexNumber = elevations.get(identity + i);
                 for (int j = 8; j >= 0; j -= 8) {
                     if (indexFilled < samplesNumber) {
@@ -137,20 +145,20 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the array of profile samples for an edge of type 3.
-     * @param res the results array
+     *
+     * @param res           the results array
      * @param samplesNumber the number of samples
-     * @param identity the identity of the first elevation
+     * @param identity      the identity of the first elevation
      * @return the array of profil samples in reverse order
      */
     private float[] profileSamplesType3(float[] res, int samplesNumber, int identity) {
-        int iterNumber = (int)Math.ceil((samplesNumber - 1) / 4.0) + 1;
+        int iterNumber = (int) Math.ceil((samplesNumber - 1) / 4.0) + 1;
         int indexFilled = 0;
         for (int i = 0; i < iterNumber; ++i) {
             if (i == 0) {
                 res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
                 ++indexFilled;
-            }
-            else {
+            } else {
                 int hexNumber = elevations.get(identity + i);
                 for (int j = 12; j >= 0; j -= 4) {
                     if (indexFilled < samplesNumber) {
@@ -165,12 +173,13 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
     /**
      * Returns the array of profile samples of the given identity edge, which is empty if the edge does not have a profile.
+     *
      * @param edgeId the id of the concerned edge
      * @return the array of profile samples
      */
     public float[] profileSamples(int edgeId) {
         int identity = Bits.extractUnsigned(profileIds.get(edgeId), 0, 30);
-        int samplesNumber = 1 + (int)Math.ceil(length(edgeId) / 2);
+        int samplesNumber = 1 + (int) Math.ceil(length(edgeId) / 2);
 
         if (!hasProfile(edgeId)) return new float[0];
 
@@ -178,13 +187,14 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         if (getProfile(edgeId) == 1) res = profileSamplesType1(res, samplesNumber, identity);
         if (getProfile(edgeId) == 2) res = profileSamplesType2(res, samplesNumber, identity);
         if (getProfile(edgeId) == 3) res = profileSamplesType3(res, samplesNumber, identity);
-        
+
         if (isInverted(edgeId)) return reverseFloatArray(res);
         return res;
     }
 
     /**
      * Returns the identity of the set of attributes attached to the given identity edge.
+     *
      * @param edgeId the id of the concerned edge
      * @return the identity
      */
