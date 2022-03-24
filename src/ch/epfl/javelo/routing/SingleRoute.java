@@ -1,5 +1,7 @@
 package ch.epfl.javelo.routing;
 
+import ch.epfl.javelo.Math2;
+import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 
 import java.util.ArrayList;
@@ -12,11 +14,17 @@ import java.util.List;
  * @author Quentin Chappuis (339517)
  */
 public final class SingleRoute implements Route {
-    private List<Edge> edges;
+    private final List<Edge> edges;
+    private final double[] route;
 
     public SingleRoute(List<Edge> edges) {
-        if (edges.isEmpty()) throw new IllegalArgumentException();
+        Preconditions.checkArgument(!edges.isEmpty());
         this.edges = edges;
+        route = new double[edges.size()];
+        route[0] = 0;
+        for (int i = 1; i < edges.size(); i++) {
+            route[i] = edges.get(i - 1).length() + route[i - 1];
+        }
     }
 
 
@@ -50,7 +58,7 @@ public final class SingleRoute implements Route {
      */
     @Override
     public List<Edge> edges() {
-        return edges; // immuabilité ??!
+        return new ArrayList<>(edges);
     }
 
     /**
@@ -60,30 +68,21 @@ public final class SingleRoute implements Route {
      */
     @Override
     public List<PointCh> points() {
-        List<PointCh> res = new ArrayList<PointCh>() {
-        };
-        for (Edge edge : edges) {
-            res.add(edge.fromPoint());
-            res.add(edge.toPoint());
-        }
+        List<PointCh> res = new ArrayList<PointCh>();
+        res.add(edges.get(0).fromPoint());
+        for (Edge edge : edges) res.add(edge.toPoint());
         return res;
     }
 
+    /**
+     *
+     *
+     * @param position the given position
+     * @return the index
+     */
     private int dichotomousSearch(double position) {
-        double[] route = new double[edges.size()];
-        route[0] = edges.get(0).length();
-        for (int i = 1; i < edges.size(); i++) {
-            route[i] = edges.get(i).length() + route[i - 1];
-        }
         int res = Arrays.binarySearch(route, position);
-        if (res >= 0) return res;
-        return -(res + 1);
-    }
-
-    private double checkPosition(double position) {
-        if (position < 0) position = 0;
-        if (position > length()) position = length();
-        return position;
+        return res < 0 ? -(res + 2) : res;
     }
 
     /**
@@ -94,8 +93,9 @@ public final class SingleRoute implements Route {
      */
     @Override
     public PointCh pointAt(double position) {
-        position = checkPosition(position);
+        position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
+        for (int i = 0; i < index; i++) position -= edges.get(i).length();
         return edges.get(index).pointAt(position);
     }
 
@@ -107,8 +107,9 @@ public final class SingleRoute implements Route {
      */
     @Override
     public double elevationAt(double position) {
-        position = checkPosition(position);
+        position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
+        for (int i = 0; i < index; i++) position -= edges.get(i).length();
         return edges.get(index).elevationAt(position);
     }
 
@@ -120,12 +121,10 @@ public final class SingleRoute implements Route {
      */
     @Override
     public int nodeClosestTo(double position) {
-        position = checkPosition(position);
+        position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
-        for (int i = 0; i < index; ++i) {
-            position -= edges.get(i).length();
-        }
-        if (position < edges.get(index).length()) return edges.get(index).fromNodeId();
+        for (int i = 0; i < index; ++i) position -= edges.get(i).length();
+        if (position < edges.get(index).length()/2) return edges.get(index).fromNodeId();
         return edges.get(index).toNodeId();
     }
 
@@ -137,6 +136,19 @@ public final class SingleRoute implements Route {
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        return new RoutePoint(point, )
+        List<PointCh> points = new ArrayList<PointCh>();
+        for (Edge edge : edges) {
+            double position = edge.positionClosestTo(point);
+            points.add(edge.pointAt(position));
+        }
+        double distanceToReference = points.get(0).distanceTo(point);
+        int index = 0;
+        for (int i = 1; i < points.size(); ++i) {
+            if (points.get(i).distanceTo(point) < distanceToReference) {
+                distanceToReference = points.get(i).distanceTo(point);
+                index = i;
+            }
+        }
+        return new RoutePoint(points.get(index), edges.get(index).fromPoint().distanceTo(points.get(index)), distanceToReference);
     }
 }
