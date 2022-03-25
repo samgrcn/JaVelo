@@ -38,7 +38,7 @@ class ElevationProfileComputerTest {
         edges0.add(edge2);
 
 
-        route0 = new TestRoute(edges0);
+        //route0 = new TestRoute(edges0);
 
         Edge edge3 = new Edge(0, 1, point0, point1, 5,
                 Functions.constant(Double.NaN));
@@ -51,7 +51,7 @@ class ElevationProfileComputerTest {
         edges1.add(edge4);
         edges1.add(edge5);
 
-        route1 = new TestRoute(edges1);
+        //route1 = new TestRoute(edges1);
     }
 
     @Test
