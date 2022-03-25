@@ -26,16 +26,17 @@ class ElevationProfileComputerTest {
         PointCh point3 = new PointCh(E + 4.5, N + 8);
 
 
-    //    Edge edge0 = new Edge(0, 1, point0, point1, 5,
-    //            Functions.constant(5));
+        Edge edge0 = new Edge(0, 1, point0, point1, 5,
+                Functions.constant(5));
         Edge edge1 = new Edge(0, 1, point1, point2, 2,
                 Functions.constant(Double.NaN));
         Edge edge2 = new Edge(0, 1, point2, point3, 2.5,
                 Functions.constant(2));
         List<Edge> edges0 = new ArrayList<>();
-    //    edges0.add(edge0);
-        edges0.add(edge2);
+        edges0.add(edge0);
         edges0.add(edge1);
+        edges0.add(edge2);
+
 
         route0 = new TestRoute(edges0);
 
