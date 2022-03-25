@@ -20,9 +20,9 @@ public final class SingleRoute implements Route {
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
         this.edges = edges;
-        route = new double[edges.size()];
+        route = new double[edges.size() + 1];
         route[0] = 0;
-        for (int i = 1; i < edges.size(); i++) {
+        for (int i = 1; i < edges.size() + 1; i++) {
             route[i] = edges.get(i - 1).length() + route[i - 1];
         }
     }
@@ -46,9 +46,7 @@ public final class SingleRoute implements Route {
      */
     @Override
     public double length() {
-        double length = 0.0;
-        for (Edge edge : edges) length += edge.length();
-        return length;
+        return route[route.length - 1];
     }
 
     /**
@@ -58,7 +56,7 @@ public final class SingleRoute implements Route {
      */
     @Override
     public List<Edge> edges() {
-        return new ArrayList<>(edges);
+        return List.copyOf(edges);
     }
 
     /**
@@ -68,20 +66,21 @@ public final class SingleRoute implements Route {
      */
     @Override
     public List<PointCh> points() {
-        List<PointCh> res = new ArrayList<PointCh>();
+        List<PointCh> res = new ArrayList<>();
         res.add(edges.get(0).fromPoint());
         for (Edge edge : edges) res.add(edge.toPoint());
         return res;
     }
 
     /**
-     *
+     * Dichotomously searches for the position in a list of lengths.
      *
      * @param position the given position
      * @return the index
      */
     private int dichotomousSearch(double position) {
         int res = Arrays.binarySearch(route, position);
+        if (res == edges().size()) return res - 1;
         return res < 0 ? -(res + 2) : res;
     }
 
@@ -95,7 +94,7 @@ public final class SingleRoute implements Route {
     public PointCh pointAt(double position) {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
-        for (int i = 0; i < index; i++) position -= edges.get(i).length();
+        position -= route[index];
         return edges.get(index).pointAt(position);
     }
 
@@ -109,7 +108,7 @@ public final class SingleRoute implements Route {
     public double elevationAt(double position) {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
-        for (int i = 0; i < index; i++) position -= edges.get(i).length();
+        position -= route[index];
         return edges.get(index).elevationAt(position);
     }
 
@@ -123,7 +122,7 @@ public final class SingleRoute implements Route {
     public int nodeClosestTo(double position) {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
-        for (int i = 0; i < index; ++i) position -= edges.get(i).length();
+        position -= route[index];
         if (position < edges.get(index).length()/2) return edges.get(index).fromNodeId();
         return edges.get(index).toNodeId();
     }
@@ -136,9 +135,9 @@ public final class SingleRoute implements Route {
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        List<PointCh> points = new ArrayList<PointCh>();
+        List<PointCh> points = new ArrayList<>();
         for (Edge edge : edges) {
-            double position = edge.positionClosestTo(point);
+            double position = Math2.clamp(0, edge.positionClosestTo(point), edge.length());
             points.add(edge.pointAt(position));
         }
         double distanceToReference = points.get(0).distanceTo(point);
@@ -149,6 +148,6 @@ public final class SingleRoute implements Route {
                 index = i;
             }
         }
-        return new RoutePoint(points.get(index), edges.get(index).fromPoint().distanceTo(points.get(index)), distanceToReference);
+        return new RoutePoint(points.get(index), edges.get(0).fromPoint().distanceTo(points.get(index)), distanceToReference);
     }
 }
