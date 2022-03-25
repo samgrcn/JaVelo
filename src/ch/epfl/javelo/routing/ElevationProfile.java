@@ -131,7 +131,6 @@ public class ElevationProfile {
      */
 
     public double elevationAt(double position) {
-        System.out.println(function.applyAsDouble(position));
         return function.applyAsDouble(position);
     }
 

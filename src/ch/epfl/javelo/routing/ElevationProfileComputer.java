@@ -4,8 +4,6 @@ import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 import java.util.Arrays;
-import java.util.function.DoubleUnaryOperator;
-
 public class ElevationProfileComputer {
 
     private ElevationProfileComputer() {
@@ -81,13 +79,8 @@ public class ElevationProfileComputer {
             double position = i * route.length() / (samplesNumber - 1);
             elevationSamples[i] = (float) route.elevationAt(position);
         }
-
-        System.out.println(Arrays.toString(elevationSamples));
-
         checkSpecialCases(elevationSamples);
         fillingArray(route, elevationSamples);
-
-        System.out.println(Arrays.toString(elevationSamples));
 
         return new ElevationProfile(route.length(), elevationSamples);
     }
