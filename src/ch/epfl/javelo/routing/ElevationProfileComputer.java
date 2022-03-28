@@ -70,6 +70,15 @@ public class ElevationProfileComputer {
         }
     }
 
+    /**
+     * which returns the long profile of the route, ensuring that the spacing between the
+     * samples of the profile is at most maxStepLength meters.
+     * @param route
+     * @param maxStepLength
+     * @throws IllegalArgumentException if this spacing is not strictly positive.
+     * @return
+     */
+
 
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
         Preconditions.checkArgument(maxStepLength > 0);
