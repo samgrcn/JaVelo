@@ -25,18 +25,29 @@ public class RouteComputer {
         }
         distance[startNodeId] = 0;
         exploration.add(startNodeId);
-        int N = exploration.get(0);
+        int n = exploration.get(0);
         while (!exploration.isEmpty()) {
-            for (int i = 0; i < exploration.size(); i++) {
-                if(distance[N] < distance[exploration.get(i)]) {
-                    N = exploration.get(i);
+            for (Integer i : exploration) {
+                if (distance[n] < distance[i]) {
+                    n = i;
                 }
             }
-            exploration.remove(N);
-            if(N == endNodeId) {
+            exploration.remove(n);
+            if(n == endNodeId) {
                 break;
             }
-            for
+            int numberOfEdges = graph.nodeOutDegree(n);
+            int n2;
+            for (int i = 0; i < numberOfEdges; i++) {
+                for (int j = graph.nodeOutEdgeId(n, 0); j < graph.nodeOutEdgeId(n, numberOfEdges); j++) {
+                    n2 = graph.edgeTargetNodeId(j);
+                    double d = distance[n] + graph.edgeLength(j);
+                    if(d < distance[n2]) {
+                        distance[n2] = d;
+                        exploration.add(n2);
+                    }
+                }
+            }
         }
     }
 
