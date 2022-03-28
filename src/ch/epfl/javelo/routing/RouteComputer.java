@@ -38,35 +38,40 @@ public class RouteComputer {
         distance[startNodeId] = 0;
         exploration.add(new WeightedNode(startNodeId, distance[startNodeId]));
         int n;
+        int n2;
+        int edgeThId;
+        int numberOfEdges;
+
         while (!exploration.isEmpty()) {
 
             n = exploration.remove().nodeId;
 
             if (n == endNodeId) {
                 break;
-            } else {
-                int numberOfEdges = graph.nodeOutDegree(n);
-                int n2;
-                for (int i = 0; i < numberOfEdges; i++) {
-                        double costFactor = costFunction.costFactor(n, graph.nodeOutEdgeId(n, i));
-                        n2 = graph.edgeTargetNodeId(graph.nodeOutEdgeId(n, i));
-                        float d = (float) ((distance[n] + (graph.edgeLength(graph.nodeOutEdgeId(n, i)) * costFactor)));
-                        if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
-                            distance[n2] = d;
-                            predecessor[n2] = n;
-                            exploration.add(new WeightedNode(n2, distance[n2]));
-
-                    }
-                }
-                distance[n] = Float.NEGATIVE_INFINITY;
             }
+
+            numberOfEdges = graph.nodeOutDegree(n);
+
+            for (int i = 0; i < numberOfEdges; i++) {
+                edgeThId = graph.nodeOutEdgeId(n, i);
+                double costFactor = costFunction.costFactor(n, edgeThId);
+                n2 = graph.edgeTargetNodeId(edgeThId);
+                float d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
+                if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
+                    distance[n2] = d;
+                    predecessor[n2] = n;
+                    exploration.add(new WeightedNode(n2, distance[n2]));
+
+                }
+            }
+            distance[n] = Float.NEGATIVE_INFINITY;
         }
 
         List<Edge> routeEdgeList = new ArrayList<>();
         int currentNodeId = endNodeId;
         int previousNodeId = predecessor[endNodeId];
         int edgeId;
-        while(currentNodeId != startNodeId) {
+        while (currentNodeId != startNodeId) {
             for (int i = 0; i < graph.nodeOutDegree(previousNodeId); i++) {
                 edgeId = graph.nodeOutEdgeId(previousNodeId, i);
                 if (graph.edgeTargetNodeId(edgeId) == currentNodeId) {
@@ -79,8 +84,6 @@ public class RouteComputer {
         }
         return new SingleRoute(routeEdgeList);
     }
-
-
 
 
 }
