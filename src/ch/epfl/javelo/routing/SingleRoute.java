@@ -19,7 +19,7 @@ public final class SingleRoute implements Route {
 
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
-        this.edges = edges;
+        this.edges = List.copyOf(edges);
         route = new double[edges.size() + 1];
         route[0] = 0;
         for (int i = 1; i < edges.size() + 1; i++) {
@@ -148,6 +148,6 @@ public final class SingleRoute implements Route {
                 index = i;
             }
         }
-        return new RoutePoint(points.get(index), edges.get(0).fromPoint().distanceTo(points.get(index)), distanceToReference);
+        return new RoutePoint(points.get(index), route[index] + edges.get(index).fromPoint().distanceTo(points.get(index)), distanceToReference);
     }
 }
