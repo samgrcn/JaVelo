@@ -4,6 +4,7 @@ import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.data.Graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -47,15 +48,14 @@ public class RouteComputer {
                 int numberOfEdges = graph.nodeOutDegree(n);
                 int n2;
                 for (int i = 0; i < numberOfEdges; i++) {
-                    for (int j = graph.nodeOutEdgeId(n, 0); j < graph.nodeOutEdgeId(n, numberOfEdges); j++) {
-                        double costFactor = costFunction.costFactor(n, j);
-                        n2 = graph.edgeTargetNodeId(j);
-                        float d = (float) ((distance[n] + (graph.edgeLength(j) * costFactor)));
-                        if (d < distance[n2]) {
+                        double costFactor = costFunction.costFactor(n, graph.nodeOutEdgeId(n, i));
+                        n2 = graph.edgeTargetNodeId(graph.nodeOutEdgeId(n, i));
+                        float d = (float) ((distance[n] + (graph.edgeLength(graph.nodeOutEdgeId(n, i)) * costFactor)));
+                        if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
                             distance[n2] = d;
                             predecessor[n2] = n;
                             exploration.add(new WeightedNode(n2, distance[n2]));
-                        }
+
                     }
                 }
                 distance[n] = Float.NEGATIVE_INFINITY;
