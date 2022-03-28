@@ -52,6 +52,7 @@ public class MultiRoute implements Route {
         for (Route segment : segments) {
 
         }
+        return null;
     }
 
     /**
@@ -60,11 +61,11 @@ public class MultiRoute implements Route {
      * @return all the points
      */
     @Override
-    public List<PointCh> points() {
-        List<PointCh> res = new ArrayList<>();
-        res.add(segments.get(0).fromPoint());
-        for (Route segment : segments) res.add((Edge)segment.toPoint());
-        return res;
+   public List<PointCh> points() {
+   //     List<PointCh> res = new ArrayList<>();
+   //     res.add(segments.get(0).fromPoint());
+   //     for (Route segment : segments) res.add((Edge)segment.toPoint());
+        return null;
     }
 
     /**
