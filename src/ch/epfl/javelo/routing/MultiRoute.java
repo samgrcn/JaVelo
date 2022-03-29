@@ -5,20 +5,28 @@ import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MultiRoute implements Route {
     private final List<Route> segments;
     private final double[] route;
+    private final List<Edge> edges = new ArrayList<>();
 
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
-        this.segments = segments;
-        route = new double[segments.size() + 1];
-        route[0] = 0;
-        for (int i = 1; i < segments.size() + 1; i++) {
-            route[i] = segments.get(i - 1).length() + route[i - 1];
+        this.segments = List.copyOf(segments);
+
+        for (Route segment : segments) {
+            edges.addAll(segment.edges());
         }
+
+        route = new double[edges.size() + 1];
+        route[0] = 0;
+        for (int i = 1; i < edges.size() + 1; i++) {
+            route[i] = edges.get(i - 1).length() + route[i - 1];
+        }
+
     }
 
     /**
@@ -29,7 +37,18 @@ public class MultiRoute implements Route {
      */
     @Override
     public int indexOfSegmentAt(double position) {
-        return 0;
+        int totalLength = 0;
+        int index = 0;
+        for (int i = 0; i < segments.size(); ++i) {
+            if (position > totalLength) {
+                index = i -1;
+                break;
+            }
+            totalLength += segments.get(i).length();
+            index = i;
+        }
+        if (segments.get(index) instanceof SingleRoute) return 1;
+        return 1 + segments.get(index).indexOfSegmentAt(position);
     }
 
     /**
@@ -49,10 +68,7 @@ public class MultiRoute implements Route {
      */
     @Override
     public List<Edge> edges() {
-        for (Route segment : segments) {
-
-        }
-        return null;
+        return List.copyOf(edges);
     }
 
     /**
@@ -61,11 +77,23 @@ public class MultiRoute implements Route {
      * @return all the points
      */
     @Override
-   public List<PointCh> points() {
-   //     List<PointCh> res = new ArrayList<>();
-   //     res.add(segments.get(0).fromPoint());
-   //     for (Route segment : segments) res.add((Edge)segment.toPoint());
-        return null;
+    public List<PointCh> points() {
+        List<PointCh> res = new ArrayList<>();
+        res.add(edges.get(0).fromPoint());
+        for (Edge edge : edges) res.add(edge.toPoint());
+        return res;
+    }
+
+    /**
+     * Dichotomously searches for the position in a list of lengths.
+     *
+     * @param position the given position
+     * @return the index
+     */
+    private int dichotomousSearch(double position) {
+        int res = Arrays.binarySearch(route, position);
+        if (res == edges.size()) return res - 1;
+        return res < 0 ? -(res + 2) : res;
     }
 
     /**
@@ -77,7 +105,9 @@ public class MultiRoute implements Route {
     @Override
     public PointCh pointAt(double position) {
         position = Math2.clamp(0, position, length());
-        return null;
+        int index = dichotomousSearch(position);
+        position -= route[index];
+        return edges.get(index).pointAt(position);
     }
 
     /**
@@ -89,7 +119,9 @@ public class MultiRoute implements Route {
     @Override
     public double elevationAt(double position) {
         position = Math2.clamp(0, position, length());
-        return 0;
+        int index = dichotomousSearch(position);
+        position -= route[index];
+        return edges.get(index).elevationAt(position);
     }
 
     /**
@@ -101,7 +133,10 @@ public class MultiRoute implements Route {
     @Override
     public int nodeClosestTo(double position) {
         position = Math2.clamp(0, position, length());
-        return 0;
+        int index = dichotomousSearch(position);
+        position -= route[index];
+        if (position < edges.get(index).length()/2) return edges.get(index).fromNodeId();
+        return edges.get(index).toNodeId();
     }
 
     /**
@@ -112,6 +147,19 @@ public class MultiRoute implements Route {
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        return null;
+        List<PointCh> points = new ArrayList<>();
+        for (Edge edge : edges) {
+            double position = Math2.clamp(0, edge.positionClosestTo(point), edge.length());
+            points.add(edge.pointAt(position));
+        }
+        double distanceToReference = points.get(0).distanceTo(point);
+        int index = 0;
+        for (int i = 1; i < points.size(); ++i) {
+            if (points.get(i).distanceTo(point) < distanceToReference) {
+                distanceToReference = points.get(i).distanceTo(point);
+                index = i;
+            }
+        }
+        return new RoutePoint(points.get(index), route[index] + edges.get(index).fromPoint().distanceTo(points.get(index)), distanceToReference);
     }
 }
