@@ -2,6 +2,7 @@ package ch.epfl.javelo.routing;
 
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.data.Graph;
+import ch.epfl.javelo.projection.PointCh;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public class RouteComputer {
                 if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
                     distance[n2] = d;
                     predecessor[n2] = n;
-                    exploration.add(new WeightedNode(n2, distance[n2]));
+                    exploration.add(new WeightedNode(n2, (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
 
                 }
             }
