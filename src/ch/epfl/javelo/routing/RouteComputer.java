@@ -18,6 +18,7 @@ public class RouteComputer {
         this.costFunction = costFunction;
     }
 
+
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
 
         record WeightedNode(int nodeId, float distance)
@@ -41,6 +42,7 @@ public class RouteComputer {
         int n2;
         int edgeThId;
         int numberOfEdges;
+        double costFactor;
 
         while (!exploration.isEmpty()) {
 
@@ -54,7 +56,7 @@ public class RouteComputer {
 
             for (int i = 0; i < numberOfEdges; i++) {
                 edgeThId = graph.nodeOutEdgeId(n, i);
-                double costFactor = costFunction.costFactor(n, edgeThId);
+                costFactor = costFunction.costFactor(n, edgeThId);
                 n2 = graph.edgeTargetNodeId(edgeThId);
                 float d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
                 if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
@@ -67,6 +69,7 @@ public class RouteComputer {
             distance[n] = Float.NEGATIVE_INFINITY;
         }
 
+
         List<Edge> routeEdgeList = new ArrayList<>();
         int currentNodeId = endNodeId;
         int previousNodeId = predecessor[endNodeId];
@@ -76,8 +79,11 @@ public class RouteComputer {
                 edgeId = graph.nodeOutEdgeId(previousNodeId, i);
                 if (graph.edgeTargetNodeId(edgeId) == currentNodeId) {
                     routeEdgeList.add(Edge.of(graph, edgeId, previousNodeId, currentNodeId));
+                    break;
                 }
             }
+
+
             currentNodeId = previousNodeId;
             previousNodeId = predecessor[currentNodeId];
 
