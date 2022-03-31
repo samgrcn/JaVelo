@@ -41,6 +41,7 @@ public class RouteComputer {
         exploration.add(new WeightedNode(startNodeId, distance[startNodeId]));
         int n;
         int n2;
+        float d;
         int edgeThId;
         int numberOfEdges;
         double costFactor;
@@ -59,7 +60,7 @@ public class RouteComputer {
                 edgeThId = graph.nodeOutEdgeId(n, i);
                 costFactor = costFunction.costFactor(n, edgeThId);
                 n2 = graph.edgeTargetNodeId(edgeThId);
-                float d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
+                 d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
                 if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
                     distance[n2] = d;
                     predecessor[n2] = n;
@@ -91,6 +92,4 @@ public class RouteComputer {
         }
         return new SingleRoute(routeEdgeList);
     }
-
-
 }
