@@ -55,6 +55,7 @@ public class RouteComputer {
                     return null;
                 }
                 n = exploration.remove().nodeId;
+
             } while (distance[n] == Float.NEGATIVE_INFINITY);
 
             if (n == endNodeId) {
@@ -84,7 +85,7 @@ public class RouteComputer {
                 edgeThId = graph.nodeOutEdgeId(n, i);
                 costFactor = costFunction.costFactor(n, edgeThId);
                 n2 = graph.edgeTargetNodeId(edgeThId);
-                d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
+                d =  ((distance[n] + (float)(graph.edgeLength(edgeThId) * costFactor)));
                 if (d < distance[n2]) {
                     distance[n2] = d;
                     predecessor[n2] = n;
