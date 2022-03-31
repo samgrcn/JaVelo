@@ -8,25 +8,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents a multiple route, i.e. composed of a sequence of contiguous routes called segments.
+ *
+ * @author Quentin Chappuis (339517)
+ */
 public class MultiRoute implements Route {
     private final List<Route> segments;
     private final double[] route;
     private final List<Edge> edges = new ArrayList<>();
 
+    /**
+     *
+     * @param segments a list containing all segments
+     */
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
         this.segments = List.copyOf(segments);
-
         for (Route segment : segments) {
             edges.addAll(segment.edges());
         }
-
         route = new double[edges.size() + 1];
         route[0] = 0;
         for (int i = 1; i < edges.size() + 1; i++) {
             route[i] = edges.get(i - 1).length() + route[i - 1];
         }
-
     }
 
     /**
@@ -37,18 +43,19 @@ public class MultiRoute implements Route {
      */
     @Override
     public int indexOfSegmentAt(double position) {
+        position = Math2.clamp(0, position, length());
         int totalLength = 0;
-        int index = 0;
-        for (int i = 0; i < segments.size(); ++i) {
-            if (position > totalLength) {
-                index = i -1;
+        int res = 0;
+        for (Route segment : segments) {
+            if (position > totalLength + segment.length()) {
+                res += segment.indexOfSegmentAt(segment.length()) + 1;
+            } else {
+                res += segment.indexOfSegmentAt(position - totalLength);
                 break;
             }
-            totalLength += segments.get(i).length();
-            index = i;
+            totalLength += segment.length();
         }
-        if (segments.get(index) instanceof SingleRoute) return 1;
-        return 1 + segments.get(index).indexOfSegmentAt(position);
+        return res;
     }
 
     /**

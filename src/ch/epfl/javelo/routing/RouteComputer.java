@@ -41,13 +41,19 @@ public class RouteComputer {
         exploration.add(new WeightedNode(startNodeId, distance[startNodeId]));
         int n;
         int n2;
+<<<<<<< HEAD
+=======
         float d;
+>>>>>>> f07fa4ddf41a44f83adbe086435ef646bc1dc2d4
         int edgeThId;
         int numberOfEdges;
         double costFactor;
 
         while (!exploration.isEmpty()) {
+<<<<<<< HEAD
+=======
 
+>>>>>>> f07fa4ddf41a44f83adbe086435ef646bc1dc2d4
             n = exploration.remove().nodeId;
 
             if (n == endNodeId) {
@@ -60,11 +66,19 @@ public class RouteComputer {
                 edgeThId = graph.nodeOutEdgeId(n, i);
                 costFactor = costFunction.costFactor(n, edgeThId);
                 n2 = graph.edgeTargetNodeId(edgeThId);
+<<<<<<< HEAD
+                float d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
+                if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
+                    distance[n2] = d;
+                    predecessor[n2] = n;
+                    exploration.add(new WeightedNode(n2, distance[n2]));
+=======
                  d = (float) ((distance[n] + (graph.edgeLength(edgeThId) * costFactor)));
                 if (d < distance[n2] && distance[n] != Float.NEGATIVE_INFINITY) {
                     distance[n2] = d;
                     predecessor[n2] = n;
                     exploration.add(new WeightedNode(n2, (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
+>>>>>>> f07fa4ddf41a44f83adbe086435ef646bc1dc2d4
 
                 }
             }
@@ -92,4 +106,8 @@ public class RouteComputer {
         }
         return new SingleRoute(routeEdgeList);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f07fa4ddf41a44f83adbe086435ef646bc1dc2d4
