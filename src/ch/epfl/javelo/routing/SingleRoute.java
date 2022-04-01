@@ -135,19 +135,13 @@ public final class SingleRoute implements Route {
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        List<PointCh> points = new ArrayList<>();
-        for (Edge edge : edges) {
-            double position = Math2.clamp(0, edge.positionClosestTo(point), edge.length());
-            points.add(edge.pointAt(position));
+        RoutePoint res = RoutePoint.NONE;
+        for (int i = 0; i < edges.size(); ++i) {
+            double position = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
+            double thatPosition = route[i] + edges.get(i).fromPoint().distanceTo(edges.get(i).pointAt(position));
+            double thatDistanceToReference = edges.get(i).pointAt(position).distanceTo(point);
+            res = res.min(edges.get(i).pointAt(position), thatPosition, thatDistanceToReference);
         }
-        double distanceToReference = points.get(0).distanceTo(point);
-        int index = 0;
-        for (int i = 1; i < points.size(); ++i) {
-            if (points.get(i).distanceTo(point) < distanceToReference) {
-                distanceToReference = points.get(i).distanceTo(point);
-                index = i;
-            }
-        }
-        return new RoutePoint(points.get(index), route[index] + edges.get(index).fromPoint().distanceTo(points.get(index)), distanceToReference);
+        return res;
     }
 }
