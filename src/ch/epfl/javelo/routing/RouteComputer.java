@@ -4,10 +4,7 @@ import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class RouteComputer {
 
@@ -76,6 +73,7 @@ public class RouteComputer {
                     previousNodeId = predecessor[currentNodeId];
 
                 }
+                Collections.reverse(routeEdgeList);
                 return new SingleRoute(routeEdgeList);
             }
 
