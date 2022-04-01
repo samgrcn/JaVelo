@@ -492,6 +492,9 @@ public class MultiRouteTest {
         MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
         MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
         MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-
+        assertEquals(new RoutePoint(new PointCh(2485060.0, 1075000.0), 60, 1000), multiRoute.pointClosestTo(new PointCh(2485060.0, 1076000.0)));
+        assertEquals(new RoutePoint(new PointCh(2485078.0, 1075000.0), 78, 4000), multiRoute.pointClosestTo(new PointCh(2485078.0, 1079000.0)));
+        assertEquals(new RoutePoint(new PointCh(2485120.0, 1075000.0), 120, 0), multiRoute.pointClosestTo(new PointCh(2485120.0, 1075000.0)));
+        assertEquals(new RoutePoint(new PointCh(2485120.0, 1075000.0), 120, 2000), multiRoute.pointClosestTo(new PointCh(2487120.0, 1075000.0)));
     }
 }
