@@ -19,7 +19,7 @@ public class MultiRoute implements Route {
     private final List<Edge> edges = new ArrayList<>();
 
     /**
-     *
+     * Constructor that initializes the segments list, the edges list and the route for the dichotomous search.
      * @param segments a list containing all segments
      */
     public MultiRoute(List<Route> segments) {

@@ -17,6 +17,10 @@ public final class SingleRoute implements Route {
     private final List<Edge> edges;
     private final double[] route;
 
+    /**
+     * Constructor that initializes the edges list and the route for the dichotomous search.
+     * @param edges a list containing all edges
+     */
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
         this.edges = List.copyOf(edges);
