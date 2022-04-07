@@ -11,33 +11,52 @@ public class RouteComputer {
     private final Graph graph;
     private final CostFunction costFunction;
 
+
     public RouteComputer(Graph graph, CostFunction costFunction) {
         this.graph = graph;
         this.costFunction = costFunction;
     }
 
+    record WeightedNode(int nodeId, float distance)
+            implements Comparable<WeightedNode> {
+        @Override
+        public int compareTo(WeightedNode that) {
+            return Float.compare(this.distance, that.distance);
+        }
+    }
+
+
+    private void explorationFiller(int n, int endNodeId, float[] distance, int[] predecessor, PriorityQueue<WeightedNode> exploration) {
+
+        int numberOfEdges = graph.nodeOutDegree(n);
+        for (int i = 0; i < numberOfEdges; i++) {
+            int edgeThId = graph.nodeOutEdgeId(n, i);
+            double costFactor = costFunction.costFactor(n, edgeThId);
+            int n2 = graph.edgeTargetNodeId(edgeThId);
+            float d = ((distance[n] + (float) (graph.edgeLength(edgeThId) * costFactor)));
+            if (d < distance[n2]) {
+                distance[n2] = d;
+                predecessor[n2] = n;
+                exploration.add(new WeightedNode(n2, (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
+
+            }
+        }
+    }
+
 
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
 
-        int n;
-        int n2;
-        float d;
-        int edgeThId;
-        int numberOfEdges;
-        double costFactor;
-
-        record WeightedNode(int nodeId, float distance)
-                implements Comparable<WeightedNode> {
-            @Override
-            public int compareTo(WeightedNode that) {
-                return Float.compare(this.distance, that.distance);
-            }
-        }
 
         Preconditions.checkArgument(startNodeId != endNodeId);
+
+        int n;
+
         float[] distance = new float[graph.nodeCount()];
         int[] predecessor = new int[graph.nodeCount()];
+
+        List<Edge> routeEdgeList = new ArrayList<>();
         PriorityQueue<WeightedNode> exploration = new PriorityQueue<>();
+
         for (int i = 0; i < graph.nodeCount(); i++) {
             distance[i] = Float.POSITIVE_INFINITY;
         }
@@ -55,8 +74,9 @@ public class RouteComputer {
 
             } while (distance[n] == Float.NEGATIVE_INFINITY);
 
+
             if (n == endNodeId) {
-                List<Edge> routeEdgeList = new ArrayList<>();
+
                 int currentNodeId = endNodeId;
                 int previousNodeId = predecessor[endNodeId];
                 int edgeId;
@@ -77,20 +97,8 @@ public class RouteComputer {
                 return new SingleRoute(routeEdgeList);
             }
 
-            numberOfEdges = graph.nodeOutDegree(n);
+            explorationFiller(n, endNodeId, distance, predecessor, exploration);
 
-            for (int i = 0; i < numberOfEdges; i++) {
-                edgeThId = graph.nodeOutEdgeId(n, i);
-                costFactor = costFunction.costFactor(n, edgeThId);
-                n2 = graph.edgeTargetNodeId(edgeThId);
-                d =  ((distance[n] + (float)(graph.edgeLength(edgeThId) * costFactor)));
-                if (d < distance[n2]) {
-                    distance[n2] = d;
-                    predecessor[n2] = n;
-                    exploration.add(new WeightedNode(n2, (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
-
-                }
-            }
             distance[n] = Float.NEGATIVE_INFINITY;
         }
         return null;

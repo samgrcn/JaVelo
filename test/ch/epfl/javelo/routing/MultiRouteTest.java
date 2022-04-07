@@ -1,807 +1,333 @@
 package ch.epfl.javelo.routing;
 
-import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.projection.PointCh;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MultiRouteTest {
-    @Test
-    void indexOfSegmentAtTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2486000, 1075000.0), new PointCh(2487000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 1000, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-        assertEquals(5, multiRoute.indexOfSegmentAt(5500));
+class MultiRouteTest {
+    private static final int ORIGIN_N = 1_200_000;
+    private static final int ORIGIN_E = 2_600_000;
+    private static final double EDGE_LENGTH = 100.25;
+
+    // Sides of triangle used for "sawtooth" edges (shape: /\/\/\…)
+    private static final double TOOTH_EW = 1023;
+    private static final double TOOTH_NS = 64;
+    private static final double TOOTH_LENGTH = 1025;
+    private static final double TOOTH_ELEVATION_GAIN = 100d;
+    private static final double TOOTH_SLOPE = TOOTH_ELEVATION_GAIN / TOOTH_LENGTH;
+
+    private static Edge horizontalEdge1K(int i) {
+        var j = i + 1;
+        var pI = new PointCh(2_600_000 + 1000 * i, 1_200_000);
+        var pJ = new PointCh(2_600_000 + 1000 * j, 1_200_000);
+        return new Edge(i, j, pI, pJ, 1000, x -> 500);
     }
 
     @Test
-    void indexOfSegmentAtTest2() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2486000, 1075000.0), new PointCh(2487000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute7 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2491000.0, 1075000.0), new PointCh(2492000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute8 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2492000.0, 1075000.0), new PointCh(2493000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute9 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2493000.0, 1075000.0), new PointCh(2494000.0, 1075000.0), 1000, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute3 = new MultiRoute(Arrays.asList(singleRoute7, singleRoute8, singleRoute9));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2, multiRoute3));
-        assertEquals(8, multiRoute.indexOfSegmentAt(8500));
-        assertEquals(7, multiRoute.indexOfSegmentAt(7890));
-        assertEquals(1, multiRoute.indexOfSegmentAt(1500));
-        assertEquals(8, multiRoute.indexOfSegmentAt(8500));
-        assertEquals(8, multiRoute.indexOfSegmentAt(10500));
-        assertEquals(0, multiRoute.indexOfSegmentAt(-8500));
-        assertEquals(3, multiRoute.indexOfSegmentAt(4000));
-        assertEquals(8, multiRoute.indexOfSegmentAt(9000));
+    void multiRouteConstructorThrowsOnEmptyEdgeList() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new MultiRoute(List.of());
+        });
     }
 
     @Test
-    void indexOfSegmentAtTest3() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2491000.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2491500.0, 1075000.0), new PointCh(2492000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(5,twoMultiroutes.indexOfSegmentAt(5500));
-        assertEquals(0,twoMultiroutes.indexOfSegmentAt(0));
-        assertEquals(0,twoMultiroutes.indexOfSegmentAt(-1000));
-        assertEquals(5,twoMultiroutes.indexOfSegmentAt(6000));
-        assertEquals(5,twoMultiroutes.indexOfSegmentAt(100000));
-
+    void multiRouteIndexOfSegmentAtWorksWithShallowRoutes() {
+        var m = new MultiRoute(List.of(
+                new SingleRoute(List.of(horizontalEdge1K(0))),
+                new SingleRoute(List.of(horizontalEdge1K(1))),
+                new SingleRoute(List.of(horizontalEdge1K(2))),
+                new SingleRoute(List.of(horizontalEdge1K(3))),
+                new SingleRoute(List.of(horizontalEdge1K(4))),
+                new SingleRoute(List.of(horizontalEdge1K(5)))));
+        for (int i = 0; i < 6; i += 1)
+            assertEquals(i, m.indexOfSegmentAt((i + 0.5) * 1000));
+        assertEquals(5, m.indexOfSegmentAt(10000));
     }
 
     @Test
-    void indexOfSegmentAtSimpleTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2486000, 1075000.0), new PointCh(2487000.0, 1075000.0), 1000, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 1000, null)));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        assertEquals(1, multiRoute.indexOfSegmentAt(1400));
-        assertEquals(2, multiRoute.indexOfSegmentAt(2400));
-        assertEquals(2, multiRoute.indexOfSegmentAt(3000));
-        assertEquals(0, multiRoute.indexOfSegmentAt(-23));
+    void multiRouteIndexOfSegmentAtWorksWithDeepRoutes() {
+        var m1 = new MultiRoute(List.of(
+                new SingleRoute(List.of(horizontalEdge1K(0))),
+                new SingleRoute(List.of(horizontalEdge1K(1))),
+                new SingleRoute(List.of(horizontalEdge1K(2)))));
+        var m2 = new MultiRoute(List.of(
+                new SingleRoute(List.of(horizontalEdge1K(3))),
+                new MultiRoute(List.of(
+                        new SingleRoute(List.of(horizontalEdge1K(4))),
+                        new SingleRoute(List.of(horizontalEdge1K(5)))))));
+        var m = new MultiRoute(List.of(m1, m2));
+        for (int i = 0; i < 6; i += 1)
+            assertEquals(i, m.indexOfSegmentAt((i + 0.5) * 1000));
+        assertEquals(5, m.indexOfSegmentAt(10000));
     }
 
     @Test
-    void lengthTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 1000, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute, singleRoute));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute1));
-        assertEquals(6000, multiRoute.length());
+    void multiRouteLengthReturnsTotalLength() {
+        for (int i = 1; i < 10; i += 1) {
+            var routes = new ArrayList<Route>();
+            for (var edge : verticalEdges(i)) routes.add(new SingleRoute(List.of(edge)));
+            var route = new MultiRoute(routes);
+            assertEquals(i * EDGE_LENGTH, route.length());
+        }
     }
 
     @Test
-    void lengthTest2() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(6000,twoMultiroutes.length());
+    void multiRouteRoutesAreCopiedToEnsureImmutability() {
+        var immutableRoutes = List.<Route>of(new SingleRoute(verticalEdges(10)));
+        var mutableRoutes = new ArrayList<>(immutableRoutes);
+        var route = new MultiRoute(mutableRoutes);
+        mutableRoutes.clear();
+        assertNotEquals(0, route.length());
     }
 
     @Test
-    void pointAtTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485020.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485020, 1075000.0), new PointCh(2485040.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485040.0, 1075000.0), new PointCh(2485060.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485060.0, 1075000.0), new PointCh(2485080.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485080.0, 1075000.0), new PointCh(2485100.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485100.0, 1075000.0), new PointCh(2485120.0, 1075000.0), 20, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-        assertEquals(new PointCh(2485060.0, 1075000.0), multiRoute.pointAt(60));
-        assertEquals(new PointCh(2485120.0, 1075000.0), multiRoute.pointAt(7890));
-        assertEquals(new PointCh(2485000.0, 1075000.0), multiRoute.pointAt(-40));
-        assertEquals(new PointCh(2485120.0, 1075000.0), multiRoute.pointAt(120));
+    void multiRouteEdgesAreNotModifiableFromOutside() {
+        var edgesCount = 5;
+        var route = new MultiRoute(List.of(new SingleRoute(verticalEdges(edgesCount))));
+        try {
+            route.edges().clear();
+        } catch (UnsupportedOperationException e) {
+            // Nothing to do (the list of points is not modifiable, which is fine).
+        }
+        assertEquals(edgesCount, route.edges().size());
     }
 
     @Test
-    void elevationAtTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485020.0, 1075000.0), 20, Functions.constant(10))));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485020, 1075000.0), new PointCh(2485040.0, 1075000.0), 20, Functions.constant(10))));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485040.0, 1075000.0), new PointCh(2485060.0, 1075000.0), 20, Functions.constant(10))));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485060.0, 1075000.0), new PointCh(2485080.0, 1075000.0), 20, Functions.constant(20))));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485080.0, 1075000.0), new PointCh(2485100.0, 1075000.0), 20, Functions.constant(30))));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485100.0, 1075000.0), new PointCh(2485120.0, 1075000.0), 20, Functions.constant(100))));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-        assertEquals(10, multiRoute.elevationAt(-60));
-        assertEquals(10, multiRoute.elevationAt(0));
-        assertEquals(100, multiRoute.elevationAt(120));
-        assertEquals(30, multiRoute.elevationAt(84));
+    void multiRoutePointsAreNotModifiableFromOutside() {
+        var edgesCount = 5;
+        var route = new MultiRoute(List.of(new SingleRoute(verticalEdges(edgesCount))));
+        try {
+            route.points().clear();
+        } catch (UnsupportedOperationException e) {
+            // Nothing to do (the list of points is not modifiable, which is fine).
+        }
+        assertEquals(edgesCount + 1, route.points().size());
     }
 
     @Test
-    void pointsTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485020.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485020, 1075000.0), new PointCh(2485040.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485040.0, 1075000.0), new PointCh(2485060.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485060.0, 1075000.0), new PointCh(2485080.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485080.0, 1075000.0), new PointCh(2485100.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485100.0, 1075000.0), new PointCh(2485120.0, 1075000.0), 20, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-        List<PointCh> expected = Arrays.asList(new PointCh(2485000.0, 1075000.0), new PointCh(2485020, 1075000.0), new PointCh(2485040.0, 1075000.0), new PointCh(2485060.0, 1075000.0)
-        , new PointCh(2485080.0, 1075000.0), new PointCh(2485100.0, 1075000.0), new PointCh(2485120.0, 1075000.0));
-        assertEquals(expected, multiRoute.points());
-    }
-
-
-    @Test
-    void indexOfSegmentAt() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2491000.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2491500.0, 1075000.0), new PointCh(2492000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(5,twoMultiroutes.indexOfSegmentAt(5500));
-
+    void multiRoutePointsAreCorrect() {
+        for (int edgesCount = 1; edgesCount < 10; edgesCount += 1) {
+            var edges = verticalEdges(edgesCount);
+            var routes = new ArrayList<Route>();
+            for (var edge : edges) routes.add(new SingleRoute(List.of(edge)));
+            var route = new MultiRoute(routes);
+            var points = route.points();
+            assertEquals(edgesCount + 1, points.size());
+            assertEquals(edges.get(0).fromPoint(), points.get(0));
+            for (int i = 1; i < points.size(); i += 1)
+                assertEquals(edges.get(i - 1).toPoint(), points.get(i));
+        }
     }
 
     @Test
-    void length() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
+    void multiRoutePointAtWorks() {
+        var edgesCount = 12;
+        var edges = sawToothEdges(edgesCount);
+        var route = new MultiRoute(List.of(
+                new SingleRoute(edges.subList(0, 4)),
+                new SingleRoute(edges.subList(4, 8)),
+                new SingleRoute(edges.subList(8, 12))));
 
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
+        // Outside the range of the route
+        assertEquals(sawToothPoint(0), route.pointAt(Math.nextDown(0)));
+        assertEquals(sawToothPoint(edgesCount), route.pointAt(Math.nextUp(edgesCount * TOOTH_LENGTH)));
 
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
+        // Edge endpoints
+        for (int i = 0; i < edgesCount + 1; i += 1)
+            assertEquals(sawToothPoint(i), route.pointAt(i * TOOTH_LENGTH));
 
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(6000,twoMultiroutes.length());
+        // Points at 1/4, 2/4 and 3/4 of the edges
+        for (int i = 0; i < edgesCount; i += 1) {
+            for (double p = 0.25; p <= 0.75; p += 0.25) {
+                var expectedE = ORIGIN_E + (i + p) * TOOTH_EW;
+                var expectedN = (i & 1) == 0
+                        ? ORIGIN_N + TOOTH_NS * p
+                        : ORIGIN_N + TOOTH_NS * (1 - p);
+                assertEquals(
+                        new PointCh(expectedE, expectedN),
+                        route.pointAt((i + p) * TOOTH_LENGTH));
+            }
+        }
     }
 
     @Test
-    void edges() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
+    void multiRouteElevationAtWorks() {
+        var edgesCount = 12;
+        var edges = sawToothEdges(edgesCount);
+        var route = new MultiRoute(List.of(
+                new SingleRoute(edges.subList(0, 4)),
+                new SingleRoute(edges.subList(4, 8)),
+                new SingleRoute(edges.subList(8, 12))));
 
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        List<Edge> allEdges1 = new ArrayList<>();
-        allEdges1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        allEdges1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        allEdges1.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        allEdges1.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        allEdges1.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        allEdges1.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-
-        List<Edge> allEdges2 = new ArrayList<>();
-        allEdges2.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        allEdges2.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        allEdges2.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        allEdges2.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        allEdges2.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        allEdges2.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-
-        List<Edge> allEdgesTwoRoutes = new ArrayList<>();
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        allEdgesTwoRoutes.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-
-        assertEquals(allEdgesTwoRoutes,twoMultiroutes.edges());
-
-        assertEquals(allEdges1,multiRoute1.edges());
-        assertEquals(allEdges2,multiRoute2.edges());
+        for (int i = 0; i < edgesCount; i += 1) {
+            for (double p = 0; p < 1; p += 0.125) {
+                var pos = (i + p) * TOOTH_LENGTH;
+                var expectedElevation = (i + p) * TOOTH_ELEVATION_GAIN;
+                assertEquals(expectedElevation, route.elevationAt(pos));
+            }
+        }
+        assertEquals(0, route.elevationAt(-1e6));
+        assertEquals(edgesCount * TOOTH_ELEVATION_GAIN, route.elevationAt(+1e6));
     }
 
     @Test
-    void points() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
+    void multiRouteNodeClosestToWorks() {
+        var edgesCount = 12;
+        var edges = sawToothEdges(edgesCount);
+        var route = new MultiRoute(List.of(
+                new SingleRoute(edges.subList(0, 4)),
+                new SingleRoute(edges.subList(4, 8)),
+                new SingleRoute(edges.subList(8, 12))));
 
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        List<PointCh> listOfAllPointsTwoRoutes = new ArrayList<>();
-
-        listOfAllPointsTwoRoutes.add( new PointCh(2485000.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2485500.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2486000.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2486500.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2487000.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2487500.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2488000.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2488500.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2489000.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2489500.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2490000.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2490500.0, 1075000.0));
-        listOfAllPointsTwoRoutes.add( new PointCh(2491000.0, 1075000.0));
-
-        List<PointCh> listOfAllPoints1 = new ArrayList<>();
-        listOfAllPoints1.add( new PointCh(2485000.0, 1075000.0));
-        listOfAllPoints1.add( new PointCh(2485500.0, 1075000.0));
-        listOfAllPoints1.add( new PointCh(2486000.0, 1075000.0));
-        listOfAllPoints1.add( new PointCh(2486500.0, 1075000.0));
-        listOfAllPoints1.add( new PointCh(2487000.0, 1075000.0));
-        listOfAllPoints1.add( new PointCh(2487500.0, 1075000.0));
-        listOfAllPoints1.add( new PointCh(2488000.0, 1075000.0));
-
-        List<PointCh> listOfAllPoints2 = new ArrayList<>();
-        listOfAllPoints2 .add( new PointCh(2488000.0, 1075000.0));
-        listOfAllPoints2 .add( new PointCh(2488500.0, 1075000.0));
-        listOfAllPoints2 .add( new PointCh(2489000.0, 1075000.0));
-        listOfAllPoints2 .add( new PointCh(2489500.0, 1075000.0));
-        listOfAllPoints2 .add( new PointCh(2490000.0, 1075000.0));
-        listOfAllPoints2 .add( new PointCh(2490500.0, 1075000.0));
-        listOfAllPoints2 .add( new PointCh(2491000.0, 1075000.0));
-
-
-        assertEquals(listOfAllPoints1,multiRoute1.points());
-        assertEquals(listOfAllPoints2,multiRoute2.points());
-
-        assertEquals(listOfAllPointsTwoRoutes,twoMultiroutes.points());
-
+        for (int i = 0; i <= edgesCount; i += 1) {
+            for (double p = -0.25; p <= 0.25; p += 0.25) {
+                var pos = (i + p) * TOOTH_LENGTH;
+                assertEquals(i, route.nodeClosestTo(pos));
+            }
+        }
     }
 
     @Test
-    void pointAt() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
+    void multiRoutePointClosestToWorksWithFarAwayPoints() {
+        var rng = newRandom();
 
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
+        var edgesCount = 12;
+        var edges = verticalEdges(edgesCount);
+        var route = new MultiRoute(List.of(
+                new SingleRoute(edges.subList(0, 4)),
+                new SingleRoute(edges.subList(4, 8)),
+                new SingleRoute(edges.subList(8, 12))));
 
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
+        // Points below the route
+        var origin = new PointCh(ORIGIN_E, ORIGIN_N);
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var dN = rng.nextDouble(-10_000, -1);
+            var dE = rng.nextDouble(-1000, 1000);
+            var p = new PointCh(ORIGIN_E + dE, ORIGIN_N + dN);
+            var pct = route.pointClosestTo(p);
+            assertEquals(origin, pct.point());
+            assertEquals(0, pct.position());
+            assertEquals(Math.hypot(dE, dN), pct.distanceToReference(), 1e-4);
+        }
 
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(new PointCh(2486000.0, 1075000.0),multiRoute1.pointAt(1000)); //1
-
-        assertEquals(new PointCh(2489500.0, 1075000.0),multiRoute2.pointAt(1500)); //2
-
-        assertEquals(new PointCh(2487000.0, 1075000.0),twoMultiroutes.pointAt(2000)); //2
-    }
-
-
-    @Test
-    void elevationAtTest2() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
-
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, Functions.constant(10)));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, Functions.constant(20)));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, Functions.constant(30)));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, Functions.constant(40)));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, Functions.constant(50)));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, Functions.constant(60)));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, Functions.constant(70)));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, Functions.constant(80)));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, Functions.constant(90)));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, Functions.constant(100)));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, Functions.constant(110)));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, Functions.constant(120)));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(30,multiRoute1.elevationAt(1000));
-
-        assertEquals(100,multiRoute2.elevationAt(1500));
-
-        assertEquals(90,twoMultiroutes.elevationAt(4000));
+        // Points above the route
+        var end = new PointCh(ORIGIN_E, ORIGIN_N + edgesCount * EDGE_LENGTH);
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var dN = rng.nextDouble(1, 10_000);
+            var dE = rng.nextDouble(-1000, 1000);
+            var p = new PointCh(ORIGIN_E + dE, ORIGIN_N + edgesCount * EDGE_LENGTH + dN);
+            var pct = route.pointClosestTo(p);
+            assertEquals(end, pct.point());
+            assertEquals(edgesCount * EDGE_LENGTH, pct.position());
+            assertEquals(Math.hypot(dE, dN), pct.distanceToReference(), 1e-4);
+        }
     }
 
     @Test
-    void nodeClosestToTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485020.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(1, 2, new PointCh(2485020, 1075000.0), new PointCh(2485040.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(2, 3, new PointCh(2485040.0, 1075000.0), new PointCh(2485060.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(3, 4, new PointCh(2485060.0, 1075000.0), new PointCh(2485080.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(4, 5, new PointCh(2485080.0, 1075000.0), new PointCh(2485100.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(5, 6, new PointCh(2485100.0, 1075000.0), new PointCh(2485120.0, 1075000.0), 20, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-        assertEquals(0,multiRoute.nodeClosestTo(-455));
-        assertEquals(0,multiRoute.nodeClosestTo(5));
-        assertEquals(0,multiRoute.nodeClosestTo(0));
-        assertEquals(1,multiRoute.nodeClosestTo(29));
-        assertEquals(2,multiRoute.nodeClosestTo(43.3647));
-        assertEquals(3,multiRoute.nodeClosestTo(66));
-        assertEquals(4,multiRoute.nodeClosestTo(80));
-        assertEquals(6,multiRoute.nodeClosestTo(1200));
+    void multiRoutePointClosestToWorksWithPointsOnRoute() {
+        var rng = newRandom();
 
+        var edgesCount = 12;
+        var edges = verticalEdges(edgesCount);
+        var route = new MultiRoute(List.of(
+                new SingleRoute(edges.subList(0, 4)),
+                new SingleRoute(edges.subList(4, 8)),
+                new SingleRoute(edges.subList(8, 12))));
+
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var pos = rng.nextDouble(0, route.length());
+            var pt = route.pointAt(pos);
+            var pct = route.pointClosestTo(pt);
+            assertEquals(pt.e(), pct.point().e(), 1e-4);
+            assertEquals(pt.n(), pct.point().n(), 1e-4);
+            assertEquals(pos, pct.position(), 1e-4);
+            assertEquals(0, pct.distanceToReference(), 1e-4);
+        }
     }
 
     @Test
-    void nodeClosestToTest2() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
+    void multiRoutePointClosestToWorksWithSawtoothPoints() {
+        var edgesCount = 12;
+        var edges = sawToothEdges(edgesCount);
+        var route = new MultiRoute(List.of(
+                new SingleRoute(edges.subList(0, 4)),
+                new SingleRoute(edges.subList(4, 8)),
+                new SingleRoute(edges.subList(8, 12))));
 
-        edge1.add(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 500, null));
-        edge1.add(new Edge(1, 2, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(2, 3, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(3, 4, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(4, 5, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(5, 6, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
+        // Points above the sawtooth
+        for (int i = 1; i <= edgesCount; i += 2) {
+            var p = sawToothPoint(i);
+            var dN = i * 500;
+            var pAbove = new PointCh(p.e(), p.n() + dN);
+            var pct = route.pointClosestTo(pAbove);
+            assertEquals(p, pct.point());
+            assertEquals(i * TOOTH_LENGTH, pct.position());
+            assertEquals(dN, pct.distanceToReference());
+        }
 
-        edge4.add(new Edge(6, 7, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(7, 8, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(8, 9, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(9, 10, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(10, 11, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(11, 12, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
+        // Points below the sawtooth
+        for (int i = 0; i <= edgesCount; i += 2) {
+            var p = sawToothPoint(i);
+            var dN = i * 500;
+            var pBelow = new PointCh(p.e(), p.n() - dN);
+            var pct = route.pointClosestTo(pBelow);
+            assertEquals(p, pct.point());
+            assertEquals(i * TOOTH_LENGTH, pct.position());
+            assertEquals(dN, pct.distanceToReference());
+        }
 
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-        assertEquals(3000,multiRoute1.length());
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-        assertEquals(3000,multiRoute2.length());
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        assertEquals(2, multiRoute1.nodeClosestTo(1000));
-        assertEquals(0,multiRoute1.nodeClosestTo(-1000));
-        assertEquals(6,multiRoute1.nodeClosestTo(10000));
-
-        assertEquals(9, multiRoute2.nodeClosestTo(1500));
-        assertEquals(6 , multiRoute2.nodeClosestTo(-100));
-        assertEquals(12,multiRoute2.nodeClosestTo(10000));
-
-        assertEquals(12,twoMultiroutes.nodeClosestTo(7000));
-        assertEquals(0,twoMultiroutes.nodeClosestTo(-7000));
-        assertEquals(8,twoMultiroutes.nodeClosestTo(4000));
-        assertEquals(12,twoMultiroutes.nodeClosestTo(10000));
-
-
+        // Points close to the n/8
+        var dE = TOOTH_NS / 16d;
+        var dN = TOOTH_EW / 16d;
+        for (int i = 0; i < edgesCount; i += 1) {
+            var upwardEdge = (i & 1) == 0;
+            for (double p = 0.125; p <= 0.875; p += 0.125) {
+                var pointE = ORIGIN_E + (i + p) * TOOTH_EW;
+                var pointN = ORIGIN_N + TOOTH_NS * (upwardEdge ? p : (1 - p));
+                var point = new PointCh(pointE, pointN);
+                var position = (i + p) * TOOTH_LENGTH;
+                var reference = new PointCh(
+                        pointE + dE,
+                        pointN + (upwardEdge ? -dN : dN));
+                var pct = route.pointClosestTo(reference);
+                assertEquals(point, pct.point());
+                assertEquals(position, pct.position());
+                assertEquals(Math.hypot(dE, dN), pct.distanceToReference());
+            }
+        }
     }
 
-    @Test
-    void pointClosestToTest() {
-        SingleRoute singleRoute = new SingleRoute(List.of(new Edge(0, 1, new PointCh(2485000.0, 1075000.0), new PointCh(2485020.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute2 = new SingleRoute(List.of(new Edge(1, 2, new PointCh(2485020, 1075000.0), new PointCh(2485040.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute3 = new SingleRoute(List.of(new Edge(2, 3, new PointCh(2485040.0, 1075000.0), new PointCh(2485060.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute4 = new SingleRoute(List.of(new Edge(3, 4, new PointCh(2485060.0, 1075000.0), new PointCh(2485080.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute5 = new SingleRoute(List.of(new Edge(4, 5, new PointCh(2485080.0, 1075000.0), new PointCh(2485100.0, 1075000.0), 20, null)));
-        SingleRoute singleRoute6 = new SingleRoute(List.of(new Edge(5, 6, new PointCh(2485100.0, 1075000.0), new PointCh(2485120.0, 1075000.0), 20, null)));
-        MultiRoute multiRoute1 = new MultiRoute(Arrays.asList(singleRoute, singleRoute2, singleRoute3));
-        MultiRoute multiRoute2 = new MultiRoute(Arrays.asList(singleRoute4, singleRoute5, singleRoute6));
-        MultiRoute multiRoute = new MultiRoute(Arrays.asList(multiRoute1, multiRoute2));
-        assertEquals(new RoutePoint(new PointCh(2485060.0, 1075000.0), 60, 1000), multiRoute.pointClosestTo(new PointCh(2485060.0, 1076000.0)));
-        assertEquals(new RoutePoint(new PointCh(2485078.0, 1075000.0), 78, 4000), multiRoute.pointClosestTo(new PointCh(2485078.0, 1079000.0)));
-        assertEquals(new RoutePoint(new PointCh(2485120.0, 1075000.0), 120, 0), multiRoute.pointClosestTo(new PointCh(2485120.0, 1075000.0)));
-        assertEquals(new RoutePoint(new PointCh(2485120.0, 1075000.0), 120, 2000), multiRoute.pointClosestTo(new PointCh(2487120.0, 1075000.0)));
+    private static List<Edge> verticalEdges(int edgesCount) {
+        var edges = new ArrayList<Edge>(edgesCount);
+        for (int i = 0; i < edgesCount; i += 1) {
+            var p1 = new PointCh(ORIGIN_E, ORIGIN_N + i * EDGE_LENGTH);
+            var p2 = new PointCh(ORIGIN_E, ORIGIN_N + (i + 1) * EDGE_LENGTH);
+            edges.add(new Edge(i, i + 1, p1, p2, EDGE_LENGTH, x -> Double.NaN));
+        }
+        return Collections.unmodifiableList(edges);
     }
 
-    @Test
-    void pointClosestToTest2() {
-        List<Edge> edge1 = new ArrayList<>();
-        List<Edge> edge2 = new ArrayList<>();
-        List<Edge> edge3 = new ArrayList<>();
-        List<Edge> edge4 = new ArrayList<>();
-        List<Edge> edge5 = new ArrayList<>();
-        List<Edge> edge6 = new ArrayList<>();
+    private static List<Edge> sawToothEdges(int edgesCount) {
+        var edges = new ArrayList<Edge>(edgesCount);
+        for (int i = 0; i < edgesCount; i += 1) {
+            var p1 = sawToothPoint(i);
+            var p2 = sawToothPoint(i + 1);
+            var startingElevation = i * TOOTH_ELEVATION_GAIN;
+            edges.add(new Edge(i, i + 1, p1, p2, TOOTH_LENGTH, x -> startingElevation + x * TOOTH_SLOPE));
+        }
+        return Collections.unmodifiableList(edges);
+    }
 
-        edge1.add(new Edge(0, 1, new PointCh(2485100.0, 1075000.0), new PointCh(2485500.0, 1075000.0), 400, null));
-        edge1.add(new Edge(0, 1, new PointCh(2485500.0, 1075000.0), new PointCh(2486000.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486000.0, 1075000.0), new PointCh(2486500.0, 1075000.0), 500, null));
-        edge2.add(new Edge(0, 1, new PointCh(2486500.0, 1075000.0), new PointCh(2487000.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487000.0, 1075000.0), new PointCh(2487500.0, 1075000.0), 500, null));
-        edge3.add(new Edge(0, 1, new PointCh(2487500.0, 1075000.0), new PointCh(2488000.0, 1075000.0), 500, null));
-
-        edge4.add(new Edge(0, 1, new PointCh(2488000.0, 1075000.0), new PointCh(2488500.0, 1075000.0), 500, null));
-        edge4.add(new Edge(0, 1, new PointCh(2488500.0, 1075000.0), new PointCh(2489000.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489000.0, 1075000.0), new PointCh(2489500.0, 1075000.0), 500, null));
-        edge5.add(new Edge(0, 1, new PointCh(2489500.0, 1075000.0), new PointCh(2490000.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490000.0, 1075000.0), new PointCh(2490500.0, 1075000.0), 500, null));
-        edge6.add(new Edge(0, 1, new PointCh(2490500.0, 1075000.0), new PointCh(2491000.0, 1075000.0), 500, null));
-        SingleRoute singleRoute1 = new SingleRoute(edge1);
-        SingleRoute singleRoute2 = new SingleRoute(edge2);
-        SingleRoute singleRoute3 = new SingleRoute(edge3);
-
-        SingleRoute singleRoute4 = new SingleRoute(edge4);
-        SingleRoute singleRoute5 = new SingleRoute(edge5);
-        SingleRoute singleRoute6 = new SingleRoute(edge6);
-
-        List<Route> route1 = new ArrayList<>();
-        List<Route> route2 = new ArrayList<>();
-        route1.add(singleRoute1);
-        route1.add(singleRoute2);
-        route1.add(singleRoute3);
-        route2.add(singleRoute4);
-        route2.add(singleRoute5);
-        route2.add(singleRoute6);
-
-        MultiRoute multiRoute1 = new MultiRoute(route1);
-
-        MultiRoute multiRoute2 = new MultiRoute(route2);
-
-        List<Route> twoRoutes = new ArrayList<>();
-        twoRoutes.add(multiRoute1);
-        twoRoutes.add(multiRoute2);
-        MultiRoute twoMultiroutes = new MultiRoute(twoRoutes);
-
-        RoutePoint routePoint1 = new RoutePoint(new PointCh(2486000.0, 1075000.0),  900,10);
-
-        RoutePoint routePoint2 = new RoutePoint(new PointCh(2489500.0, 1075000.0),1500,20);
-
-        RoutePoint routePointTwoRoute = new RoutePoint(new PointCh(2489500.0, 1075000.0), 4400,30);
-
-        RoutePoint routePoint1Gauche = new RoutePoint(new PointCh(2485100.0, 1075000.0), 0,100);
-
-        RoutePoint routePoint1Droite = new RoutePoint(new PointCh(2488000.0, 1075000.0),2900,4000);
-
-        assertEquals(routePoint1,multiRoute1.pointClosestTo(new PointCh(2486000.0, 1075010.0)));
-        assertEquals(routePoint1Gauche,multiRoute1.pointClosestTo(new PointCh(2485000.0,1075000.0)));
-
-        assertEquals(routePoint1Droite,multiRoute1.pointClosestTo(new PointCh(2492000.0,1075000.0)));
-
-        assertEquals(routePoint2,multiRoute2.pointClosestTo(new PointCh(2489500.0, 1075020.0)));
-
-
-        assertEquals(routePointTwoRoute,twoMultiroutes.pointClosestTo(new PointCh(2489500.0, 1075030.0)));
-
-
-
-
-        RoutePoint routePoint1Gauche2 = new RoutePoint(new PointCh(2485100.0, 1075000.0), 0,100);
-        RoutePoint routePoint1Droite2 = new RoutePoint(new PointCh(2491000.0, 1075000.0),5900,1000);
-        assertEquals(routePoint1Gauche2,twoMultiroutes.pointClosestTo(new PointCh(2485000.0, 1075000.0)));
-        assertEquals(routePoint1Droite2,twoMultiroutes.pointClosestTo(new PointCh(2492000.0, 1075000.0)));
-
+    private static PointCh sawToothPoint(int i) {
+        return new PointCh(
+                ORIGIN_E + TOOTH_EW * i,
+                ORIGIN_N + ((i & 1) == 0 ? 0 : TOOTH_NS));
     }
 }

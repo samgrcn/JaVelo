@@ -39,7 +39,7 @@ public record AttributeSet(long bits) {
     }
 
     /**
-     *  Determines whether the set contains the given attribute.
+     * Determines whether the set contains the given attribute.
      *
      * @param attribute the given attribute
      * @return true if the attribute is in the set, false otherwise
@@ -53,6 +53,7 @@ public record AttributeSet(long bits) {
 
     /**
      * Determines whether a bit has attributes in common with this
+     *
      * @param that the bits we want to test
      * @return true if there's at least one attribute in common
      */

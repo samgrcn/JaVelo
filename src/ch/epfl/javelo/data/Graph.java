@@ -27,9 +27,10 @@ public class Graph {
     /**
      * Returns an instance of the complete Graph with the desired nodes, sectors, edges, attributeSets entered
      * in parameter.
-     * @param nodes nodes
-     * @param sectors sectors
-     * @param edges edges
+     *
+     * @param nodes         nodes
+     * @param sectors       sectors
+     * @param edges         edges
      * @param attributeSets attributeSets
      */
 
@@ -43,6 +44,7 @@ public class Graph {
 
     /**
      * Private method to open the wanted file and map it to a buffer of bytes
+     *
      * @param path the wanted file (not only the folder)
      * @return the mapped buffer
      * @throws IOException if the file doesn't exist
@@ -60,6 +62,7 @@ public class Graph {
      * Returns the JaVelo graph obtained from the files in the directory whose path is basePath,
      * or throws IOException if there is an input/output error,
      * e.g. if one of the expected files does not exist.
+     *
      * @param basePath path of the folder
      * @return a JaVelo graph obtained from the files in the directory whose path is basePath
      * @throws IOException if one of the expected file doesn't exist.
@@ -86,6 +89,7 @@ public class Graph {
 
     /**
      * Counts the number of nodes in the graph.
+     *
      * @return the total number of nodes in the graph.
      */
     public int nodeCount() {
@@ -94,6 +98,7 @@ public class Graph {
 
     /**
      * Gives the position of the given identity node
+     *
      * @param nodeId identity of the desired node
      * @return the position of the node
      */
@@ -103,6 +108,7 @@ public class Graph {
 
     /**
      * Gives the number of edges coming out of the given identity node.
+     *
      * @param nodeId the identity of the desired node
      * @return the number of edges coming out of the node
      */
@@ -113,7 +119,8 @@ public class Graph {
 
     /**
      * Gives the identity of the edgeIndex-th edge coming out of the node of identity nodeId.
-     * @param nodeId identity of the desired node
+     *
+     * @param nodeId    identity of the desired node
      * @param edgeIndex index of the desired edge
      * @return the identity of the desired edge of the desired node
      */
@@ -125,7 +132,8 @@ public class Graph {
     /**
      * Gives the identity of the closest node to the given point, at the given maximum distance (in meters),
      * or -1 if no node matches these criteria
-     * @param point reference point
+     *
+     * @param point          reference point
      * @param searchDistance distance to find the closest node (in meters)
      * @return the closest node to the point
      */
@@ -140,7 +148,7 @@ public class Graph {
                 distance = point.squaredDistanceTo(nodePoint(i));
                 if (distance < min) {
                     min = distance;
-                    if(distance < Math.pow(searchDistance, 2)) {
+                    if (distance < Math.pow(searchDistance, 2)) {
                         index = i;
                     }
                 }
@@ -152,6 +160,7 @@ public class Graph {
 
     /**
      * Gives the identity of the destination node of the given identity edge.
+     *
      * @param edgeId identity of the desired edge
      * @return identity of the node at the end of the edge
      */
@@ -163,6 +172,7 @@ public class Graph {
     /**
      * Returns true if and only if the given identity edge goes in the
      * opposite direction of the OSM path from which it comes.
+     *
      * @param edgeId identity of the desired edge
      * @return true if given identity edge goes in the opposite direction of the OSM path from which it comes
      */
@@ -173,14 +183,18 @@ public class Graph {
 
     /**
      * Gives the set of OSM attributes attached to the given identity edge.
+     *
      * @param edgeId identity of the desired edge
      * @return the set of OSM attributes of the desired edge
      */
 
-    public AttributeSet edgeAttributes(int edgeId) { return attributeSets.get(edges.attributesIndex(edgeId)); }
+    public AttributeSet edgeAttributes(int edgeId) {
+        return attributeSets.get(edges.attributesIndex(edgeId));
+    }
 
     /**
      * Gives the length, in meters, of the given identity edge.
+     *
      * @param edgeId identity of the desired edge
      * @return length, in meters, of the given identity edge
      */
@@ -191,6 +205,7 @@ public class Graph {
 
     /**
      * Gives the total positive elevation of the given identity ridge.
+     *
      * @param edgeId identity of the desired edge
      * @return the total positive elevation of the given identity ridge
      */
@@ -200,15 +215,17 @@ public class Graph {
     }
 
     /**
-     *  Gives the long profile of the given identity edge, as a function; if the edge has no profile,
-     *  then this function returns Double.NaN for any argument.
+     * Gives the long profile of the given identity edge, as a function; if the edge has no profile,
+     * then this function returns Double.NaN for any argument.
+     *
      * @param edgeId identity of the desired edge
      * @return the long profile of the edge
      */
 
     public DoubleUnaryOperator edgeProfile(int edgeId) {
-        if(!edges.hasProfile(edgeId)) { return Functions.constant(Double.NaN); }
-        else {
+        if (!edges.hasProfile(edgeId)) {
+            return Functions.constant(Double.NaN);
+        } else {
             return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
         }
     }

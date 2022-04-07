@@ -4,6 +4,14 @@ import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 import java.util.Arrays;
+
+
+/**
+ * ElevationProfileComputer contains the code to allow to calculate the long profile of a given route
+ *
+ * @author Samuel Garcin (345633)
+ */
+
 public class ElevationProfileComputer {
 
     private ElevationProfileComputer() {
@@ -57,7 +65,7 @@ public class ElevationProfileComputer {
         }
     }
 
-    private static void fillingArray(Route route, float[] elevationSamples) {
+    private static void fillingArray(float[] elevationSamples) {
         int samplesNumber = elevationSamples.length;
         for (int i = 0; i < samplesNumber; i++) {
             if (Float.isNaN(elevationSamples[i])) {
@@ -71,7 +79,7 @@ public class ElevationProfileComputer {
     }
 
     /**
-     * which returns the long profile of the route, ensuring that the spacing between the
+     * Returns the long profile of the route, ensuring that the spacing between the
      * samples of the profile is at most maxStepLength meters.
      * @param route
      * @param maxStepLength
@@ -89,7 +97,7 @@ public class ElevationProfileComputer {
             elevationSamples[i] = (float) route.elevationAt(position);
         }
         checkSpecialCases(elevationSamples);
-        fillingArray(route, elevationSamples);
+        fillingArray(elevationSamples);
 
         return new ElevationProfile(route.length(), elevationSamples);
     }

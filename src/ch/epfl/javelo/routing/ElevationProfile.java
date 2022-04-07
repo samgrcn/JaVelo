@@ -8,6 +8,11 @@ import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.function.DoubleUnaryOperator;
 
+/**
+ * ElevationProfile represents the long profile of either a simple or multiple route.
+ * @author Samuel Garcin (345633)
+ */
+
 public class ElevationProfile {
 
     private final double length;
@@ -20,8 +25,8 @@ public class ElevationProfile {
      *
      * @param length           length of the route (in meters)
      * @param elevationSamples elevations of the profile
-     * @throws IllegalArgumentException if the length is negative or null,
-     *                                  or if the sample array contains less than 2 elements
+     * @throws IllegalArgumentException  if the length is negative or null,
+     *                                   or if the sample array contains less than 2 elements
      */
 
     public ElevationProfile(double length, float[] elevationSamples) {
@@ -133,6 +138,4 @@ public class ElevationProfile {
     public double elevationAt(double position) {
         return function.applyAsDouble(position);
     }
-
-
 }

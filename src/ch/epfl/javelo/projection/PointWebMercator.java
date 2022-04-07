@@ -18,9 +18,10 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Returns the point whose coordinates are x and y at the zoom level zoomLevel.
+     *
      * @param zoomLevel the zoom level
-     * @param x x-coordinate
-     * @param y y-coordinate
+     * @param x         x-coordinate
+     * @param y         y-coordinate
      * @return the Web Mercator point
      */
     public static PointWebMercator of(int zoomLevel, double x, double y) {
@@ -31,6 +32,7 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Returns the Web Mercator point corresponding to the given Swiss coordinate system point.
+     *
      * @param pointCh Swiss coordinate point
      * @return the Web Mercator point
      */
@@ -42,6 +44,7 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Returns the x-coordinate at the given zoom level.
+     *
      * @param zoomLevel the zoom level
      * @return x-coordinate
      */
@@ -51,6 +54,7 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Returns the y-coordinate at the given zoom level.
+     *
      * @param zoomLevel the zoom level
      * @return the y-coordinate
      */
@@ -60,6 +64,7 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Returns the longitude of the point, in radians.
+     *
      * @return the longitude
      */
     public double lon() {
@@ -68,6 +73,7 @@ public record PointWebMercator(double x, double y) {
 
     /**
      * Returns the latitude of the point, in radians.
+     *
      * @return the latitude
      */
     public double lat() {
@@ -77,6 +83,7 @@ public record PointWebMercator(double x, double y) {
     /**
      * Returns the Swiss coordinate point at the same position as the receiver (this) or
      * null if this point is not within the boundaries of Switzerland defined by SwissBounds.
+     *
      * @return the Swiss coordinate point or null
      */
     public PointCh toPointCh() {

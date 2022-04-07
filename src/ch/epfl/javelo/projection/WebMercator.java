@@ -8,10 +8,13 @@ import ch.epfl.javelo.Math2;
  * @author Quentin Chappuis (339517)
  */
 public final class WebMercator {
-    private WebMercator(){};
+    private WebMercator() {
+    }
+
 
     /**
      * Returns the x-coordinate of the projection of a point at longitude lon, given in radians.
+     *
      * @param lon longitude
      * @return the x-coordinate
      */
@@ -21,6 +24,7 @@ public final class WebMercator {
 
     /**
      * Returns the y-coordinate of the projection of a point at latitude lat, given in radians.
+     *
      * @param lat latitude
      * @return the y-coordinate
      */
@@ -30,6 +34,7 @@ public final class WebMercator {
 
     /**
      * Returns the longitude, in radians, of a point whose projection is at the given x-coordinate.
+     *
      * @param x x-coordinate
      * @return the longitude
      */
@@ -39,6 +44,7 @@ public final class WebMercator {
 
     /**
      * Returns the latitude, in radians, of a point whose projection is at the given y-coordinate.
+     *
      * @param y y-coordinate
      * @return the latitude
      */
