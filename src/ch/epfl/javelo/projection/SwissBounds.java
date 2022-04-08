@@ -14,7 +14,7 @@ public final class SwissBounds {
     public static final double WIDTH = MAX_E - MIN_E;
     public static final double HEIGHT = MAX_N - MIN_N;
 
-    private SwissBounds() {}
+    private SwissBounds(){}
 
 
     /**

@@ -19,6 +19,7 @@ public final class SingleRoute implements Route {
 
     /**
      * Constructor that initializes the edges list and the route for the dichotomous search.
+     *
      * @param edges a list containing all edges
      * @throws IllegalArgumentException if the edges list is empty
      */
