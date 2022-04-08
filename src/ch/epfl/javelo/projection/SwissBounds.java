@@ -14,8 +14,7 @@ public final class SwissBounds {
     public static final double WIDTH = MAX_E - MIN_E;
     public static final double HEIGHT = MAX_N - MIN_N;
 
-    private SwissBounds() {
-    }
+    private SwissBounds(){}
 
 
     /**
@@ -28,6 +27,4 @@ public final class SwissBounds {
     public static boolean containsEN(double e, double n) {
         return e >= MIN_E && e <= MAX_E && n >= MIN_N && n <= MAX_N;
     }
-
-    ;
 }

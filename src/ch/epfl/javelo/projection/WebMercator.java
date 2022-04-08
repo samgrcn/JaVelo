@@ -8,10 +8,8 @@ import ch.epfl.javelo.Math2;
  * @author Quentin Chappuis (339517)
  */
 public final class WebMercator {
-    private WebMercator() {
-    }
-
-
+    private WebMercator(){}
+    
     /**
      * Returns the x-coordinate of the projection of a point at longitude lon, given in radians.
      *

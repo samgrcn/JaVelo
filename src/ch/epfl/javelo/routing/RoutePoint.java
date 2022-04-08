@@ -13,6 +13,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
 
     /**
      * Retourne un point identique au récepteur (this) mais dont la position est décalée de la différence donnée, qui peut être positive ou négative.
+     *
      * @param positionDifference the position difference that should be applied
      * @return a new route point
      */
@@ -22,6 +23,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
 
     /**
      * Returns this if its distance to the reference is less than or equal to that, and that otherwise.
+     *
      * @param that another route point
      * @return this or that
      */
@@ -32,6 +34,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
     /**
      * Returns this if its distance to the reference is less than or equal to thatDistanceToReference,
      * and a new instance of RoutePoint whose attributes are the arguments passed to min otherwise.
+     *
      * @param thatPoint another route point
      * @param thatPosition new position
      * @param thatDistanceToReference the distance to compare

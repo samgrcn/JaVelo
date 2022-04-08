@@ -10,6 +10,7 @@ public final class Preconditions {
 
     /**
      * Throws the IllegalArgumentException if its argument is false, and does nothing otherwise.
+     *
      * @param shouldBeTrue the argument
      * @throws IllegalArgumentException if the passed argument is false
      */

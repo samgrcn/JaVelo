@@ -6,10 +6,11 @@ package ch.epfl.javelo;
  * @author Quentin Chappuis (339517)
  */
 public final class Q28_4 {
-    private Q28_4(){};
+    private Q28_4(){}
 
     /**
      * Returns the value Q28.4 corresponding to the given integer.
+     *
      * @param i the integer
      * @return the Q28.4 value
      */
@@ -19,6 +20,7 @@ public final class Q28_4 {
 
     /**
      * Returns the value of type double equal to the given value Q28.4.
+     *
      * @param q28_4 the Q28.4 value
      * @return the double corresponding
      */
@@ -28,6 +30,7 @@ public final class Q28_4 {
 
     /**
      * Returns the float value corresponding to the given Q28.4 value.
+     *
      * @param q28_4 the Q28.4 value
      * @return the float corresponding
      */
