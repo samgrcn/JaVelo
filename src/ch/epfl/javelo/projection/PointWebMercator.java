@@ -1,5 +1,7 @@
 package ch.epfl.javelo.projection;
 
+import ch.epfl.javelo.Preconditions;
+
 /**
  * Represents a point in the Web Mercator system.
  *
@@ -11,9 +13,7 @@ public record PointWebMercator(double x, double y) {
      * @throws IllegalArgumentException if x or y are not between 0 and 1
      */
     public PointWebMercator {
-        if (x < 0 || x > 1 || y < 0 || y > 1) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(x >= 0 && x <= 1 && y >= 0 && y <= 1);
     }
 
     /**
