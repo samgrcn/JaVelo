@@ -1,7 +1,5 @@
 package ch.epfl.javelo.data;
 
-
-import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.SwissBounds;
 
@@ -35,6 +33,7 @@ public record GraphSectors(ByteBuffer buffer) {
      */
 
     public record Sector(int startNodeId, int endNodeId) {
+
     }
 
 
@@ -80,7 +79,9 @@ public record GraphSectors(ByteBuffer buffer) {
             for (int x = xMinSectorInSwiss; x <= xMaxSectorInSwiss; x++) {
                 sectorId = y * SECTOR_NUMBER + x;
                 firstNodeId = buffer.getInt(sectorId * OFFSET_TO_NEXT_SECTOR);
-                endNodeId = firstNodeId + Short.toUnsignedInt(buffer.getShort(sectorId * OFFSET_TO_NEXT_SECTOR + OFFSET_TO_NODE_NUMBER));
+                endNodeId = firstNodeId +
+                        Short.toUnsignedInt(
+                                buffer.getShort(sectorId * OFFSET_TO_NEXT_SECTOR + OFFSET_TO_NODE_NUMBER));
                 listOfSectorsInSquare.add(new Sector(firstNodeId, endNodeId));
             }
         }

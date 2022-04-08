@@ -13,6 +13,7 @@ public record PointCh(double e, double n) {
     /**
      * @throws IllegalArgumentException if the given coordinates are not contained in Switzerland
      */
+
     public PointCh {
         if (!SwissBounds.containsEN(e, n))
             throw new IllegalArgumentException();

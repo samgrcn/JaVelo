@@ -29,6 +29,7 @@ public class RouteComputer {
 
     record WeightedNode(int nodeId, float distance)
             implements Comparable<WeightedNode> {
+
         @Override
         public int compareTo(WeightedNode that) {
             return Float.compare(this.distance, that.distance);
@@ -119,10 +120,11 @@ public class RouteComputer {
         List<Edge> routeEdgeList = new ArrayList<>();
         PriorityQueue<WeightedNode> exploration = new PriorityQueue<>();
 
-
+        //we set the distance of each element at positive infinity
         for (int i = 0; i < nodeNumber; i++) {
             distance[i] = Float.POSITIVE_INFINITY;
         }
+
         distance[startNodeId] = 0;
         exploration.add(new WeightedNode(startNodeId, distance[startNodeId]));
 
@@ -147,6 +149,6 @@ public class RouteComputer {
 
             distance[n] = Float.NEGATIVE_INFINITY;
         }
-        return null;
+        return null; //if there's no more node to explore, and it has not reached the last node.
     }
 }

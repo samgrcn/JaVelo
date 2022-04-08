@@ -6,6 +6,7 @@ package ch.epfl.javelo;
  * @author Quentin Chappuis (339517)
  */
 public final class Bits {
+
     private Bits(){}
 
     /**

@@ -31,6 +31,7 @@ public class ElevationProfileComputer {
         int samplesNumber = elevationSamples.length;
         int existingFloat = 0;
 
+        //we explore the list forward (starting from the left)
         if (forward) {
             for (int i = from; i < samplesNumber; i++) {
                 if (!Float.isNaN(elevationSamples[i])) {
@@ -38,7 +39,9 @@ public class ElevationProfileComputer {
                     break;
                 }
             }
-        } else {
+        }
+        //we explore the list backward (starting from the right)
+        else {
             for (int i = samplesNumber - 1; i > 0; i--) {
                 if (!Float.isNaN(elevationSamples[i])) {
                     existingFloat = i;
@@ -58,12 +61,18 @@ public class ElevationProfileComputer {
      */
 
     private static void checkSpecialCases(float[] elevationSamples) {
+
         int samplesNumber = elevationSamples.length;
+
         if (Float.isNaN(elevationSamples[0])) {
             int i = toNextExistingFloat(elevationSamples, 0, true);
+
+            //if the list is full of NaN
             if (i == 0) {
                 Arrays.fill(elevationSamples, 0, samplesNumber, 0);
-            } else {
+            }
+            //only if some of the first values are NaN, but not the entire array
+            else {
                 Arrays.fill(elevationSamples,
                         0,
                         i - 1,
@@ -71,8 +80,10 @@ public class ElevationProfileComputer {
             }
         }
 
+        //only if some of the last values are NaN, but not the entire array
         if (Float.isNaN(elevationSamples[samplesNumber - 1])) {
             int i = toNextExistingFloat(elevationSamples, samplesNumber, false);
+
             Arrays.fill(elevationSamples,
                     i + 1,
                     samplesNumber,
@@ -86,7 +97,10 @@ public class ElevationProfileComputer {
      * @param elevationSamples the array we want to fill
      */
     private static void fillingArray(float[] elevationSamples) {
+
         int samplesNumber = elevationSamples.length;
+
+        //for each element, we check whether it is a NaN, and we fill the array accordingly
         for (int i = 0; i < samplesNumber; i++) {
             if (Float.isNaN(elevationSamples[i])) {
                 int lowerBound = i - 1;
