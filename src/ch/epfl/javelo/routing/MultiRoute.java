@@ -20,7 +20,9 @@ public class MultiRoute implements Route {
 
     /**
      * Constructor that initializes the segments list, the edges list and the route for the dichotomous search.
+     *
      * @param segments a list containing all segments
+     * @throws IllegalArgumentException if the segments list is empty
      */
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
@@ -142,7 +144,7 @@ public class MultiRoute implements Route {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
-        if (position < edges.get(index).length()/2) return edges.get(index).fromNodeId();
+        if (position < edges.get(index).length() / 2) return edges.get(index).fromNodeId();
         return edges.get(index).toNodeId();
     }
 
@@ -155,11 +157,13 @@ public class MultiRoute implements Route {
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
         RoutePoint res = RoutePoint.NONE;
+        Edge currentEdge;
         for (int i = 0; i < edges.size(); ++i) {
-            double position = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
-            double thatPosition = route[i] + edges.get(i).fromPoint().distanceTo(edges.get(i).pointAt(position));
-            double thatDistanceToReference = edges.get(i).pointAt(position).distanceTo(point);
-            res = res.min(edges.get(i).pointAt(position), thatPosition, thatDistanceToReference);
+            currentEdge = edges.get(i);
+            double position = Math2.clamp(0, currentEdge.positionClosestTo(point), currentEdge.length());
+            double thatPosition = route[i] + currentEdge.fromPoint().distanceTo(currentEdge.pointAt(position));
+            double thatDistanceToReference = currentEdge.pointAt(position).distanceTo(point);
+            res = res.min(currentEdge.pointAt(position), thatPosition, thatDistanceToReference);
         }
         return res;
     }

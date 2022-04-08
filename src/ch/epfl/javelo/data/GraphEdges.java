@@ -1,7 +1,6 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Bits;
-import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Q28_4;
 
 import java.nio.ByteBuffer;
@@ -180,7 +179,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     public float[] profileSamples(int edgeId) {
         int identity = Bits.extractUnsigned(profileIds.get(edgeId), 0, 30);
         int samplesNumber = 1 + (int) Math.ceil(length(edgeId) / 2);
-
         if (!hasProfile(edgeId)) return new float[0];
 
         float[] res = new float[samplesNumber];
@@ -188,8 +186,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         if (getProfile(edgeId) == 2) res = profileSamplesType2(res, samplesNumber, identity);
         if (getProfile(edgeId) == 3) res = profileSamplesType3(res, samplesNumber, identity);
 
-        if (isInverted(edgeId)) return reverseFloatArray(res);
-        return res;
+        return isInverted(edgeId) ? reverseFloatArray(res) : res;
     }
 
     /**

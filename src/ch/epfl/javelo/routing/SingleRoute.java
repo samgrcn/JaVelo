@@ -20,6 +20,7 @@ public final class SingleRoute implements Route {
     /**
      * Constructor that initializes the edges list and the route for the dichotomous search.
      * @param edges a list containing all edges
+     * @throws IllegalArgumentException if the edges list is empty
      */
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
@@ -30,7 +31,6 @@ public final class SingleRoute implements Route {
             route[i] = edges.get(i - 1).length() + route[i - 1];
         }
     }
-
 
     /**
      * Returns the segment index at the given position (in metres).
@@ -140,11 +140,13 @@ public final class SingleRoute implements Route {
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
         RoutePoint res = RoutePoint.NONE;
+        Edge currentEdge;
         for (int i = 0; i < edges.size(); ++i) {
-            double position = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
-            double thatPosition = route[i] + edges.get(i).fromPoint().distanceTo(edges.get(i).pointAt(position));
-            double thatDistanceToReference = edges.get(i).pointAt(position).distanceTo(point);
-            res = res.min(edges.get(i).pointAt(position), thatPosition, thatDistanceToReference);
+            currentEdge = edges.get(i);
+            double position = Math2.clamp(0, currentEdge.positionClosestTo(point), currentEdge.length());
+            double thatPosition = route[i] + currentEdge.fromPoint().distanceTo(currentEdge.pointAt(position));
+            double thatDistanceToReference = currentEdge.pointAt(position).distanceTo(point);
+            res = res.min(currentEdge.pointAt(position), thatPosition, thatDistanceToReference);
         }
         return res;
     }

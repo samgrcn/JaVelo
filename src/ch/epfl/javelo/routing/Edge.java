@@ -1,10 +1,8 @@
 package ch.epfl.javelo.routing;
 
-import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
-import ch.epfl.javelo.projection.WebMercator;
 
 import java.util.function.DoubleUnaryOperator;
 
