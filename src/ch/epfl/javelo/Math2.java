@@ -21,6 +21,7 @@ public final class Math2 {
     public static int ceilDiv(int x, int y) {
         Preconditions.checkArgument(x >= 0);
         Preconditions.checkArgument(y > 0);
+
         return (x + y - 1) / y;
     }
 
@@ -34,6 +35,7 @@ public final class Math2 {
      */
     public static double interpolate(double y0, double y1, double x) {
         double a = (y0 - y1) / (-1);
+
         return fma(a, x, y0);
     }
 
@@ -137,6 +139,7 @@ public final class Math2 {
         double apY = pY - aY;
         double abX = bX - aX;
         double abY = bY - aY;
+
         return dotProduct(apX, apY, abX, abY) / norm(abX, abY);
     }
 }

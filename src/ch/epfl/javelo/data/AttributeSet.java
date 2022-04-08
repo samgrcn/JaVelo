@@ -43,6 +43,7 @@ public record AttributeSet(long bits) {
     public boolean contains(Attribute attribute) {
         long modifiedBits = this.bits;
         modifiedBits >>>= attribute.ordinal();
+
         return (modifiedBits & 1L) == 1L;
     }
 

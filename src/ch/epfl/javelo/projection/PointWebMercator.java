@@ -29,6 +29,7 @@ public record PointWebMercator(double x, double y) {
     public static PointWebMercator of(int zoomLevel, double x, double y) {
         x = x / Math.pow(2, ZOOM_AT_LEVEL_0 + zoomLevel);
         y = y / Math.pow(2, ZOOM_AT_LEVEL_0 + zoomLevel);
+
         return new PointWebMercator(x, y);
     }
 
@@ -41,6 +42,7 @@ public record PointWebMercator(double x, double y) {
     public static PointWebMercator ofPointCh(PointCh pointCh) {
         double lat = pointCh.lat();
         double lon = pointCh.lon();
+
         return new PointWebMercator(WebMercator.x(lon), WebMercator.y(lat));
     }
 

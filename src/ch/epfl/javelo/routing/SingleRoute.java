@@ -103,6 +103,7 @@ public final class SingleRoute implements Route {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
+
         return edges.get(index).pointAt(position);
     }
 
@@ -133,6 +134,7 @@ public final class SingleRoute implements Route {
         int index = dichotomousSearch(position);
         position -= route[index];
         if (position < edges.get(index).length()/2) return edges.get(index).fromNodeId();
+
         return edges.get(index).toNodeId();
     }
 

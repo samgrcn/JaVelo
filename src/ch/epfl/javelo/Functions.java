@@ -89,6 +89,7 @@ public final class Functions {
         // in samples - 1) intervals, and we want to find in which interval x is.
         private int bound(double x) {
             double intervalLength = xMax / (samples.length - 1);
+
             return (int) (x / intervalLength);
         }
 

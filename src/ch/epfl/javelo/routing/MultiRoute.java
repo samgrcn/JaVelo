@@ -66,9 +66,7 @@ public class MultiRoute implements Route {
      * @return the length
      */
     @Override
-    public double length() {
-        return route[route.length - 1];
-    }
+    public double length() { return route[route.length - 1]; }
 
     /**
      * Returns all the edges of the route.
@@ -76,9 +74,7 @@ public class MultiRoute implements Route {
      * @return all the edges
      */
     @Override
-    public List<Edge> edges() {
-        return List.copyOf(edges);
-    }
+    public List<Edge> edges() { return List.copyOf(edges); }
 
     /**
      * Returns all the points located at the ends of the edges of the route.
@@ -90,6 +86,7 @@ public class MultiRoute implements Route {
         List<PointCh> res = new ArrayList<>();
         res.add(edges.get(0).fromPoint());
         for (Edge edge : edges) res.add(edge.toPoint());
+
         return res;
     }
 
@@ -102,6 +99,7 @@ public class MultiRoute implements Route {
     private int dichotomousSearch(double position) {
         int res = Arrays.binarySearch(route, position);
         if (res == edges.size()) return res - 1;
+
         return res < 0 ? -(res + 2) : res;
     }
 
@@ -116,6 +114,7 @@ public class MultiRoute implements Route {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
+
         return edges.get(index).pointAt(position);
     }
 
@@ -130,6 +129,7 @@ public class MultiRoute implements Route {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
+
         return edges.get(index).elevationAt(position);
     }
 
@@ -145,6 +145,7 @@ public class MultiRoute implements Route {
         int index = dichotomousSearch(position);
         position -= route[index];
         if (position < edges.get(index).length() / 2) return edges.get(index).fromNodeId();
+
         return edges.get(index).toNodeId();
     }
 
