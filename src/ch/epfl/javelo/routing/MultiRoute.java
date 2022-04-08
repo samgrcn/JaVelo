@@ -144,9 +144,8 @@ public class MultiRoute implements Route {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
-        if (position < edges.get(index).length() / 2) return edges.get(index).fromNodeId();
 
-        return edges.get(index).toNodeId();
+        return position < edges.get(index).length() / 2 ?  edges.get(index).fromNodeId() : edges.get(index).toNodeId();
     }
 
     /**
