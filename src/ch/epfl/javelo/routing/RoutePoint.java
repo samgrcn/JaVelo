@@ -18,7 +18,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * @return a new route point
      */
     public RoutePoint withPositionShiftedBy(double positionDifference) {
-        return new RoutePoint(this.point(), this.position() + positionDifference, this.distanceToReference());
+        return new RoutePoint(point, position + positionDifference, distanceToReference);
     }
 
     /**
@@ -28,7 +28,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * @return this or that
      */
     public RoutePoint min(RoutePoint that) {
-        return distanceToReference() <= that.distanceToReference() ? this : that;
+        return distanceToReference <= that.distanceToReference() ? this : that;
     }
 
     /**
@@ -41,6 +41,6 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * @return this or a new route point
      */
     public RoutePoint min(PointCh thatPoint, double thatPosition, double thatDistanceToReference) {
-        return distanceToReference() <= thatDistanceToReference ? this : new RoutePoint(thatPoint, thatPosition, thatDistanceToReference);
+        return distanceToReference <= thatDistanceToReference ? this : new RoutePoint(thatPoint, thatPosition, thatDistanceToReference);
     }
 }
