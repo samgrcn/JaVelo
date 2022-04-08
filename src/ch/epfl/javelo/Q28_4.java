@@ -6,6 +6,7 @@ package ch.epfl.javelo;
  * @author Quentin Chappuis (339517)
  */
 public final class Q28_4 {
+
     private Q28_4(){}
 
     /**
