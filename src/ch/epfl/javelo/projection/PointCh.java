@@ -27,6 +27,7 @@ public record PointCh(double e, double n) {
     public double squaredDistanceTo(PointCh that) {
         double vectorX = that.e - this.e;
         double vectorY = that.n - this.n;
+
         return Math2.squaredNorm(vectorX, vectorY);
     }
 
@@ -39,6 +40,7 @@ public record PointCh(double e, double n) {
     public double distanceTo(PointCh that) {
         double vectorX = that.e - this.e;
         double vectorY = that.n - this.n;
+
         return Math2.norm(vectorX, vectorY);
     }
 
