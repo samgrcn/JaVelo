@@ -16,7 +16,6 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Samuel Garcin (345633)
  */
-
 public class Graph {
 
     private final GraphNodes nodes;

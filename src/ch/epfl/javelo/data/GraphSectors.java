@@ -14,7 +14,6 @@ import static ch.epfl.javelo.Math2.clamp;
  *
  * @author Samuel Garcin (345633)
  */
-
 public record GraphSectors(ByteBuffer buffer) {
 
     private static final int OFFSET_TO_NODE_NUMBER = Integer.BYTES; //number of bytes in an integer, = 4

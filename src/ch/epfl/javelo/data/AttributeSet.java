@@ -8,7 +8,6 @@ import java.util.StringJoiner;
  *
  * @author Samuel Garcin (345633)
  */
-
 public record AttributeSet(long bits) {
 
     /**

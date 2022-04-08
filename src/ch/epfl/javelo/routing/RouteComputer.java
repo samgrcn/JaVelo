@@ -10,7 +10,6 @@ import java.util.*;
  *
  * @author Samuel Garcin (345633)
  */
-
 public class RouteComputer {
 
 
@@ -26,7 +25,6 @@ public class RouteComputer {
     /**
      * Record used to store in the list exploration a WeightedNode, including an id of the node and its distance.
      */
-
     record WeightedNode(int nodeId, float distance)
             implements Comparable<WeightedNode> {
 
@@ -45,8 +43,6 @@ public class RouteComputer {
      * @param predecessor array of predecessor (id of the node before the index in the array, which is also its closest)
      * @param exploration list of WeightedNode
      */
-
-
     private void explorationFiller(int n, int endNodeId, float[] distance, int[] predecessor, PriorityQueue<WeightedNode> exploration) {
 
         for (int i = 0; i < graph.nodeOutDegree(n); i++) {
@@ -67,14 +63,14 @@ public class RouteComputer {
     }
 
     /**
-     * Private method which creates a list of Edge connecting the nodes of the array predecessor (a node and its closest).
+     * Private method which creates a list of Edge connecting the nodes with its predecessor
+     * (a node and the node at the end of the shortest edge).
      *
      * @param startNodeId   first node of the route
      * @param endNodeId     last node of the route
      * @param predecessor   array of predecessor (id of the node before the index in the array, which is also its closest)
      * @param routeEdgeList the list of Edge we want to return
      */
-
     private void endNodeReached(int startNodeId, int endNodeId, int[] predecessor, List<Edge> routeEdgeList) {
         int currentNodeId = endNodeId;
         int previousNodeId = predecessor[endNodeId];
@@ -106,7 +102,6 @@ public class RouteComputer {
      * or null if no route exists
      * @throws IllegalArgumentException if the start and end nodes are identical
      */
-
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
 
         Preconditions.checkArgument(startNodeId != endNodeId);

@@ -12,7 +12,8 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
     public final static RoutePoint NONE = new RoutePoint(null, Double.NaN, Double.POSITIVE_INFINITY);
 
     /**
-     * Retourne un point identique au récepteur (this) mais dont la position est décalée de la différence donnée, qui peut être positive ou négative.
+     * Returns a point identical to the receiver (this) but whose position is offset by the given difference,
+     * which can be positive or negative
      *
      * @param positionDifference the position difference that should be applied
      * @return a new route point

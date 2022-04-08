@@ -8,7 +8,6 @@ import ch.epfl.javelo.Preconditions;
  *
  * @author Samuel Garcin (345633)
  */
-
 public record PointCh(double e, double n) {
 
     /**

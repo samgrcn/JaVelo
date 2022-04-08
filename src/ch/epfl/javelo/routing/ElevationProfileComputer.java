@@ -11,7 +11,6 @@ import java.util.Arrays;
  *
  * @author Samuel Garcin (345633)
  */
-
 public class ElevationProfileComputer {
 
     private ElevationProfileComputer() {
@@ -26,7 +25,6 @@ public class ElevationProfileComputer {
      *                         since we start from the end
      * @return the index of the first element that is not NaN, going forward or backward depending on the boolean forward.
      */
-
     private static int toNextExistingFloat(float[] elevationSamples, int from, boolean forward) {
         int samplesNumber = elevationSamples.length;
         int existingFloat = 0;
@@ -59,7 +57,6 @@ public class ElevationProfileComputer {
      *
      * @param elevationSamples the array we want to check
      */
-
     private static void checkSpecialCases(float[] elevationSamples) {
 
         int samplesNumber = elevationSamples.length;
@@ -121,7 +118,6 @@ public class ElevationProfileComputer {
      * @return the long profile of the route.
      * @throws IllegalArgumentException if this spacing is not strictly positive.
      */
-
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
 
         Preconditions.checkArgument(maxStepLength > 0);

@@ -28,6 +28,7 @@ public final class SingleRoute implements Route {
         this.edges = List.copyOf(edges);
         route = new double[edges.size() + 1];
         route[0] = 0;
+
         for (int i = 1; i < edges.size() + 1; i++) {
             route[i] = edges.get(i - 1).length() + route[i - 1];
         }
@@ -74,6 +75,7 @@ public final class SingleRoute implements Route {
         List<PointCh> res = new ArrayList<>();
         res.add(edges.get(0).fromPoint());
         for (Edge edge : edges) res.add(edge.toPoint());
+
         return res;
     }
 
@@ -86,6 +88,7 @@ public final class SingleRoute implements Route {
     private int dichotomousSearch(double position) {
         int res = Arrays.binarySearch(route, position);
         if (res == edges().size()) return res - 1;
+
         return res < 0 ? -(res + 2) : res;
     }
 
@@ -114,6 +117,7 @@ public final class SingleRoute implements Route {
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
+
         return edges.get(index).elevationAt(position);
     }
 

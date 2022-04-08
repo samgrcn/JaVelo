@@ -7,7 +7,6 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Samuel Garcin (345633)
  */
-
 public final class Functions {
 
     private Functions() {
@@ -19,7 +18,6 @@ public final class Functions {
      * @param y y
      * @return a new instance of Constant
      */
-
     public static DoubleUnaryOperator constant(double y) {
         return new Constant(y);
     }
@@ -29,7 +27,6 @@ public final class Functions {
      *
      * @param y y
      */
-
     private record Constant(double y)
             implements DoubleUnaryOperator {
 
@@ -40,7 +37,6 @@ public final class Functions {
          * @param x x
          * @return y from record Constant (this.y)
          */
-
         @Override
         public double applyAsDouble(double x) {
             return this.y;
@@ -54,7 +50,6 @@ public final class Functions {
      * @param samples [] an array of y values spaced by a same interval.
      * @return a new instance of Sampled.
      */
-
     public static DoubleUnaryOperator sampled(float[] samples, double xMax) {
         return new Sampled(samples, xMax);
     }
@@ -66,7 +61,6 @@ public final class Functions {
      * @param samples [] an array of y values spaced by a same interval.
      * @param xMax    the maximum x value of the big interval containing all values of samples [].
      */
-
     private record Sampled(float[] samples, double xMax) implements DoubleUnaryOperator {
 
         /**
@@ -89,7 +83,6 @@ public final class Functions {
          * @return The value of x divided by the length of an interval, rounded down ; so the lower boundary of
          * the interval in which x is.
          */
-
         // We create intervalLength
         // which is the length in the X-axis between each point with a corresponding value on the Y-axis of samples.
         // Each point in samples has a value on the X-axis, spaced by intervalLength. There are (the number of elements
@@ -105,7 +98,6 @@ public final class Functions {
          * @param x x
          * @return the corresponding y of the x value
          */
-
         @Override
         public double applyAsDouble(double x) {
 
@@ -116,6 +108,7 @@ public final class Functions {
             }
 
             double intervalLength = xMax / (samples.length - 1);
+
             return Math2.interpolate(samples[bound(x)], samples[bound(x) + 1],
                     (x - intervalLength * bound(x)) / intervalLength);
 

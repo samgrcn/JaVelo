@@ -12,7 +12,6 @@ import ch.epfl.javelo.Q28_4;
  *
  * @author Samuel Garcin (345633)
  */
-
 public record GraphNodes(IntBuffer buffer) {
 
 

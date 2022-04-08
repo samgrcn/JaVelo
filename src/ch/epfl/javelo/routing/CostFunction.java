@@ -4,7 +4,6 @@ package ch.epfl.javelo.routing;
  * @author Samuel Garcin (345633)
  * A very small interface that CityBikeCF implements
  */
-
 public interface CostFunction {
 
     /**
@@ -14,6 +13,5 @@ public interface CostFunction {
      * @param edgeId Identity of the last node
      * @return the factor by which the length of the identity edgeId must be multiplied.
      */
-
     double costFactor(int nodeId, int edgeId);
 }
