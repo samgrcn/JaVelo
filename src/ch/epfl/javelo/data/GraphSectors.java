@@ -33,7 +33,6 @@ public record GraphSectors(ByteBuffer buffer) {
      */
 
     public record Sector(int startNodeId, int endNodeId) {
-
     }
 
 

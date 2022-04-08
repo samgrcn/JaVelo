@@ -9,6 +9,8 @@ import ch.epfl.javelo.Preconditions;
  */
 public record PointWebMercator(double x, double y) {
 
+    private static final int ZOOM_AT_LEVEL_0 = 8;
+
     /**
      * @throws IllegalArgumentException if x or y are not between 0 and 1
      */
@@ -25,8 +27,8 @@ public record PointWebMercator(double x, double y) {
      * @return the Web Mercator point
      */
     public static PointWebMercator of(int zoomLevel, double x, double y) {
-        x = x / Math.pow(2, 8 + zoomLevel);
-        y = y / Math.pow(2, 8 + zoomLevel);
+        x = x / Math.pow(2, ZOOM_AT_LEVEL_0 + zoomLevel);
+        y = y / Math.pow(2, ZOOM_AT_LEVEL_0 + zoomLevel);
         return new PointWebMercator(x, y);
     }
 
@@ -49,7 +51,7 @@ public record PointWebMercator(double x, double y) {
      * @return x-coordinate
      */
     public double xAtZoomLevel(int zoomLevel) {
-        return Math.scalb(x, 8 + zoomLevel);
+        return Math.scalb(x, ZOOM_AT_LEVEL_0 + zoomLevel);
     }
 
     /**
@@ -59,7 +61,7 @@ public record PointWebMercator(double x, double y) {
      * @return the y-coordinate
      */
     public double yAtZoomLevel(int zoomLevel) {
-        return Math.scalb(y, 8 + zoomLevel);
+        return Math.scalb(y, ZOOM_AT_LEVEL_0 + zoomLevel);
     }
 
     /**
