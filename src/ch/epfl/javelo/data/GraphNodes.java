@@ -29,7 +29,6 @@ public record GraphNodes(IntBuffer buffer) {
      *
      * @return the amount of nodes in Switzerland
      */
-
     public int count() {
         return buffer.capacity() / NUMBER_PER_NODE;
     }
@@ -40,15 +39,9 @@ public record GraphNodes(IntBuffer buffer) {
      * @param nodeId the node we want to know the E coordinates.
      * @return the integer of his E coordinates for the given node, in Q28_4 representation.
      */
-
     public double nodeE(int nodeId) {
-        if (buffer.capacity() == 0) {
-            return 0;
-        } else {
-            return Q28_4.asDouble(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_E));
-        }
+        return buffer.capacity() == 0 ? 0 : Q28_4.asDouble(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_E));
     }
-
 
     /**
      * Among the 3 integers of a node, takes the second one, which represents the N coordinates.
@@ -56,15 +49,9 @@ public record GraphNodes(IntBuffer buffer) {
      * @param nodeId the node we want to know the N coordinates.
      * @return the integer of his N coordinates for the given node, in Q28_4 representation.
      */
-
     public double nodeN(int nodeId) {
-        if (buffer.capacity() == 0) {
-            return 0;
-        } else {
-            return Q28_4.asDouble(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_N));
-        }
+        return buffer.capacity() == 0 ? 0 :  Q28_4.asDouble(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_N));
     }
-
 
     /**
      * Among the 3 integers of a node, takes the third one and returns the amount of outgoing edges in this node.
@@ -72,11 +59,10 @@ public record GraphNodes(IntBuffer buffer) {
      * @param nodeId the node we want to know the outgoing edges.
      * @return the amount of outgoing edges of the given node.
      */
-
     public int outDegree(int nodeId) {
-        return Bits.extractUnsigned(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_OUT_EDGES), NUMBER_OF_ID_BITS, NUMBER_OF_EDGES);
+        return Bits.extractUnsigned(
+                buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_OUT_EDGES), NUMBER_OF_ID_BITS, NUMBER_OF_EDGES);
     }
-
 
     /**
      * Among the 3 integers of a node, takes the third and returns the id of the desired edge
@@ -85,9 +71,9 @@ public record GraphNodes(IntBuffer buffer) {
      * @param edgeIndex desired edge, from 0 to 15
      * @return the id of the desired edge.
      */
-
     public int edgeId(int nodeId, int edgeIndex) {
         assert 0 <= edgeIndex && edgeIndex < outDegree(nodeId);
-        return Bits.extractUnsigned(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_OUT_EDGES), 0, NUMBER_OF_ID_BITS) + edgeIndex;
+        return Bits.extractUnsigned(
+                buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_OUT_EDGES), 0, NUMBER_OF_ID_BITS) + edgeIndex;
     }
 }

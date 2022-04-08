@@ -33,8 +33,6 @@ public class Graph {
      * @param edges         edges
      * @param attributeSets attributeSets
      */
-
-
     public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets) {
         this.nodes = nodes;
         this.sectors = sectors;
@@ -49,9 +47,9 @@ public class Graph {
      * @return the mapped buffer
      * @throws IOException if the file doesn't exist
      */
-
     private static ByteBuffer pathBuffer(Path path) throws IOException {
         ByteBuffer byteBuffer;
+
         try (FileChannel channel = FileChannel.open(path)) {
             byteBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
         }
@@ -67,8 +65,8 @@ public class Graph {
      * @return a JaVelo graph obtained from the files in the directory whose path is basePath
      * @throws IOException if one of the expected file doesn't exist.
      */
-
     public static Graph loadFrom(Path basePath) throws IOException {
+
         IntBuffer nodesIdBuffer = pathBuffer(basePath.resolve("nodes.bin")).asIntBuffer();
         ByteBuffer sectorsIdBuffer = pathBuffer(basePath.resolve("sectors.bin"));
         ByteBuffer edgeIdBuffer = pathBuffer(basePath.resolve("edges.bin"));
@@ -77,6 +75,7 @@ public class Graph {
         LongBuffer attributeSetIdBuffer = pathBuffer(basePath.resolve("attributes.bin")).asLongBuffer();
 
         List<AttributeSet> attributeSetList = new ArrayList<>();
+
         for (int i = 0; i < attributeSetIdBuffer.capacity(); i++) {
             attributeSetList.add(new AttributeSet(attributeSetIdBuffer.get(i)));
         }
@@ -112,7 +111,6 @@ public class Graph {
      * @param nodeId the identity of the desired node
      * @return the number of edges coming out of the node
      */
-
     public int nodeOutDegree(int nodeId) {
         return nodes.outDegree(nodeId);
     }
@@ -124,7 +122,6 @@ public class Graph {
      * @param edgeIndex index of the desired edge
      * @return the identity of the desired edge of the desired node
      */
-
     public int nodeOutEdgeId(int nodeId, int edgeIndex) {
         return nodes.edgeId(nodeId, edgeIndex);
     }
@@ -137,12 +134,12 @@ public class Graph {
      * @param searchDistance distance to find the closest node (in meters)
      * @return the closest node to the point
      */
-
     public int nodeClosestTo(PointCh point, double searchDistance) {
         List<GraphSectors.Sector> sectorsInArea = sectors.sectorsInArea(point, searchDistance);
         int index = -1;
         double min = Double.POSITIVE_INFINITY;
         double distance;
+
         for (GraphSectors.Sector sectorsInSquare : sectorsInArea) {
             for (int i = sectorsInSquare.startNodeId(); i < sectorsInSquare.endNodeId(); i++) {
                 distance = point.squaredDistanceTo(nodePoint(i));
@@ -164,7 +161,6 @@ public class Graph {
      * @param edgeId identity of the desired edge
      * @return identity of the node at the end of the edge
      */
-
     public int edgeTargetNodeId(int edgeId) {
         return edges.targetNodeId(edgeId);
     }
@@ -176,7 +172,6 @@ public class Graph {
      * @param edgeId identity of the desired edge
      * @return true if given identity edge goes in the opposite direction of the OSM path from which it comes
      */
-
     public boolean edgeIsInverted(int edgeId) {
         return edges.isInverted(edgeId);
     }
@@ -187,7 +182,6 @@ public class Graph {
      * @param edgeId identity of the desired edge
      * @return the set of OSM attributes of the desired edge
      */
-
     public AttributeSet edgeAttributes(int edgeId) {
         return attributeSets.get(edges.attributesIndex(edgeId));
     }
@@ -198,7 +192,6 @@ public class Graph {
      * @param edgeId identity of the desired edge
      * @return length, in meters, of the given identity edge
      */
-
     public double edgeLength(int edgeId) {
         return edges.length(edgeId);
     }
@@ -209,7 +202,6 @@ public class Graph {
      * @param edgeId identity of the desired edge
      * @return the total positive elevation of the given identity ridge
      */
-
     public double edgeElevationGain(int edgeId) {
         return edges.elevationGain(edgeId);
     }
@@ -221,14 +213,9 @@ public class Graph {
      * @param edgeId identity of the desired edge
      * @return the long profile of the edge
      */
-
     public DoubleUnaryOperator edgeProfile(int edgeId) {
-        if (!edges.hasProfile(edgeId)) {
-            return Functions.constant(Double.NaN);
-        } else {
-            return Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
-        }
+        return !edges.hasProfile(edgeId) ? Functions.constant(Double.NaN)
+                : Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId));
     }
-
 
 }

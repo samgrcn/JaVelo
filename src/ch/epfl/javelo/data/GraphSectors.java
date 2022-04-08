@@ -31,7 +31,6 @@ public record GraphSectors(ByteBuffer buffer) {
      * @param startNodeId the first node of a sector.
      * @param endNodeId   and its last.
      */
-
     public record Sector(int startNodeId, int endNodeId) {
     }
 

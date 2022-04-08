@@ -14,7 +14,6 @@ public record AttributeSet(long bits) {
     /**
      * @throws IllegalArgumentException if there are elements in the bit than in the list of attribute (Attribute)
      */
-
     public AttributeSet {
         Preconditions.checkArgument((bits >> Attribute.COUNT) == 0L);
     }
@@ -27,9 +26,9 @@ public record AttributeSet(long bits) {
      * @return a bit with 1 in the position from right to left of the position of the parameter attribute in the
      * list ALL (in Attribute). This bit can contain at most one of each attribute in the list.
      */
-
     public static AttributeSet of(Attribute... attributes) {
         long modifiedBits = 0L;
+
         for (Attribute a : attributes) {
             modifiedBits |= (1L << (a.ordinal()));
         }
@@ -42,7 +41,6 @@ public record AttributeSet(long bits) {
      * @param attribute the given attribute
      * @return true if the attribute is in the set, false otherwise
      */
-
     public boolean contains(Attribute attribute) {
         long modifiedBits = this.bits;
         modifiedBits >>>= attribute.ordinal();
@@ -55,7 +53,6 @@ public record AttributeSet(long bits) {
      * @param that the bits we want to test
      * @return true if there's at least one attribute in common
      */
-
     public boolean intersects(AttributeSet that) {
         return ((that.bits & this.bits) != 0L);
     }
@@ -65,11 +62,11 @@ public record AttributeSet(long bits) {
      *
      * @return the list of attributes marked as 1 in the bits
      */
-
     @Override
     public String toString() {
         long modifiedBits = this.bits;
         StringJoiner j = new StringJoiner(",", "{", "}");
+
         for (int i = 0; i < (Attribute.COUNT + 1); i++) {
             if ((modifiedBits & 1L) == 1L) {
                 j.add(Attribute.ALL.get(i).keyValue());
