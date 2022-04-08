@@ -112,7 +112,6 @@ public class RouteComputer {
 
         int n;
         int nodeNumber = graph.nodeCount();
-        ;
 
         float[] distance = new float[nodeNumber];
         int[] predecessor = new int[nodeNumber];
