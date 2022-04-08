@@ -2,11 +2,17 @@ package ch.epfl.javelo.routing;
 
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.data.Graph;
-import ch.epfl.javelo.projection.PointCh;
 
 import java.util.*;
 
+/**
+ * RouteComputer builds a route planner for the given graph and cost function.
+ *
+ * @author Samuel Garcin (345633)
+ */
+
 public class RouteComputer {
+
 
     private final Graph graph;
     private final CostFunction costFunction;
@@ -17,6 +23,10 @@ public class RouteComputer {
         this.costFunction = costFunction;
     }
 
+    /**
+     * Record used to store in the list exploration a WeightedNode, including an id of the node and its distance.
+     */
+
     record WeightedNode(int nodeId, float distance)
             implements Comparable<WeightedNode> {
         @Override
@@ -25,39 +35,93 @@ public class RouteComputer {
         }
     }
 
+    /**
+     * Private method adding a WeightedNode of the closest node to the node n to the exploration list.
+     *
+     * @param n           the node n
+     * @param endNodeId   endNodeId
+     * @param distance    array of distance
+     * @param predecessor array of predecessor (id of the node before the index in the array, which is also its closest)
+     * @param exploration list of WeightedNode
+     */
+
 
     private void explorationFiller(int n, int endNodeId, float[] distance, int[] predecessor, PriorityQueue<WeightedNode> exploration) {
 
-        int numberOfEdges = graph.nodeOutDegree(n);
-        for (int i = 0; i < numberOfEdges; i++) {
-            int edgeThId = graph.nodeOutEdgeId(n, i);
-            double costFactor = costFunction.costFactor(n, edgeThId);
-            int n2 = graph.edgeTargetNodeId(edgeThId);
-            float d = ((distance[n] + (float) (graph.edgeLength(edgeThId) * costFactor)));
+        for (int i = 0; i < graph.nodeOutDegree(n); i++) {
+            int edgeId = graph.nodeOutEdgeId(n, i);
+            double costFactor = costFunction.costFactor(n, edgeId);
+            int n2 = graph.edgeTargetNodeId(edgeId);
+            float d = ((distance[n] + (float) (graph.edgeLength(edgeId) * costFactor)));
             if (d < distance[n2]) {
                 distance[n2] = d;
                 predecessor[n2] = n;
-                exploration.add(new WeightedNode(n2, (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
+                exploration.add(
+                        new WeightedNode(
+                                n2,
+                                (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
 
             }
         }
     }
 
+    /**
+     * Private method which creates a list of Edge connecting the nodes of the array predecessor (a node and its closest).
+     *
+     * @param startNodeId   first node of the route
+     * @param endNodeId     last node of the route
+     * @param predecessor   array of predecessor (id of the node before the index in the array, which is also its closest)
+     * @param routeEdgeList the list of Edge we want to return
+     */
+
+    private void endNodeReached(int startNodeId, int endNodeId, int[] predecessor, List<Edge> routeEdgeList) {
+        int currentNodeId = endNodeId;
+        int previousNodeId = predecessor[endNodeId];
+        int edgeId;
+        while (currentNodeId != startNodeId) {
+            for (int i = 0; i < graph.nodeOutDegree(previousNodeId); i++) {
+                edgeId = graph.nodeOutEdgeId(previousNodeId, i);
+                if (graph.edgeTargetNodeId(edgeId) == currentNodeId) {
+                    routeEdgeList.add(
+                            Edge.of(graph, edgeId, previousNodeId, currentNodeId));
+                    break;
+                }
+            }
+
+            currentNodeId = previousNodeId;
+            previousNodeId = predecessor[currentNodeId];
+
+        }
+        Collections.reverse(routeEdgeList);
+    }
+
+    /**
+     * Gives the minimum total cost route from the startNodeId to the endNodeId in the
+     * graph passed to the constructor.
+     *
+     * @param startNodeId first node of the route
+     * @param endNodeId   last node of the route
+     * @return the minimum total cost route from the startNodeId to the endNodeId in the graph passed to the constructor,
+     * or null if no route exists
+     * @throws IllegalArgumentException if the start and end nodes are identical
+     */
 
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
-
 
         Preconditions.checkArgument(startNodeId != endNodeId);
 
         int n;
+        int nodeNumber = graph.nodeCount();
+        ;
 
-        float[] distance = new float[graph.nodeCount()];
-        int[] predecessor = new int[graph.nodeCount()];
+        float[] distance = new float[nodeNumber];
+        int[] predecessor = new int[nodeNumber];
 
         List<Edge> routeEdgeList = new ArrayList<>();
         PriorityQueue<WeightedNode> exploration = new PriorityQueue<>();
 
-        for (int i = 0; i < graph.nodeCount(); i++) {
+
+        for (int i = 0; i < nodeNumber; i++) {
             distance[i] = Float.POSITIVE_INFINITY;
         }
         distance[startNodeId] = 0;
@@ -76,24 +140,7 @@ public class RouteComputer {
 
 
             if (n == endNodeId) {
-
-                int currentNodeId = endNodeId;
-                int previousNodeId = predecessor[endNodeId];
-                int edgeId;
-                while (currentNodeId != startNodeId) {
-                    for (int i = 0; i < graph.nodeOutDegree(previousNodeId); i++) {
-                        edgeId = graph.nodeOutEdgeId(previousNodeId, i);
-                        if (graph.edgeTargetNodeId(edgeId) == currentNodeId) {
-                            routeEdgeList.add(Edge.of(graph, edgeId, previousNodeId, currentNodeId));
-                            break;
-                        }
-                    }
-
-                    currentNodeId = previousNodeId;
-                    previousNodeId = predecessor[currentNodeId];
-
-                }
-                Collections.reverse(routeEdgeList);
+                endNodeReached(startNodeId, endNodeId, predecessor, routeEdgeList);
                 return new SingleRoute(routeEdgeList);
             }
 

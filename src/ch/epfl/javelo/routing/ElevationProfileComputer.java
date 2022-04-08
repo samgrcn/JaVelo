@@ -17,36 +17,51 @@ public class ElevationProfileComputer {
     private ElevationProfileComputer() {
     }
 
-    private static int toNextExistingFloat(float[] elevationSamples, int from) {
-        int samplesNumber = elevationSamples.length;
-        int existingFloat = -1;
+    /**
+     * Private method used to get the first non NaN element of an array
+     *
+     * @param elevationSamples the array
+     * @param from             the starting index
+     * @param forward          true if it goes forward and false if we want to explore backward, in which case from isn't useful
+     *                         since we start from the end
+     * @return the index of the first element that is not NaN, going forward or backward depending on the boolean forward.
+     */
 
-        for (int i = from; i < samplesNumber; i++) {
-            if (!Float.isNaN(elevationSamples[i])) {
-                existingFloat = i;
-                break;
-            }
-        }
-        return existingFloat;
-    }
-
-    private static int toPreviousExistingFloat(float[] elevationSamples) {
+    private static int toNextExistingFloat(float[] elevationSamples, int from, boolean forward) {
         int samplesNumber = elevationSamples.length;
         int existingFloat = 0;
-        for (int i = samplesNumber - 1; i > 0; i--) {
-            if (!Float.isNaN(elevationSamples[i])) {
-                existingFloat = i;
-                break;
+
+        if (forward) {
+            for (int i = from; i < samplesNumber; i++) {
+                if (!Float.isNaN(elevationSamples[i])) {
+                    existingFloat = i;
+                    break;
+                }
+            }
+        } else {
+            for (int i = samplesNumber - 1; i > 0; i--) {
+                if (!Float.isNaN(elevationSamples[i])) {
+                    existingFloat = i;
+                    break;
+                }
             }
         }
+
         return existingFloat;
     }
+
+    /**
+     * Private method used to check the special cases (if the array is full of NaN, if there are NaN at the beginning
+     * or at the end of the array) and fills the array accordingly.
+     *
+     * @param elevationSamples the array we want to check
+     */
 
     private static void checkSpecialCases(float[] elevationSamples) {
         int samplesNumber = elevationSamples.length;
         if (Float.isNaN(elevationSamples[0])) {
-            int i = toNextExistingFloat(elevationSamples, 0);
-            if (i == -1) {
+            int i = toNextExistingFloat(elevationSamples, 0, true);
+            if (i == 0) {
                 Arrays.fill(elevationSamples, 0, samplesNumber, 0);
             } else {
                 Arrays.fill(elevationSamples,
@@ -57,7 +72,7 @@ public class ElevationProfileComputer {
         }
 
         if (Float.isNaN(elevationSamples[samplesNumber - 1])) {
-            int i = toPreviousExistingFloat(elevationSamples);
+            int i = toNextExistingFloat(elevationSamples, samplesNumber, false);
             Arrays.fill(elevationSamples,
                     i + 1,
                     samplesNumber,
@@ -65,37 +80,46 @@ public class ElevationProfileComputer {
         }
     }
 
+    /**
+     * Private method used to fill an array, replacing the NaNs by existing values by interpolation.
+     *
+     * @param elevationSamples the array we want to fill
+     */
     private static void fillingArray(float[] elevationSamples) {
         int samplesNumber = elevationSamples.length;
         for (int i = 0; i < samplesNumber; i++) {
             if (Float.isNaN(elevationSamples[i])) {
                 int lowerBound = i - 1;
-                int higherBound = toNextExistingFloat(elevationSamples, i);
+                int higherBound = toNextExistingFloat(elevationSamples, i, true);
                 elevationSamples[i] = (float) Math2.interpolate(
                         elevationSamples[lowerBound],
-                        elevationSamples[higherBound], (double)(i - lowerBound) / (higherBound - lowerBound));
+                        elevationSamples[higherBound], (double) (i - lowerBound) / (higherBound - lowerBound));
             }
         }
     }
 
     /**
-     * Returns the long profile of the route, ensuring that the spacing between the
-     * samples of the profile is at most maxStepLength meters.
-     * @param route
-     * @param maxStepLength
+     * Build the long profile of the route in parameter, ensuring that the spacing between the
+     * samples of the profile is at most maxStepLength meters
+     *
+     * @param route         the route
+     * @param maxStepLength maximum space between each sample
+     * @return the long profile of the route.
      * @throws IllegalArgumentException if this spacing is not strictly positive.
-     * @return
      */
 
-
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
+
         Preconditions.checkArgument(maxStepLength > 0);
+
         int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
         float[] elevationSamples = new float[samplesNumber];
+
         for (int i = 0; i < samplesNumber; i++) {
             double position = i * route.length() / (samplesNumber - 1);
             elevationSamples[i] = (float) route.elevationAt(position);
         }
+
         checkSpecialCases(elevationSamples);
         fillingArray(elevationSamples);
 
