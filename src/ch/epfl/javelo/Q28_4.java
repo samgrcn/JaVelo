@@ -7,6 +7,8 @@ package ch.epfl.javelo;
  */
 public final class Q28_4 {
 
+    private final static int NUMBER_OF_DECIMAL_BITS = 4;
+
     private Q28_4(){}
 
     /**
@@ -16,7 +18,7 @@ public final class Q28_4 {
      * @return the Q28.4 value
      */
     public static int ofInt(int i) {
-        return i << 4;
+        return i << NUMBER_OF_DECIMAL_BITS;
     }
 
     /**
@@ -26,7 +28,7 @@ public final class Q28_4 {
      * @return the double corresponding
      */
     public static double asDouble(int q28_4) {
-        return Math.scalb((double) q28_4, -4);
+        return Math.scalb((double) q28_4, -NUMBER_OF_DECIMAL_BITS);
     }
 
     /**
@@ -36,6 +38,6 @@ public final class Q28_4 {
      * @return the float corresponding
      */
     public static float asFloat(int q28_4) {
-        return Math.scalb((float) q28_4, -4);
+        return Math.scalb((float) q28_4, -NUMBER_OF_DECIMAL_BITS);
     }
 }
