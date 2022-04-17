@@ -62,7 +62,7 @@ public final class SingleRoute implements Route {
      */
     @Override
     public List<Edge> edges() {
-        return List.copyOf(edges);
+        return edges;
     }
 
     /**
