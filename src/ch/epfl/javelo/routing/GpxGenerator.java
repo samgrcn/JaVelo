@@ -34,7 +34,7 @@ public class GpxGenerator {
 
     public static Document createGPX(Route route, ElevationProfile profile) {
 
-        Document doc = newDocument(); // voir plus bas
+        Document doc = newDocument();
 
         Element root = doc
                 .createElementNS("http://www.topografix.com/GPX/1/1",
