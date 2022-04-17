@@ -1,11 +1,21 @@
 package ch.epfl.javelo.routing;
 
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class GpxGenerator {
 
@@ -22,7 +32,7 @@ public class GpxGenerator {
         }
     }
 
-    public Document createGPX(Route route, ElevationProfile profile) {
+    public static Document createGPX(Route route, ElevationProfile profile) {
 
         Document doc = newDocument(); // voir plus bas
 
@@ -47,21 +57,37 @@ public class GpxGenerator {
         name.setTextContent("Route JaVelo");
 
         Element rte = doc.createElement("rte");
-        for (Edge edge: route.edges()) {
-            for (int i = edge.fromNodeId(); i < edge.toNodeId(); i++) {
-                Element rtept = doc.createElement("rtept");
-                Element ele = doc.createElement("ele");
-                ele.setAttribute("elevation", route.elevationAt());
-            }
-            }
-            profile.
+
+        int position = 0;
+        for (int i = 0; i < route.points().size() - 1; i++) {
+
+            Element rtept = doc.createElement("rtept");
+            Element ele = doc.createElement("ele");
+            ele.setAttribute("ele", Double.toString(profile.elevationAt(position)));
+            rtept.appendChild(ele);
+            rte.appendChild(rtept);
+
+            position += route.points().get(i).distanceTo(route.points().get(i + 1));
         }
-        doc.appendChild(rte);
-
+        return doc;
     }
 
-    public void writeGPX() {
 
+    public static void writeGPX(String fileName, Route route, ElevationProfile profile) throws IOException {
+
+        Document doc = newDocument();
+        Writer w = Files.newBufferedWriter(Path.of(fileName), Charset.defaultCharset());
+
+        try {
+            Transformer transformer = TransformerFactory
+                    .newDefaultInstance()
+                    .newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(new DOMSource(doc),
+                    new StreamResult(w));
+        } catch (TransformerException e) {
+            throw new Error(e); // Should never happen
+
+        }
     }
-
 }
