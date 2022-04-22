@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Locale;
 
 public class GpxGenerator {
 
@@ -72,10 +73,10 @@ public class GpxGenerator {
 
             Element rtept = doc.createElement("rtept");
             Element ele = doc.createElement("ele");
-            rtept.setAttribute("lat", Double.toString(Math.toDegrees(p.lat())));
-            rtept.setAttribute("lon", Double.toString(Math.toDegrees(p.lon())));
+            rtept.setAttribute("lat", String.format(Locale.ROOT, "%.5f", Math.toDegrees(p.lat())));
+            rtept.setAttribute("lon", String.format(Locale.ROOT, "%.5f", Math.toDegrees(p.lon())));
 
-            ele.setTextContent(Double.toString(profile.elevationAt(position)));
+            ele.setTextContent(String.format(Locale.ROOT, "%.5f", profile.elevationAt(position)));
 
             rtept.appendChild(ele);
             rte.appendChild(rtept);
