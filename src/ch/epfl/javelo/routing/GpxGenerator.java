@@ -1,5 +1,8 @@
 package ch.epfl.javelo.routing;
 
+import ch.epfl.javelo.projection.PointCh;
+import ch.epfl.javelo.projection.PointWebMercator;
+import ch.epfl.javelo.projection.WebMercator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -11,11 +14,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.IOException;
 import java.io.Writer;
+
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 
 public class GpxGenerator {
 
@@ -32,7 +38,7 @@ public class GpxGenerator {
         }
     }
 
-    public static Document createGPX(Route route, ElevationProfile profile) {
+    public static Document createGpx(Route route, ElevationProfile profile) {
 
         Document doc = newDocument();
 
@@ -57,25 +63,35 @@ public class GpxGenerator {
         name.setTextContent("Route JaVelo");
 
         Element rte = doc.createElement("rte");
+        root.appendChild(rte);
 
-        int position = 0;
-        for (int i = 0; i < route.points().size() - 1; i++) {
+        double position = 0;
+        Iterator<Edge> iterator = route.edges().iterator();
+
+        for (PointCh p: route.points()) {
 
             Element rtept = doc.createElement("rtept");
             Element ele = doc.createElement("ele");
-            ele.setAttribute("ele", Double.toString(profile.elevationAt(position)));
+            rtept.setAttribute("lat", Double.toString(Math.toDegrees(p.lat())));
+            rtept.setAttribute("lon", Double.toString(Math.toDegrees(p.lon())));
+
+            ele.setTextContent(Double.toString(profile.elevationAt(position)));
+
             rtept.appendChild(ele);
             rte.appendChild(rtept);
 
-            position += route.points().get(i).distanceTo(route.points().get(i + 1));
+            if(iterator.hasNext()) {
+                position += iterator.next().length();
+            }
         }
+
         return doc;
     }
 
 
-    public static void writeGPX(String fileName, Route route, ElevationProfile profile) throws IOException {
+    public static void writeGpx(String fileName, Route route, ElevationProfile profile) throws IOException {
 
-        Document doc = newDocument();
+        Document doc = createGpx(route, profile);
         Writer w = Files.newBufferedWriter(Path.of(fileName), Charset.defaultCharset());
 
         try {
