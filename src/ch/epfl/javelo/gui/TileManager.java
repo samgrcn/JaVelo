@@ -38,7 +38,7 @@ public final class TileManager {
      *
      * @param tileId the tile identity
      * @return the image of the tile
-     * @throws IOException ignals that an I/O exception of some sort has occurred
+     * @throws IOException signals that an I/O exception of some sort has occurred
      * while creating a folder or by transferring the flow
      */
     public Image imageForTileAt(TileId tileId) throws IOException {
@@ -69,6 +69,13 @@ public final class TileManager {
         }
     }
 
+    /**
+     * Builds an URL for a given tile identity.
+     *
+     * @param tileId the tile identity
+     * @return the URL
+     * @throws MalformedURLException if an error occured while creating the URL
+     */
     private URL URLBuilder(TileId tileId) throws MalformedURLException {
         int zoomAt = tileId.zoomAt;
         int x = tileId.x;
@@ -76,6 +83,12 @@ public final class TileManager {
         return new URL("https://" + name + "/" + zoomAt + "/" + x + "/" + y + ".png");
     }
 
+    /**
+     * Download the tile from the server and return an input flow.
+     * @param tileId the tile identity
+     * @return the image input flow
+     * @throws IOException signals that an I/O exception of some sort has occurred
+     */
     private InputStream tileDownloader(TileId tileId) throws IOException {
         URL u = URLBuilder(tileId);
         URLConnection c = u.openConnection();
@@ -90,10 +103,22 @@ public final class TileManager {
      */
     public record TileId(int zoomAt, int x, int y) {
 
+        /**
+         * @throws IllegalArgumentException if the zoom is negative, x or y is negative or x or y is greater than
+         * two power the zoom
+         */
         public TileId {
             Preconditions.checkArgument(isValid(zoomAt, x, y));
         }
 
+        /**
+         * Takes as argument three attributes (zoom and X/Y index) and returns true if - and only if -
+         * they constitute a valid tile identity.
+         * @param zoomAt the zoom
+         * @param x the x-coordinate
+         * @param y the y-coordinate
+         * @return true or false
+         */
         public static boolean isValid(int zoomAt, int x, int y) {
             return zoomAt >= 0 && x >= 0 && x < 1 << zoomAt
                     && y >= 0 && y < 1 << zoomAt;
