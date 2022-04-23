@@ -28,10 +28,10 @@ public record MapViewParameters(int zoomAt, double x, double y) {
     }
 
     public double viewX(PointWebMercator point) {
-
+        return point.x();
     }
 
     public double viewY(PointWebMercator point) {
-
+        return point.y();
     }
 }

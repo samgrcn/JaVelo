@@ -2,13 +2,11 @@ package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.Preconditions;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -24,7 +22,7 @@ public final class TileManager {
 
     private final Path path;
     private final String name;
-    private final LinkedHashMap<TileId, Image> tiles = new LinkedHashMap(100, 0.75F, true);
+    private final Map<TileId, Image> tiles = new LinkedHashMap(100, 0.75F, true);
 
     /**
      * @param path the path to the directory containing the disk cache
@@ -47,12 +45,13 @@ public final class TileManager {
         Preconditions.checkArgument(TileId.isValid(tileId.zoomAt, tileId.x, tileId.y));
         if (tiles.containsKey(tileId)) return tiles.get(tileId);
         Path imagePath = Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
-                .resolve(String.valueOf(tileId.x)).resolve(String.valueOf(tileId.y)).resolve(".png");
+                .resolve(String.valueOf(tileId.x)).resolve(tileId.y + ".png");
         if (Files.exists(imagePath)) {
-            Image image = new Image(imagePath.toString());
+            Image image = new Image("file:" + imagePath);
             tiles.put(tileId, image);
             return image;
         }
+
         if (Files.notExists(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt)))) {
             Files.createDirectories(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt)));
         }
@@ -62,12 +61,12 @@ public final class TileManager {
         }
 
         OutputStream out = new FileOutputStream(imagePath.toFile());
-        InputStream input = tileDownloader(tileId);
-        input.transferTo(out);
-        Image image = new Image(input);
-        tiles.put(tileId, image);
-
-        return image;
+        try (InputStream input = tileDownloader(tileId)) {
+            input.transferTo(out);
+            Image image = new Image(input);
+            tiles.put(tileId, image);
+            return image;
+        }
     }
 
     private URL URLBuilder(TileId tileId) throws MalformedURLException {
@@ -81,9 +80,7 @@ public final class TileManager {
         URL u = URLBuilder(tileId);
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
-        try (InputStream i = c.getInputStream()) {
-            return i;
-        }
+        return c.getInputStream();
     }
 
     /**
