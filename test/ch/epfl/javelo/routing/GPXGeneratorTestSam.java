@@ -13,6 +13,6 @@ public class GPXGeneratorTestSam {
         Route r = rc.bestRouteBetween(159049, 117669);
         ElevationProfile e = ElevationProfileComputer.elevationProfile(r, 1);
 
-        GpxGenerator.writeGpx("test.gpx", r, e);
+        GpxGenerator.writeGpx("test3.gpx", r, e);
     }
 }

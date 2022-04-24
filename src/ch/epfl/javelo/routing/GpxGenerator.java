@@ -1,8 +1,6 @@
 package ch.epfl.javelo.routing;
 
 import ch.epfl.javelo.projection.PointCh;
-import ch.epfl.javelo.projection.PointWebMercator;
-import ch.epfl.javelo.projection.WebMercator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -76,7 +74,7 @@ public class GpxGenerator {
             rtept.setAttribute("lat", String.format(Locale.ROOT, "%.5f", Math.toDegrees(p.lat())));
             rtept.setAttribute("lon", String.format(Locale.ROOT, "%.5f", Math.toDegrees(p.lon())));
 
-            ele.setTextContent(String.format(Locale.ROOT, "%.5f", profile.elevationAt(position)));
+            ele.setTextContent(String.format(Locale.ROOT, "%.2f", profile.elevationAt(position)));
 
             rtept.appendChild(ele);
             rte.appendChild(rtept);

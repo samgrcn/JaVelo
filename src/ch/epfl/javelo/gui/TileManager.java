@@ -87,7 +87,7 @@ public final class TileManager {
      * Download the tile from the server and return an input flow.
      * @param tileId the tile identity
      * @return the image input flow
-     * @throws IOException signals that an I/O exception of some sort has occurred
+     * @throws IOException signals that an I/O exception to some sort has occurred
      */
     private InputStream tileDownloader(TileId tileId) throws IOException {
         URL u = URLBuilder(tileId);
