@@ -1,54 +1,55 @@
 package ch.epfl.javelo.gui;
 
 
-import ch.epfl.javelo.data.GraphSectors;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
 
 import static ch.epfl.javelo.Math2.clamp;
 
 public final class BaseMapManager {
 
-    private boolean redrawNeeded;
+    private WaypointsManager waypointsManager;
     private Pane pane;
     private Canvas canvas;
     private GraphicsContext graphicsContext;
     private TileManager tileManager;
     private ObjectProperty<MapViewParameters> parameters;
+    private boolean redrawNeeded;
 
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
 
 
-    public BaseMapManager(TileManager tileManager, boolean redrawNeeded, ObjectProperty<MapViewParameters> parameters) {
+    public BaseMapManager(TileManager tileManager, WaypointsManager waypointsManager, ObjectProperty<MapViewParameters> parameters) {
 
 
         this.canvas = new Canvas();
         this.pane = new Pane();
 
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
-
-        this.redrawNeeded = redrawNeeded;
+        this.waypointsManager = waypointsManager;
         this.graphicsContext = canvas.getGraphicsContext2D();
         this.tileManager = tileManager;
         this.parameters = parameters;
+
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
 
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
             newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
 
+        redrawIfNeeded();
+
         redrawOnNextPulse();
     }
 
-    private Pane getPane() {
+    public Node pane() {
         return pane;
     }
 
@@ -75,12 +76,12 @@ public final class BaseMapManager {
 
         for (int y = (int) yMinSector; y <= yMaxSector; y++) {
             for (int x = (int) xMinSector; x <= xMaxSector; x++) {
-                TileManager.TileId tileId = new TileManager.TileId(parameters.get().zoomAt(), x, y);
+                TileManager.TileId tileId = new TileManager.TileId(parameters.get().zoomAt(), x * 256, y * 256);
                 try {
-                    graphicsContext.drawImage(tileManager.imageForTileAt(tileId), x, y);
+                    graphicsContext.drawImage(tileManager.imageForTileAt(tileId), tileId.x(), tileId.y());
                 } catch (IOException ignored) {
-
                 }
+
             }
         }
     }
