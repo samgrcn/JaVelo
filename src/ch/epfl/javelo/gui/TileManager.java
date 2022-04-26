@@ -1,5 +1,6 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.MemoryCacheHashMap;
 import ch.epfl.javelo.Preconditions;
 
 import java.io.*;
@@ -22,7 +23,7 @@ public final class TileManager {
 
     private final Path path;
     private final String name;
-    private final Map<TileId, Image> tiles = new LinkedHashMap(100, 0.75F, true);
+    private final Map<TileId, Image> tiles = new MemoryCacheHashMap<>();
 
     /**
      * @param path the path to the directory containing the disk cache
@@ -43,6 +44,7 @@ public final class TileManager {
      */
     public Image imageForTileAt(TileId tileId) throws IOException {
         Preconditions.checkArgument(TileId.isValid(tileId.zoomAt, tileId.x, tileId.y));
+
         if (tiles.containsKey(tileId)) return tiles.get(tileId);
         Path imagePath = Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
                 .resolve(String.valueOf(tileId.x)).resolve(tileId.y + ".png");
@@ -63,10 +65,11 @@ public final class TileManager {
         OutputStream out = new FileOutputStream(imagePath.toFile());
         try (InputStream input = tileDownloader(tileId)) {
             input.transferTo(out);
-            Image image = new Image(input);
-            tiles.put(tileId, image);
-            return image;
         }
+        Image image = new Image("file:" + imagePath);
+        System.out.println(image);
+        tiles.put(tileId, image);
+        return image;
     }
 
     /**
