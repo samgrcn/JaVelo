@@ -55,20 +55,14 @@ public final class TileManager {
             return image;
         }
 
-        if (Files.notExists(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt)))) {
-            Files.createDirectories(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt)));
-        }
-        if (Files.notExists(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt)).resolve(String.valueOf(tileId.x)))) {
-            Files.createDirectories(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
-                    .resolve(String.valueOf(tileId.x)));
-        }
+        Files.createDirectories(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
+                .resolve(String.valueOf(tileId.x)));
 
-        OutputStream out = new FileOutputStream(imagePath.toFile());
-        try (InputStream input = tileDownloader(tileId)) {
+        try (InputStream input = tileDownloader(tileId);
+             OutputStream out = new FileOutputStream(imagePath.toFile())) {
             input.transferTo(out);
         }
         Image image = new Image("file:" + imagePath);
-        System.out.println(image);
         tiles.put(tileId, image);
         return image;
     }
@@ -81,13 +75,10 @@ public final class TileManager {
      * @throws MalformedURLException if an error occured while creating the URL
      */
     private URL URLBuilder(TileId tileId) throws MalformedURLException {
-        String url = new StringJoiner("/", "https://", ".png")
-                .add(name)
-                .add(String.valueOf(tileId.zoomAt))
-                .add(String.valueOf(tileId.x))
-                .add(String.valueOf(tileId.y))
-                .toString();
-        System.out.println(url);
+        int zoomAt = tileId.zoomAt();
+        int x = tileId.x();
+        int y = tileId.y();
+        String url = String.format("https://%s/%s/%s/%s.png", name, zoomAt, x, y);
         return new URL(url);
     }
 
