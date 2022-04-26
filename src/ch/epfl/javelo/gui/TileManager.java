@@ -7,11 +7,11 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
+
 import javafx.scene.image.Image;
 
 /**
@@ -46,6 +46,7 @@ public final class TileManager {
         Preconditions.checkArgument(TileId.isValid(tileId.zoomAt, tileId.x, tileId.y));
 
         if (tiles.containsKey(tileId)) return tiles.get(tileId);
+
         Path imagePath = Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
                 .resolve(String.valueOf(tileId.x)).resolve(tileId.y + ".png");
         if (Files.exists(imagePath)) {
@@ -80,10 +81,14 @@ public final class TileManager {
      * @throws MalformedURLException if an error occured while creating the URL
      */
     private URL URLBuilder(TileId tileId) throws MalformedURLException {
-        int zoomAt = tileId.zoomAt;
-        int x = tileId.x;
-        int y = tileId.y;
-        return new URL("https://" + name + "/" + zoomAt + "/" + x + "/" + y + ".png");
+        String url = new StringJoiner("/", "https://", ".png")
+                .add(name)
+                .add(String.valueOf(tileId.zoomAt))
+                .add(String.valueOf(tileId.x))
+                .add(String.valueOf(tileId.y))
+                .toString();
+        System.out.println(url);
+        return new URL(url);
     }
 
     /**

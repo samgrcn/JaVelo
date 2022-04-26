@@ -59,7 +59,7 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding x position
      */
     public double viewX(PointWebMercator point) {
-        return point.x();
+        return point.x() - x;
     }
 
     /**
@@ -69,6 +69,6 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding y position
      */
     public double viewY(PointWebMercator point) {
-        return point.y();
+        return point.y() - y;
     }
 }
