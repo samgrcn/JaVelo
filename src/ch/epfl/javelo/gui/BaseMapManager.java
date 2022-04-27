@@ -36,15 +36,21 @@ public final class BaseMapManager {
         this.tileManager = tileManager;
         this.parameters = parameters;
 
+
+        canvas.setHeight(300);
+        canvas.setWidth(600);
+        pane.getChildren().add(canvas);
+
+        pane.setPrefSize(600, 300);
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
+
+        System.out.println(pane.getWidth());
 
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
             newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
-
-        redrawIfNeeded();
 
         redrawOnNextPulse();
     }
@@ -58,29 +64,26 @@ public final class BaseMapManager {
         redrawNeeded = false;
 
 
+
         double xMin = parameters.get().topLeft().getX();
         double xMax = xMin + canvas.getWidth();
-        double yMax = parameters.get().topLeft().getY();
-        double yMin = yMax - canvas.getHeight();
+        double yMin = parameters.get().topLeft().getY();
+        double yMax = yMin + canvas.getHeight();
 
         double xMinTile = xMin / TILE_WIDTH_AND_HEIGHT;
         double xMaxTile = xMax / TILE_WIDTH_AND_HEIGHT;
         double yMinTile = yMin / TILE_WIDTH_AND_HEIGHT;
         double yMaxTile = yMax / TILE_WIDTH_AND_HEIGHT;
 
-        double xMinSector = clamp(0, xMinTile, canvas.getWidth() / TILE_WIDTH_AND_HEIGHT);
-        double xMaxSector = clamp(0, xMaxTile, canvas.getWidth() / TILE_WIDTH_AND_HEIGHT);
-        double yMinSector = clamp(0, yMinTile, canvas.getHeight() / TILE_WIDTH_AND_HEIGHT);
-        double yMaxSector = clamp(0, yMaxTile, canvas.getHeight() / TILE_WIDTH_AND_HEIGHT);
-
-
-        for (int y = (int) yMinSector; y <= yMaxSector; y++) {
-            for (int x = (int) xMinSector; x <= xMaxSector; x++) {
-                TileManager.TileId tileId = new TileManager.TileId(parameters.get().zoomAt(), x * 256, y * 256);
+        for (int y = (int) yMinTile; y <= yMaxTile; y++) {
+            for (int x = (int) xMinTile; x <= xMaxTile; x++) {
+                TileManager.TileId tileId = new TileManager.TileId(parameters.get().zoomAt(), x, y);
                 try {
-                    graphicsContext.drawImage(tileManager.imageForTileAt(tileId), tileId.x(), tileId.y());
-                } catch (IOException ignored) {
-                }
+                    graphicsContext.drawImage(
+                            tileManager.imageForTileAt(tileId),
+                            x*TILE_WIDTH_AND_HEIGHT - xMin ,
+                            y*TILE_WIDTH_AND_HEIGHT - yMin);
+                } catch (IOException ignored) {}
 
             }
         }
