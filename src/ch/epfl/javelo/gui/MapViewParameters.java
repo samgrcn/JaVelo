@@ -59,6 +59,8 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding x position
      */
     public double viewX(PointWebMercator point) {
+        System.out.println(x);
+        System.out.println(point.x());
         return point.x() - x;
     }
 
