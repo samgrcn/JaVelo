@@ -73,8 +73,6 @@ public class WaypointsManager {
         pins.setLayoutY(y);
 
         System.out.println(pins.toString());
-        System.out.println(x);
-        System.out.println(y);
 
         pane.getChildren().add(pins);
 
