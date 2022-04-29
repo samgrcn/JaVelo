@@ -59,9 +59,9 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding x position
      */
     public double viewX(PointWebMercator point) {
-        System.out.println(x);
-        System.out.println(point.x());
-        return point.x() - x;
+        System.out.println("view x : " + (Math.scalb(point.x(), 8 + zoomAt) - x));
+        System.out.println();
+        return Math.scalb(point.x(), 8 + zoomAt) - x;
     }
 
     /**
@@ -71,6 +71,8 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding y position
      */
     public double viewY(PointWebMercator point) {
-        return point.y() - y;
+        System.out.println("view x : " + (Math.scalb(point.y(), 8 + zoomAt) - y));
+        System.out.println();
+        return Math.scalb(point.y(), 8 + zoomAt) - y;
     }
 }
