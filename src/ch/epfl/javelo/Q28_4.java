@@ -38,6 +38,6 @@ public final class Q28_4 {
      * @return the float corresponding
      */
     public static float asFloat(int q28_4) {
-        return Math.scalb((float) q28_4, -NUMBER_OF_DECIMAL_BITS);
+        return Math.scalb(q28_4, -NUMBER_OF_DECIMAL_BITS);
     }
 }

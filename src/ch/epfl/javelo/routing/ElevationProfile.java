@@ -11,7 +11,7 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Samuel Garcin (345633)
  */
-public class ElevationProfile {
+public final class ElevationProfile {
 
     private final double length;
     private final float[] elevationSamples;
