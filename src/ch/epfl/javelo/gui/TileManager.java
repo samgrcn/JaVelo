@@ -24,6 +24,7 @@ public final class TileManager {
     private final Path path;
     private final String name;
     private final Map<TileId, Image> tiles = new MemoryCacheHashMap<>();
+    private static final int POWER_TWO_BIT_SHIFT = 1;
 
     /**
      * @param path the path to the directory containing the disk cache
@@ -35,7 +36,8 @@ public final class TileManager {
     }
 
     /**
-     * Takes as argument the identity of a tile (of type TileId) and returns its image (of type Image from the JavaFX library).
+     * Takes as argument the identity of a tile (of type TileId) and
+     * returns its image (of type Image from the JavaFX library).
      *
      * @param tileId the tile identity
      * @return the image of the tile
@@ -119,8 +121,8 @@ public final class TileManager {
          * @return true or false
          */
         public static boolean isValid(int zoomAt, int x, int y) {
-            return zoomAt >= 0 && x >= 0 && x < 1 << zoomAt
-                    && y >= 0 && y < 1 << zoomAt;
+            return zoomAt >= 0 && x >= 0 && x < POWER_TWO_BIT_SHIFT << zoomAt
+                    && y >= 0 && y < POWER_TWO_BIT_SHIFT << zoomAt;
         }
     }
 }

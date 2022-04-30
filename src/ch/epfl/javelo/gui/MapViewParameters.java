@@ -11,6 +11,8 @@ import javafx.geometry.Point2D;
  */
 public record MapViewParameters(int zoomAt, double x, double y) {
 
+    private static final int ZOOM_AT_LEVEL_0 = 8;
+
     /**
      * @throws IllegalArgumentException if the zoom is negative
      */
@@ -59,9 +61,7 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding x position
      */
     public double viewX(PointWebMercator point) {
-        System.out.println("view x : " + (Math.scalb(point.x(), 8 + zoomAt) - x));
-        System.out.println();
-        return Math.scalb(point.x(), 8 + zoomAt) - x;
+        return Math.scalb(point.x(), ZOOM_AT_LEVEL_0 + zoomAt) - x;
     }
 
     /**
@@ -71,8 +71,6 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the corresponding y position
      */
     public double viewY(PointWebMercator point) {
-        System.out.println("view x : " + (Math.scalb(point.y(), 8 + zoomAt) - y));
-        System.out.println();
-        return Math.scalb(point.y(), 8 + zoomAt) - y;
+        return Math.scalb(point.y(), ZOOM_AT_LEVEL_0 + zoomAt) - y;
     }
 }
