@@ -7,8 +7,6 @@ package ch.epfl.javelo;
  */
 public final class Bits {
 
-    private final static int NUMBER_OF_BITS = 32;
-
     private Bits() {}
 
     /**
@@ -22,10 +20,10 @@ public final class Bits {
      *                                  if the length is equal to zero
      */
     public static int extractSigned(int value, int start, int length) {
-        Preconditions.checkArgument(start >= 0 && start + length <= NUMBER_OF_BITS && length > 0);
-        value = value << NUMBER_OF_BITS - start - length;
+        Preconditions.checkArgument(start >= 0 && start + length <= Integer.SIZE && length > 0);
+        value = value << Integer.SIZE - start - length;
 
-        return value >> NUMBER_OF_BITS - length;
+        return value >> Integer.SIZE - length;
     }
 
     /**
@@ -39,9 +37,9 @@ public final class Bits {
      *                                  if the length is equal to zero or the length equal to 32
      */
     public static int extractUnsigned(int value, int start, int length) {
-        Preconditions.checkArgument(start >= 0 && start + length <= NUMBER_OF_BITS && length != NUMBER_OF_BITS && length > 0);
-        value = value << NUMBER_OF_BITS - start - length;
+        Preconditions.checkArgument(start >= 0 && start + length <= Integer.SIZE && length != Integer.SIZE && length > 0);
+        value = value << Integer.SIZE - start - length;
 
-        return value >>> NUMBER_OF_BITS - length;
+        return value >>> Integer.SIZE - length;
     }
 }

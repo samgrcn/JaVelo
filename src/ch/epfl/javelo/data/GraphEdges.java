@@ -19,6 +19,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private static final int OFFSET_ALTITUDE_DIFF = OFFSET_LENGTH + 2;    // = 6
     private static final int OFFSET_OSM_ATTRIBUTES = OFFSET_ALTITUDE_DIFF + 2; // = 8
     private static final int NUMBER_OF_EDGES = 10;
+    private static final int PROFIL_SAMPLES_TYPE_2_DELTA = 2;
+    private static final int PROFIL_SAMPLES_TYPE_3_DELTA = 4;
 
     /**
      * Returns true if and only if the given identity edge goes in the opposite direction of the OSM path from which it comes.
@@ -94,87 +96,50 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * @return the reversed array
      */
     private float[] reverseFloatArray(float[] array) {
-        int len = array.length;
-        float[] newArray = new float[len];
-
-        for (int i = 0; i < array.length; i++) {
-            newArray[i] = array[len - 1];
-            --len;
+        for (int i = 0; i < array.length / 2; ++i) {
+            float temp = array[i];
+            array[i] = array[array.length - 1 - i];
+            array[array.length - 1 - i] = temp;
         }
-        return newArray;
+        return array;
     }
 
     /**
-     * Returns the array of profile samples for an edge of type 1.
+     * Fills the profile samples array for an edge of type 1.
      *
      * @param res           the results array
      * @param samplesNumber the number of samples
      * @param identity      the identity of the first elevation
-     * @return the array of profil samples in reverse order
      */
-    private float[] profileSamplesType1(float[] res, int samplesNumber, int identity) {
+    private void profileSamplesType1(float[] res, int samplesNumber, int identity) {
         for (int i = 0; i < samplesNumber; ++i) {
             res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
         }
-        return res;
     }
 
     /**
-     * Returns the array of profile samples for an edge of type 2.
+     * Fills the profile samples array for an edge of type 2 or 3.
      *
      * @param res           the results array
      * @param samplesNumber the number of samples
      * @param identity      the identity of the first elevation
-     * @return the array of profil samples in reverse order
+     * @param delta         the delta (2 for type 2 and 4 for type 3)
      */
-    private float[] profileSamplesType2(float[] res, int samplesNumber, int identity) {
-        int iterNumber = (int) Math.ceil((samplesNumber - 1) / 2.0) + 1;
-        int indexFilled = 0;
+    private void profileSamplesType2And3(float[] res, int samplesNumber, int identity, int delta) {
+        int iterNumber = (int) Math.ceil((samplesNumber - 1) / (double) delta) + 1;
+        int indexFilled = 1;
+        int length = Short.SIZE / delta;
+        res[0] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity)));
 
-        for (int i = 0; i < iterNumber; ++i) {
-            if (i == 0) {
-                res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
-                ++indexFilled;
-            } else {
-                int hexNumber = elevations.get(identity + i);
-                for (int j = 8; j >= 0; j -= 8) {
-                    if (indexFilled < samplesNumber) {
-                        res[indexFilled] = Q28_4.asFloat(Bits.extractSigned(hexNumber, j, 8)) + res[indexFilled - 1];
-                        ++indexFilled;
-                    }
+        for (int i = 1; i < iterNumber; ++i) {
+            int hexNumber = elevations.get(identity + i);
+            for (int j = Short.SIZE - length; j >= 0; j -= length) {
+                if (indexFilled < samplesNumber) {
+                    res[indexFilled] = Q28_4.asFloat(Bits.extractSigned(hexNumber, j, length)) + res[indexFilled - 1];
+                    ++indexFilled;
                 }
             }
         }
-        return res;
-    }
-
-    /**
-     * Returns the array of profile samples for an edge of type 3.
-     *
-     * @param res           the results array
-     * @param samplesNumber the number of samples
-     * @param identity      the identity of the first elevation
-     * @return the array of profil samples in reverse order
-     */
-    private float[] profileSamplesType3(float[] res, int samplesNumber, int identity) {
-        int iterNumber = (int) Math.ceil((samplesNumber - 1) / 4.0) + 1;
-        int indexFilled = 0;
-
-        for (int i = 0; i < iterNumber; ++i) {
-            if (i == 0) {
-                res[i] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(identity + i)));
-                ++indexFilled;
-            } else {
-                int hexNumber = elevations.get(identity + i);
-                for (int j = 12; j >= 0; j -= 4) {
-                    if (indexFilled < samplesNumber) {
-                        res[indexFilled] = Q28_4.asFloat(Bits.extractSigned(hexNumber, j, 4)) + res[indexFilled - 1];
-                        ++indexFilled;
-                    }
-                }
-            }
-        }
-        return res;
     }
 
     /**
@@ -192,8 +157,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
 
         switch (getProfile(edgeId)) {
             case 1 -> profileSamplesType1(res, samplesNumber, identity);
-            case 2 -> profileSamplesType2(res, samplesNumber, identity);
-            case 3 -> profileSamplesType3(res, samplesNumber, identity);
+            case 2 -> profileSamplesType2And3(res, samplesNumber, identity, PROFIL_SAMPLES_TYPE_2_DELTA);
+            case 3 -> profileSamplesType2And3(res, samplesNumber, identity, PROFIL_SAMPLES_TYPE_3_DELTA);
         }
 
         return isInverted(edgeId) ? reverseFloatArray(res) : res;

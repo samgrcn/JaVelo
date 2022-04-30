@@ -17,6 +17,7 @@ public class MultiRoute implements Route {
     private final List<Route> segments;
     private final double[] route;
     private final List<Edge> edges = new ArrayList<>();
+    private final List<PointCh> points = new ArrayList<>();
 
     /**
      * Constructor that initializes the segments list, the edges list and the route for the dichotomous search.
@@ -26,6 +27,7 @@ public class MultiRoute implements Route {
      */
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
+
         this.segments = List.copyOf(segments);
         for (Route segment : this.segments) {
             edges.addAll(segment.edges());
@@ -35,6 +37,9 @@ public class MultiRoute implements Route {
         for (int i = 1; i < edges.size() + 1; i++) {
             route[i] = edges.get(i - 1).length() + route[i - 1];
         }
+
+        points.add(edges.get(0).fromPoint());
+        for (Edge edge : edges) points.add(edge.toPoint());
     }
 
     /**
@@ -83,11 +88,7 @@ public class MultiRoute implements Route {
      */
     @Override
     public List<PointCh> points() {
-        List<PointCh> res = new ArrayList<>();
-        res.add(edges.get(0).fromPoint());
-        for (Edge edge : edges) res.add(edge.toPoint());
-
-        return res;
+        return List.copyOf(points);
     }
 
     /**
@@ -157,13 +158,15 @@ public class MultiRoute implements Route {
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
         RoutePoint res = RoutePoint.NONE;
-        Edge currentEdge;
-        for (int i = 0; i < edges.size(); ++i) {
-            currentEdge = edges.get(i);
-            double position = Math2.clamp(0, currentEdge.positionClosestTo(point), currentEdge.length());
-            double thatPosition = route[i] + currentEdge.fromPoint().distanceTo(currentEdge.pointAt(position));
-            double thatDistanceToReference = currentEdge.pointAt(position).distanceTo(point);
-            res = res.min(currentEdge.pointAt(position), thatPosition, thatDistanceToReference);
+        int index = 0;
+        PointCh currentEdgePointAt;
+        for (Edge edge : edges) {
+            double position = Math2.clamp(0, edge.positionClosestTo(point), edge.length());
+            currentEdgePointAt = edge.pointAt(position);
+            double thatPosition = route[index] + position;
+            double thatDistanceToReference = currentEdgePointAt.distanceTo(point);
+            res = res.min(currentEdgePointAt, thatPosition, thatDistanceToReference);
+            ++index;
         }
         return res;
     }

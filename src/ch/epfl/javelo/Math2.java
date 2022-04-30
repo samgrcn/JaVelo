@@ -50,7 +50,7 @@ public final class Math2 {
      * @throws IllegalArgumentException if min is striclty greater than max
      */
     public static int clamp(int min, int v, int max) {
-        Preconditions.checkArgument(min < max);
+        Preconditions.checkArgument(min <= max);
         if (v < min) {
             v = min;
         } else if (v > max) {
@@ -69,7 +69,7 @@ public final class Math2 {
      * @throws IllegalArgumentException if min is striclty greater than max
      */
     public static double clamp(double min, double v, double max) {
-        Preconditions.checkArgument(min < max);
+        Preconditions.checkArgument(min <= max);
         if (v < min) {
             v = min;
         } else if (v > max) {
@@ -109,7 +109,7 @@ public final class Math2 {
      * @return the square of the norm of the vector
      */
     public static double squaredNorm(double uX, double uY) {
-        return pow(uX, 2) + pow(uY, 2);
+        return dotProduct(uX, uY, uX, uY);
     }
 
     /**
