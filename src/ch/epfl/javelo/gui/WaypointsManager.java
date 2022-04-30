@@ -32,6 +32,8 @@ public class WaypointsManager {
 
         pane.setPrefSize(600, 300);
 
+        pane.setPickOnBounds(false);
+
 
         PointCh position = waypoints.get(0).position();
         PointWebMercator pointWeb = PointWebMercator.ofPointCh(position);
@@ -64,15 +66,13 @@ public class WaypointsManager {
         outsideBorder.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
         insideBorder.setContent("M0-23A1 1 0 000-29 1 1 0 000-23");
 
-        Group pins = new Group(outsideBorder, insideBorder);
+        Group pins = new Group();
 
         pins.getStyleClass().add("pin");
         pins.getStyleClass().add(status);
 
         pins.setLayoutX(x);
         pins.setLayoutY(y);
-
-        System.out.println(pins.toString());
 
         pane.getChildren().add(pins);
 
