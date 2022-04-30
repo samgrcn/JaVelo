@@ -1,8 +1,10 @@
 package ch.epfl.javelo.gui;
 
 
+import ch.epfl.javelo.Math2;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -10,17 +12,18 @@ import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
-import static ch.epfl.javelo.Math2.clamp;
-
 public final class BaseMapManager {
 
-    private WaypointsManager waypointsManager;
-    private Pane pane;
-    private Canvas canvas;
-    private GraphicsContext graphicsContext;
-    private TileManager tileManager;
-    private ObjectProperty<MapViewParameters> parameters;
+    private final WaypointsManager waypointsManager;
+    private final Pane pane;
+    private final Canvas canvas;
+    private final GraphicsContext graphicsContext;
+    private final TileManager tileManager;
+    private final ObjectProperty<MapViewParameters> parameters;
+    private final double topLeftX;
+    private final double topLeftY;
     private boolean redrawNeeded;
+    private ObjectProperty<Point2D> point;
 
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
 
@@ -35,6 +38,8 @@ public final class BaseMapManager {
         this.graphicsContext = canvas.getGraphicsContext2D();
         this.tileManager = tileManager;
         this.parameters = parameters;
+        this.topLeftX = parameters.get().topLeft().getX();
+        this.topLeftY = parameters.get().topLeft().getY();
 
 
         canvas.setHeight(300);
@@ -45,11 +50,51 @@ public final class BaseMapManager {
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
 
+        pane.setOnScroll(e -> {
+            double zoomDelta = e.getDeltaY();
+
+           zoomDelta = clampAtOne(zoomDelta);
+
+            int newZoomLevel = this.parameters.get().zoomAt() + (int) zoomDelta;
+            newZoomLevel = Math2.clamp(8, newZoomLevel, 19);
+
+            if(newZoomLevel != this.parameters.get().zoomAt()) {
+                double x = topLeftX + e.getX();
+                double y = topLeftY + e.getY();
+                double zoomX = Math.scalb(x, (int) zoomDelta);
+                double zoomY = Math.scalb(y, (int) zoomDelta);
+
+                this.parameters.set(new MapViewParameters(newZoomLevel, zoomX - e.getX(), zoomY - e.getY()));
+
+                redrawOnNextPulse();
+            }
+        });
+
+        pane.setOnMouseDragged(drag -> {
+            double oldX = getPoint().getX();
+            double oldY = getPoint().getY();
+
+            setPoint(new Point2D(drag.getX(), drag.getY()));
+
+            this.parameters.set(new MapViewParameters(this.parameters.get().zoomAt(),
+                    topLeftX + (oldX - getPoint().getX()),
+                    topLeftY + (oldY - getPoint().getY())));
+            redrawOnNextPulse();
+        });
+
+        pane.setOnMouseClicked(click -> {
+            setPoint(new Point2D(click.getX(), click.getY()));
+            if(click.isStillSincePress()) {
+                this.waypointsManager.addWaypoint(click.getX(), click.getY());
+                redrawOnNextPulse();
+            }
+        });
+
+
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
             newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
-
         redrawOnNextPulse();
     }
 
@@ -57,20 +102,30 @@ public final class BaseMapManager {
         return pane;
     }
 
+    private Point2D getPoint() {
+        return point.get();
+    }
+
+    private void setPoint(Point2D point) {
+        this.point.set(point);
+    }
+
+    private double clampAtOne(double zoomDelta) {
+        if(zoomDelta < 0) { zoomDelta = -1; }
+        else if(zoomDelta > 0) { zoomDelta = 1; }
+        return zoomDelta;
+    }
+
     private void redrawIfNeeded() {
         if (!redrawNeeded) return;
         redrawNeeded = false;
 
+        double xMax = topLeftX + canvas.getWidth();
+        double yMax = topLeftY + canvas.getHeight();
 
-
-        double xMin = parameters.get().topLeft().getX();
-        double xMax = xMin + canvas.getWidth();
-        double yMin = parameters.get().topLeft().getY();
-        double yMax = yMin + canvas.getHeight();
-
-        double xMinTile = xMin / TILE_WIDTH_AND_HEIGHT;
+        double xMinTile = topLeftX / TILE_WIDTH_AND_HEIGHT;
         double xMaxTile = xMax / TILE_WIDTH_AND_HEIGHT;
-        double yMinTile = yMin / TILE_WIDTH_AND_HEIGHT;
+        double yMinTile = topLeftY / TILE_WIDTH_AND_HEIGHT;
         double yMaxTile = yMax / TILE_WIDTH_AND_HEIGHT;
 
         for (int y = (int) yMinTile; y <= yMaxTile; y++) {
@@ -79,9 +134,10 @@ public final class BaseMapManager {
                 try {
                     graphicsContext.drawImage(
                             tileManager.imageForTileAt(tileId),
-                            x*TILE_WIDTH_AND_HEIGHT - xMin ,
-                            y*TILE_WIDTH_AND_HEIGHT - yMin);
-                } catch (IOException ignored) {}
+                            x * TILE_WIDTH_AND_HEIGHT - topLeftX,
+                            y * TILE_WIDTH_AND_HEIGHT - topLeftY);
+                } catch (IOException ignored) {
+                }
 
             }
         }
@@ -93,3 +149,4 @@ public final class BaseMapManager {
     }
 
 }
+
