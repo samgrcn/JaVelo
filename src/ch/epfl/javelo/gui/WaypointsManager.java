@@ -64,7 +64,7 @@ public class WaypointsManager {
         outsideBorder.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
         outsideBorder.getStyleClass().add("pin_outside");
         insideBorder.setContent("M0-23A1 1 0 000-29 1 1 0 000-23");
-        outsideBorder.getStyleClass().add("pin_inside");
+        insideBorder.getStyleClass().add("pin_inside");
 
         Group pins = new Group(outsideBorder, insideBorder);
 
