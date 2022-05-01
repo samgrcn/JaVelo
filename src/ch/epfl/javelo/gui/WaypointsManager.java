@@ -10,9 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class WaypointsManager {
@@ -34,9 +31,9 @@ public class WaypointsManager {
 
         pane.setPickOnBounds(false);
 
-
         PointCh position = waypoints.get(0).position();
         PointWebMercator pointWeb = PointWebMercator.ofPointCh(position);
+
         double x = parameters.get().viewX(pointWeb);
         double y = parameters.get().viewY(pointWeb);
 
@@ -46,8 +43,7 @@ public class WaypointsManager {
             } else if(i == waypoints.size() - 1) {
                 WaypointCreator("last", x, y);
                 break;
-            }
-            else {
+            } else {
                 WaypointCreator("middle", x, y);
             }
             position = waypoints.get(i + 1).position();
@@ -64,7 +60,9 @@ public class WaypointsManager {
         SVGPath insideBorder = new SVGPath();
 
         outsideBorder.setContent("M-8-20C-5-14-2-7 0 0 2-7 5-14 8-20 20-40-20-40-8-20");
+        outsideBorder.getStyleClass().add("pin_outside");
         insideBorder.setContent("M0-23A1 1 0 000-29 1 1 0 000-23");
+        insideBorder.getStyleClass().add("pin_inside");
 
         Group pins = new Group();
 
