@@ -4,15 +4,15 @@ import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.function.Consumer;
 
 public class WaypointsManager {
@@ -22,6 +22,7 @@ public class WaypointsManager {
     private ObjectProperty<MapViewParameters> parameters;
     private Graph graph;
     private Consumer<String> errorConsumer;
+    private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
 
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters, ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
@@ -39,13 +40,12 @@ public class WaypointsManager {
         double y = parameters.get().viewY(pointWeb);
 
         for (int i = 0; i < waypoints.size(); i++) {
-            if(i == 0) {
+            if (i == 0) {
                 WaypointCreator("first", x, y);
-            } else if(i == waypoints.size() - 1) {
+            } else if (i == waypoints.size() - 1) {
                 WaypointCreator("last", x, y);
                 break;
-            }
-            else {
+            } else {
                 WaypointCreator("middle", x, y);
             }
             position = waypoints.get(i + 1).position();
@@ -57,7 +57,9 @@ public class WaypointsManager {
 
 
     private void WaypointCreator(String status, double x, double y) {
-
+;
+        ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
+        point2d.set(new Point2D(x, y));
         SVGPath outsideBorder = new SVGPath();
         SVGPath insideBorder = new SVGPath();
 
@@ -73,6 +75,15 @@ public class WaypointsManager {
 
         pins.setLayoutX(x);
         pins.setLayoutY(y);
+
+        pane.setOnMouseDragged(drag -> {
+            double oldX = point2d.get().getX();
+            double oldY = point2d.get().getY();
+            point2d.set(new Point2D(drag.getX(), drag.getY()));
+            pins.setLayoutX(drag.getX());
+            pins.setLayoutY(drag.getY());
+
+        });
 
         pane.getChildren().add(pins);
 

@@ -2,9 +2,11 @@ package ch.epfl.javelo.gui;
 
 
 import ch.epfl.javelo.Math2;
+import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -25,7 +27,7 @@ public final class BaseMapManager {
     private final TileManager tileManager;
     private final ObjectProperty<MapViewParameters> parameters;
     private boolean redrawNeeded;
-    private ObjectProperty<Point2D> point2d;
+    private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
 
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
 
@@ -51,6 +53,8 @@ public final class BaseMapManager {
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
 
+        pane.setPickOnBounds(false);
+
         pane.setOnScroll(e -> {
             double zoomDelta = e.getDeltaY();
 
@@ -69,25 +73,26 @@ public final class BaseMapManager {
             }
         });
 
+        pane.setOnMousePressed(press -> {
+            point2d.set(new Point2D(press.getX(), press.getY()));
+        });
+
+
         pane.setOnMouseDragged(drag -> {
             double oldX = point2d.get().getX();
             double oldY = point2d.get().getY();
-
             point2d.set(new Point2D(drag.getX(), drag.getY()));
             this.parameters.set(new MapViewParameters(this.parameters.get().zoomAt(),
                     this.parameters.get().topLeft().getX() + (oldX - point2d.get().getX()),
                     this.parameters.get().topLeft().getY() + (oldY - point2d.get().getY())));
 
+
         });
 
         pane.setOnMouseClicked(click -> {
-
-            point2d.set(new Point2D(click.getX(), click.getY()));
-
             if (click.isStillSincePress()) {
-                this.waypointsManager.addWaypoint(
-                        this.parameters.get().topLeft().getX() + click.getX(),
-                        this.parameters.get().topLeft().getY() + click.getY());
+                PointCh waypoint = this.parameters.get().pointAt(click.getX(), click.getY()).toPointCh();
+                this.waypointsManager.addWaypoint(waypoint.e(), waypoint.n());
                 redrawOnNextPulse();
             }
         });
