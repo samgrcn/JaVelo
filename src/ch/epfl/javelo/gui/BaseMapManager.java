@@ -28,6 +28,7 @@ public final class BaseMapManager {
     private final ObjectProperty<MapViewParameters> parameters;
     private boolean redrawNeeded;
     private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
+    private PointCh mouseClick;
 
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
 
@@ -91,8 +92,8 @@ public final class BaseMapManager {
 
         pane.setOnMouseClicked(click -> {
             if (click.isStillSincePress()) {
-                PointCh waypoint = this.parameters.get().pointAt(click.getX(), click.getY()).toPointCh();
-                this.waypointsManager.addWaypoint(waypoint.e(), waypoint.n());
+                mouseClick = this.parameters.get().pointAt(click.getX(), click.getY()).toPointCh();
+                this.waypointsManager.addWaypoint(mouseClick.e(), mouseClick.n());
                 redrawOnNextPulse();
             }
         });

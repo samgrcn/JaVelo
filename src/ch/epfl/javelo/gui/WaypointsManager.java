@@ -77,14 +77,11 @@ public class WaypointsManager {
         pins.setLayoutY(y);
 
         pane.setOnMouseDragged(drag -> {
-            double oldX = point2d.get().getX();
-            double oldY = point2d.get().getY();
             point2d.set(new Point2D(drag.getX(), drag.getY()));
             pins.setLayoutX(drag.getX());
             pins.setLayoutY(drag.getY());
 
         });
-
         pane.getChildren().add(pins);
 
     }
