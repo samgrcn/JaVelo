@@ -44,6 +44,7 @@ public class WaypointsManager {
 
         waypoints.addListener((Observable w) -> {
             update();
+            System.out.println(waypoints.toString());
         });
 
         parameters.addListener(change -> {
@@ -77,11 +78,13 @@ public class WaypointsManager {
             pins.setLayoutX(drag.getSceneX());
             pins.setLayoutY(drag.getSceneY());
 
-            pins.setOnMouseReleased(release -> {
-                PointCh newPoint = this.parameters.get().pointAt(x + release.getX(), y + release.getY()).toPointCh();
-                Waypoint newWaypoint = new Waypoint(newPoint, graph.nodeClosestTo(newPoint, 500));
-                waypoints.set(indexInList, newWaypoint);
-            });
+        });
+
+        pins.setOnMouseReleased(release -> {
+            PointCh newPoint = this.parameters.get().pointAt(release.getSceneX(), release.getSceneY()).toPointCh();
+            Waypoint newWaypoint = new Waypoint(newPoint, graph.nodeClosestTo(newPoint, 500));
+            waypoints.set(indexInList, newWaypoint);
+            listIterator();
         });
 
 
