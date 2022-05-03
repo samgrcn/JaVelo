@@ -84,7 +84,6 @@ public class WaypointsManager {
             PointCh newPoint = this.parameters.get().pointAt(release.getSceneX(), release.getSceneY()).toPointCh();
             Waypoint newWaypoint = new Waypoint(newPoint, graph.nodeClosestTo(newPoint, 500));
             waypoints.set(indexInList, newWaypoint);
-            listIterator();
         });
 
 
