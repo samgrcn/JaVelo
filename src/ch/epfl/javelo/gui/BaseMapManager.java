@@ -28,7 +28,6 @@ public final class BaseMapManager {
     private final ObjectProperty<MapViewParameters> parameters;
     private boolean redrawNeeded;
     private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
-    private PointCh mouseClick;
 
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
 
@@ -70,7 +69,7 @@ public final class BaseMapManager {
                 double y = this.parameters.get().topLeft().getY() + e.getY();
                 double zoomX = Math.scalb(x, (int) zoomDelta);
                 double zoomY = Math.scalb(y, (int) zoomDelta);
-                this.parameters.set( new MapViewParameters(newZoomLevel, zoomX - e.getX(), zoomY - e.getY()));
+                this.parameters.set(new MapViewParameters(newZoomLevel, zoomX - e.getX(), zoomY - e.getY()));
             }
         });
 
@@ -86,15 +85,12 @@ public final class BaseMapManager {
             this.parameters.set(new MapViewParameters(this.parameters.get().zoomAt(),
                     this.parameters.get().topLeft().getX() + (oldX - point2d.get().getX()),
                     this.parameters.get().topLeft().getY() + (oldY - point2d.get().getY())));
-
-
         });
+
 
         pane.setOnMouseClicked(click -> {
             if (click.isStillSincePress()) {
-                mouseClick = this.parameters.get().pointAt(click.getX(), click.getY()).toPointCh();
-                this.waypointsManager.addWaypoint(mouseClick.e(), mouseClick.n());
-                redrawOnNextPulse();
+                waypointsManager.addWaypoint(click.getX(), click.getY());
             }
         });
 
@@ -109,8 +105,6 @@ public final class BaseMapManager {
     public Node pane() {
         return pane;
     }
-
-
 
 
     private void redrawIfNeeded() {

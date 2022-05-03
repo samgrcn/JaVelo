@@ -51,7 +51,7 @@ public record MapViewParameters(int zoomAt, double x, double y) {
      * @return the point as a PointWebMercator instance
      */
     public PointWebMercator pointAt(double x, double y) {
-        return PointWebMercator.of(zoomAt, x, y);
+        return PointWebMercator.of(zoomAt, this.x + x, this.y + y);
     }
 
     /**
