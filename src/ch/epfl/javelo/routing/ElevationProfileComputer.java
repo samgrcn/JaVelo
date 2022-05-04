@@ -63,10 +63,14 @@ public class ElevationProfileComputer {
 
         if (Float.isNaN(elevationSamples[0])) {
             int i = toNextExistingFloat(elevationSamples, 0, true);
+            int j = toNextExistingFloat(elevationSamples, 1, true);
 
             //if the list is full of NaN
             if (i == 0) {
                 Arrays.fill(elevationSamples, 0, samplesNumber, 0);
+            }
+            if(j == 0) {
+                Arrays.fill(elevationSamples, 1, samplesNumber, elevationSamples[1]);
             }
             //only if some of the first values are NaN, but not the entire array
             else {

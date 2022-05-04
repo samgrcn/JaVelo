@@ -16,7 +16,7 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @author Samuel Garcin (345633)
  */
-public class Graph {
+public final class Graph {
 
     private final GraphNodes nodes;
     private final GraphSectors sectors;
@@ -73,7 +73,7 @@ public class Graph {
         ShortBuffer elevationIdBuffer = pathBuffer(basePath.resolve("elevations.bin")).asShortBuffer();
         LongBuffer attributeSetIdBuffer = pathBuffer(basePath.resolve("attributes.bin")).asLongBuffer();
 
-        List<AttributeSet> attributeSetList = new ArrayList<>();
+        List<AttributeSet> attributeSetList = new ArrayList<>(attributeSetIdBuffer.capacity());
 
         for (int i = 0; i < attributeSetIdBuffer.capacity(); i++) {
             attributeSetList.add(new AttributeSet(attributeSetIdBuffer.get(i)));
@@ -142,11 +142,9 @@ public class Graph {
         for (GraphSectors.Sector sectorsInSquare : sectorsInArea) {
             for (int i = sectorsInSquare.startNodeId(); i < sectorsInSquare.endNodeId(); i++) {
                 distance = point.squaredDistanceTo(nodePoint(i));
-                if (distance < min) {
+                if (distance < min && distance < searchDistance * searchDistance) {
                     min = distance;
-                    if (distance < Math.pow(searchDistance, 2)) {
-                        index = i;
-                    }
+                    index = i;
                 }
             }
         }

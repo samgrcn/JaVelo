@@ -17,6 +17,7 @@ import javafx.scene.shape.SVGPath;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.function.Consumer;
 
 public class WaypointsManager {
@@ -27,7 +28,8 @@ public class WaypointsManager {
     private final Graph graph;
     private final Consumer<String> errorConsumer;
     private final List<Group> pinsList = new ArrayList<>();
-    private final ObjectProperty<Point2D> newCoordinates = new SimpleObjectProperty<>();
+    private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
+    private final ObjectProperty<Point2D> pointer = new SimpleObjectProperty<>();
 
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters, ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
@@ -44,7 +46,6 @@ public class WaypointsManager {
 
         waypoints.addListener((Observable w) -> {
             update();
-            System.out.println(waypoints.toString());
         });
 
         parameters.addListener(change -> {
@@ -74,25 +75,40 @@ public class WaypointsManager {
 
         pinsList.add(pins);
 
-        pins.setOnMouseDragged(drag -> {
-            pins.setLayoutX(drag.getSceneX());
-            pins.setLayoutY(drag.getSceneY());
+        pointer.set(new Point2D(x, y));
 
-            pins.setOnMouseReleased(release -> {
-                PointCh newPoint = this.parameters.get().pointAt(release.getSceneX(), release.getSceneY()).toPointCh();
-                Waypoint newWaypoint = new Waypoint(newPoint, graph.nodeClosestTo(newPoint, 500));
-                waypoints.set(indexInList, newWaypoint);
-            });
-
+        pane.setOnMousePressed(press -> {
+            point2d.set(new Point2D(press.getSceneX(), press.getSceneY()));
         });
 
 
+        pins.setOnMouseDragged(drag -> {
+
+            pins.setLayoutX(drag.getSceneX() + (point2d.get().getX() - pointer.get().getX()));
+            pins.setLayoutY(drag.getSceneY() + (point2d.get().getY() - pointer.get().getY()));
+
+            pins.setOnMouseReleased(release -> {
+
+                pointer.set(new Point2D(release.getX(), release.getY()));
+                PointCh newPoint = this.parameters.get().pointAt(release.getSceneX(), release.getSceneY()).toPointCh();
+                int closestNode = graph.nodeClosestTo(newPoint, 500);
+
+                if(closestNode == -1) {
+                    errorConsumer.accept("Aucune route à proximité !");
+                    pins.setLayoutX(point2d.get().getX());
+                    pins.setLayoutY(point2d.get().getY());
+                }
+
+                Waypoint newWaypoint = new Waypoint(newPoint, closestNode);
+                waypoints.set(indexInList, newWaypoint);
+
+            });
+        });
 
 
         pins.setOnMouseClicked(click -> {
             if (click.isStillSincePress()) {
                 remove(indexInList);
-                update();
             }
         });
     }
@@ -133,15 +149,14 @@ public class WaypointsManager {
     }
 
     private void remove(int indexInList) {
-        pinsList.remove(indexInList);
-        pane.getChildren().remove(indexInList);
         waypoints.remove(indexInList);
     }
 
-
     public void addWaypoint(double x, double y) {
         PointCh point = this.parameters.get().pointAt(x, y).toPointCh();
-        waypoints.add(new Waypoint(point, graph.nodeClosestTo(point, 500)));
+        int closestNode = graph.nodeClosestTo(point, 500);
+        if(closestNode == -1) { errorConsumer.accept("Aucune route à proximité !"); }
+        waypoints.add(new Waypoint(point, closestNode));
     }
 
     public Node pane() {

@@ -16,6 +16,10 @@ public final class ElevationProfile {
     private final double length;
     private final float[] elevationSamples;
     private final DoubleUnaryOperator function;
+    private final double totalAscent;
+    private final double totalDescent;
+    private final double minElevation;
+    private final double maxElevation;
 
     /**
      * Constructs the long profile of a route of length (in meters) and whose elevation samples,
@@ -30,6 +34,28 @@ public final class ElevationProfile {
         this.function = Functions.sampled(elevationSamples, length);
         this.length = length;
         this.elevationSamples = Arrays.copyOf(elevationSamples, elevationSamples.length);
+
+        double totalAscent = 0;
+        double totalDescent = 0;
+
+        for (int i = 0; i < elevationSamples.length - 1; i++) {
+            if (elevationSamples[i] < elevationSamples[i + 1]) {
+                totalAscent += elevationSamples[i + 1] - elevationSamples[i];
+
+            }
+        }
+        this.totalAscent = totalAscent;
+
+        for (int i = 0; i < elevationSamples.length - 1; i++) {
+            if (elevationSamples[i] > elevationSamples[i + 1]) {
+                totalDescent += elevationSamples[i] - elevationSamples[i + 1];
+            }
+        }
+        this.totalDescent = totalDescent;
+
+        this.minElevation = statisticsValues((elevationSamples)).getMin();
+        this.maxElevation = statisticsValues((elevationSamples)).getMax();
+
     }
 
     /**
@@ -62,47 +88,28 @@ public final class ElevationProfile {
      *
      * @return the minimum altitude of the profile (in meters)
      */
-    public double minElevation() { return statisticsValues((elevationSamples)).getMin(); }
+    public double minElevation() { return minElevation; }
 
     /**
      * Gives the maximum altitude of the profile (in meters).
      *
      * @return returns the maximum altitude of the profile (in meters)
      */
-    public double maxElevation() { return statisticsValues((elevationSamples)).getMax(); }
+    public double maxElevation() { return maxElevation; }
 
     /**
      * Gives the total positive vertical drop of the profile (in meters).
      *
      * @return the total positive vertical drop of the profile (in meters)
      */
-    public double totalAscent() {
-        double totalAscent = 0;
-
-        for (int i = 0; i < elevationSamples.length - 1; i++) {
-            if (elevationSamples[i] < elevationSamples[i + 1]) {
-                totalAscent += elevationSamples[i + 1] - elevationSamples[i];
-
-            }
-        }
-        return totalAscent;
-    }
+    public double totalAscent() { return totalAscent; }
 
     /**
      * Gives the total negative elevation of the profile (in meters).
      *
      * @return the total negative elevation of the profile (in meters)
      */
-    public double totalDescent() {
-        double totalDescent = 0;
-
-        for (int i = 0; i < elevationSamples.length - 1; i++) {
-            if (elevationSamples[i] > elevationSamples[i + 1]) {
-                totalDescent += elevationSamples[i] - elevationSamples[i + 1];
-            }
-        }
-        return totalDescent;
-    }
+    public double totalDescent() { return totalDescent; }
 
     /**
      * Gives the altitude of the profile at the given position.

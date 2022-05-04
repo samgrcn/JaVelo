@@ -55,24 +55,27 @@ public final class Functions {
     }
 
     /**
-     * Record Sampled implementing DoubleUnaryOperator, used for functions and taking an array of float samples
+     * Class Sampled implementing DoubleUnaryOperator, used for functions and taking an array of float samples
      * and xMax as a parameter.
-     *
-     * @param samples [] an array of y values spaced by a same interval.
-     * @param xMax    the maximum x value of the big interval containing all values of samples [].
      */
-    private record Sampled(float[] samples, double xMax) implements DoubleUnaryOperator {
+    private static class Sampled implements DoubleUnaryOperator {
+
+        private final float[] samples;
+        private final double xMax;
 
         /**
          * Constructor checking whether there are at least 2 values in samples, and if xMax is strictly positive.
+         * And copies samples so the class is immutable.
          *
          * @param samples [] an array of y values spaced by a same interval.
          * @param xMax    the maximum x value of the big interval containing all values of samples [].
          * @throws IllegalArgumentException if it's not the case.
          */
-        public Sampled {
+        public Sampled(float[] samples, double xMax) {
             Preconditions.checkArgument(xMax > 0);
             Preconditions.checkArgument(samples.length >= 2);
+            this.samples = samples.clone();
+            this.xMax = xMax;
         }
 
         /**

@@ -24,6 +24,7 @@ public class RouteComputer {
 
     /**
      * Record used to store in the list exploration a WeightedNode, including an id of the node and its distance.
+     * Is defined outside bestRouteBetween, in order to be used in explorationFiller
      */
     record WeightedNode(int nodeId, float distance)
             implements Comparable<WeightedNode> {
