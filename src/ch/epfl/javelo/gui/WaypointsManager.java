@@ -84,8 +84,8 @@ public class WaypointsManager {
 
         pins.setOnMouseDragged(drag -> {
 
-            pins.setLayoutX(drag.getSceneX() + (point2d.get().getX() - pointer.get().getX()));
-            pins.setLayoutY(drag.getSceneY() + (point2d.get().getY() - pointer.get().getY()));
+            pins.setLayoutX(drag.getSceneX());
+            pins.setLayoutY(drag.getSceneY());
 
             pins.setOnMouseReleased(release -> {
 
