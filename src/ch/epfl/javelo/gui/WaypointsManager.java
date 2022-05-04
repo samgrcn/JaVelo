@@ -22,6 +22,11 @@ import java.util.function.Consumer;
 
 public class WaypointsManager {
 
+    private final static int SEARCH_DISTANCE = 500;
+    private final static int NO_NODE = -1;
+    private final static int PREF_WIDTH = 600;
+    private final static int PREF_HEIGHT = 300;
+
     private final Pane pane = new Pane();
     private final ObservableList<Waypoint> waypoints;
     private final ObjectProperty<MapViewParameters> parameters;
@@ -38,7 +43,7 @@ public class WaypointsManager {
         this.graph = graph;
         this.errorConsumer = errorConsumer;
 
-        pane.setPrefSize(600, 300);
+        pane.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
         pane.setPickOnBounds(false);
 
         listIterator();
@@ -91,9 +96,9 @@ public class WaypointsManager {
 
                 pointer.set(new Point2D(release.getX(), release.getY()));
                 PointCh newPoint = this.parameters.get().pointAt(release.getSceneX(), release.getSceneY()).toPointCh();
-                int closestNode = graph.nodeClosestTo(newPoint, 500);
+                int closestNode = graph.nodeClosestTo(newPoint, SEARCH_DISTANCE);
 
-                if(closestNode == -1) {
+                if (closestNode == NO_NODE) {
                     errorConsumer.accept("Aucune route à proximité !");
                     pins.setLayoutX(point2d.get().getX());
                     pins.setLayoutY(point2d.get().getY());
@@ -154,8 +159,8 @@ public class WaypointsManager {
 
     public void addWaypoint(double x, double y) {
         PointCh point = this.parameters.get().pointAt(x, y).toPointCh();
-        int closestNode = graph.nodeClosestTo(point, 500);
-        if(closestNode == -1) { errorConsumer.accept("Aucune route à proximité !"); }
+        int closestNode = graph.nodeClosestTo(point, SEARCH_DISTANCE);
+        if (closestNode == NO_NODE) { errorConsumer.accept("Aucune route à proximité !"); }
         waypoints.add(new Waypoint(point, closestNode));
     }
 
