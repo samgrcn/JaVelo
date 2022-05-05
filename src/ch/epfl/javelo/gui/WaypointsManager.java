@@ -6,7 +6,6 @@ import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -17,7 +16,6 @@ import javafx.scene.shape.SVGPath;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.function.Consumer;
 
 public class WaypointsManager {
@@ -28,8 +26,6 @@ public class WaypointsManager {
     private final Graph graph;
     private final Consumer<String> errorConsumer;
     private final List<Group> pinsList = new ArrayList<>();
-    private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
-    private final ObjectProperty<Point2D> pointer = new SimpleObjectProperty<>();
 
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters, ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
@@ -57,6 +53,9 @@ public class WaypointsManager {
 
     private void WaypointCreator(String status, double x, double y, int indexInList) {
 
+        ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>();
+        ObjectProperty<Point2D> pointer = new SimpleObjectProperty<>();
+
         SVGPath outsideBorder = new SVGPath();
         SVGPath insideBorder = new SVGPath();
 
@@ -75,30 +74,43 @@ public class WaypointsManager {
 
         pinsList.add(pins);
 
-        pointer.set(new Point2D(x, y));
 
-        pane.setOnMousePressed(press -> {
-            point2d.set(new Point2D(press.getSceneX(), press.getSceneY()));
+        pins.setOnMousePressed(press -> {
+            mousePosition.set(new Point2D(press.getSceneX(), press.getSceneY()));
+            pointer.set(new Point2D(pins.getLayoutX(), pins.getLayoutY()));
         });
-
 
         pins.setOnMouseDragged(drag -> {
 
-            pins.setLayoutX(drag.getSceneX());
-            pins.setLayoutY(drag.getSceneY());
+            double differenceX = mousePosition.get().getX() - pointer.get().getX();
+            double differenceY = mousePosition.get().getY() - pointer.get().getY();
+            pins.setLayoutX(drag.getSceneX() - differenceX);
+            pins.setLayoutY(drag.getSceneY() - differenceY);
 
             pins.setOnMouseReleased(release -> {
 
-                pointer.set(new Point2D(release.getX(), release.getY()));
-                PointCh newPoint = this.parameters.get().pointAt(release.getSceneX(), release.getSceneY()).toPointCh();
+                try {
+                    this.parameters.get().pointAt(release.getX(), release.getY()).toPointCh();
+                } catch (NullPointerException ignored) {
+                    errorConsumer.accept("Point en dehors de la Suisse !");
+                    pins.setLayoutX(pointer.get().getX());
+                    pins.setLayoutY(pointer.get().getX());
+                }
+
+                double newX = release.getSceneX() - differenceX;
+                double newY = release.getSceneY() - differenceY;
+
+                PointCh newPoint = this.parameters.get().pointAt(newX, newY).toPointCh();
                 int closestNode = graph.nodeClosestTo(newPoint, 500);
 
                 if(closestNode == -1) {
                     errorConsumer.accept("Aucune route à proximité !");
-                    pins.setLayoutX(point2d.get().getX());
-                    pins.setLayoutY(point2d.get().getY());
+                    pins.setLayoutX(pointer.get().getX());
+                    pins.setLayoutY(pointer.get().getY());
+                    return;
                 }
 
+                pointer.set(new Point2D(newX, newY));
                 Waypoint newWaypoint = new Waypoint(newPoint, closestNode);
                 waypoints.set(indexInList, newWaypoint);
 
@@ -152,12 +164,27 @@ public class WaypointsManager {
         waypoints.remove(indexInList);
     }
 
+
+
     public void addWaypoint(double x, double y) {
+        try {
+            this.parameters.get().pointAt(x, y).toPointCh();
+        } catch (NullPointerException ignored) {
+            errorConsumer.accept("Point en dehors de la Suisse !");
+            return;
+        }
+
         PointCh point = this.parameters.get().pointAt(x, y).toPointCh();
         int closestNode = graph.nodeClosestTo(point, 500);
-        if(closestNode == -1) { errorConsumer.accept("Aucune route à proximité !"); }
+
+        if(closestNode == -1) {
+            errorConsumer.accept("Aucune route à proximité !");
+            return;
+        }
+
         waypoints.add(new Waypoint(point, closestNode));
     }
+
 
     public Node pane() {
         return pane;
