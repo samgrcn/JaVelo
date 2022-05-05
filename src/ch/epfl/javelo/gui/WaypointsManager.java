@@ -27,6 +27,7 @@ public class WaypointsManager {
     private final Consumer<String> errorConsumer;
     private final List<Group> pinsList = new ArrayList<>();
 
+
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters, ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
         this.waypoints = waypoints;
