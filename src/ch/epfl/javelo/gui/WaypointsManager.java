@@ -6,7 +6,6 @@ import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -17,7 +16,6 @@ import javafx.scene.shape.SVGPath;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.function.Consumer;
 
 public class WaypointsManager {
