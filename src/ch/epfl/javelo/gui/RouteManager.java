@@ -104,7 +104,7 @@ public final class RouteManager {
             return;
         }
 
-        disk.setVisible(true);
+        polyline.setVisible(true);
         List<PointCh> pointsList = route.points();
         Double[] points = new Double[pointsList.size() * 2];
         int index = 0;
