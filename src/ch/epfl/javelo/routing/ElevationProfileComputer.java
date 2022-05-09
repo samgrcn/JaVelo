@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * @author Samuel Garcin (345633)
  */
-public class ElevationProfileComputer {
+public final class ElevationProfileComputer {
 
     private ElevationProfileComputer() {
     }
