@@ -65,6 +65,18 @@ public final class RouteManager {
         bean.routeProperty().addListener(change -> {
             update();
         });
+
+        disk.setOnMouseClicked(click -> {
+            int closestNode = route.nodeClosestTo(bean.highlightedPosition());
+            for (Waypoint point : bean.waypoints()) {
+                if (point.closestNodeId() == closestNode) {
+                    errorConsumer.accept("Un point de passage est déjà présent à cet endroit !");
+                    return;
+                }
+            }
+            Waypoint waypoint = new Waypoint(route.pointAt(bean.highlightedPosition()), closestNode);
+            bean.waypoints().add(bean.waypoints().size() / 2, waypoint);
+        });
     }
 
     /**
@@ -121,17 +133,6 @@ public final class RouteManager {
      */
     private void update() {
         route = bean.route();
-        disk.setOnMouseClicked(click -> {
-            int closestNode = route.nodeClosestTo(bean.highlightedPosition());
-            for (Waypoint point : bean.waypoints()) {
-                if (point.closestNodeId() == closestNode) {
-                    errorConsumer.accept("Un point de passage est déjà présent à cet endroit !");
-                    return;
-                }
-            }
-            Waypoint waypoint = new Waypoint(route.pointAt(bean.highlightedPosition()), closestNode);
-            bean.waypoints().add(bean.waypoints().size() / 2, waypoint);
-        });
         setDisk();
         setPolyline();
     }
