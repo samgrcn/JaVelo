@@ -122,7 +122,6 @@ public class WaypointsManager {
             });
         });
 
-
         pins.setOnMouseClicked(click -> {
             if (click.isStillSincePress()) {
                 remove(indexInList);
