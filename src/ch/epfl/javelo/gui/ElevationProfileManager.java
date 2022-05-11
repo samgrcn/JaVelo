@@ -1,74 +1,113 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.ElevationProfile;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public final class ElevationProfileManager {
 
-    private final Pane pane = new Pane();
+    private final Insets distanceFromBorder = new Insets(10, 10, 20, 40);
     private final BorderPane borderPane = new BorderPane();
-    private ReadOnlyObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
+    private final Pane pane = new Pane();
+    private final VBox vBox = new VBox();
+    private Line line;
+    private Polygon polygon;
+    private final ReadOnlyObjectProperty<ElevationProfile> elevationProfile;
+    ReadOnlyDoubleProperty position = new SimpleDoubleProperty();
+    ObjectProperty<Transform> screenToWorld = new SimpleObjectProperty<>();
+    ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
+    ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
 
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty position) {
+        pane.setPrefSize(600, 300);
         this.elevationProfile = elevationProfile;
+        scaleManager();
+
+        pane.widthProperty().addListener(e -> {
+            updateRectangle();
+        });
+
+        pane.heightProperty().addListener(e -> {
+            updateRectangle();
+        });
+
+        borderPane.setCenter(pane);
+        borderPane.setBottom(vBox);
+
+
+        Bindings.createDoubleBinding(() -> { return  });
+        line.layoutXProperty().bind();
+
+        ;
     }
 
     public ReadOnlyDoubleProperty mousePositionOnProfileProperty() {
         return null;
     }
 
-    private void rectangleManager() {
-        Insets distanceFromBorder = new Insets(10, 10, 20, 40);
-        ObjectProperty<Transform> screenToWorld = new SimpleObjectProperty<>();
-        ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
-        ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
+    private void scaleManager() {
 
-        rectangle.set(new Rectangle2D(
-                0 + distanceFromBorder.getLeft(),
-                0 + distanceFromBorder.getBottom(),
-                borderPane.getWidth() - distanceFromBorder.getRight(),
-                borderPane.getHeight() - distanceFromBorder.getTop()));
-
+        updateRectangle();
         Affine scaleToWorldAffine = new Affine();
-        double x = 0;
-        double y = 0;
-        Point2D point = new Point2D(x, y);
 
-        scaleToWorldAffine.prependTranslation(-point.getX(), -point.getY());
+        Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMaxY());
 
-        double longueurX = 5;
-        double longueurY = 5;
-
-        scaleToWorldAffine.prependScale(rectangle.get().getWidth() / longueurX, -(rectangle.get().getHeight() / longueurY));
-
-        scaleToWorldAffine.prependTranslation(x, y);
-
+        scaleToWorldAffine.prependTranslation(-topLeft.getX(), -topLeft.getY());
+        scaleToWorldAffine.prependScale(
+                elevationProfile.get().length() / rectangle.get().getWidth(),
+                -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
+        scaleToWorldAffine.prependTranslation(topLeft.getX(), topLeft.getY());
 
         screenToWorld.set(scaleToWorldAffine);
 
-        Affine inverse = new Affine();
+        System.out.println(screenToWorld.get().transform(new Point2D(40, 10)));
 
         try {
-            inverse = scaleToWorldAffine.createInverse();
+            worldToScreen.set(scaleToWorldAffine.createInverse());
         } catch (NonInvertibleTransformException e) {
             throw new Error(e); //if scaleToWorldAffine equals to 0
         }
+
     }
 
-        public Node pane() {
-        return pane;
+    private void updateRectangle() {
+        rectangle.set(new Rectangle2D(
+                0 + distanceFromBorder.getLeft(),
+                0 + distanceFromBorder.getBottom(),
+                Math.max(0, pane.getMaxWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
+                Math.max(0, pane.getMaxHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
+    }
+
+    private void polygonCreator() {
+        Point2D worldPoint;
+        Point2D screenPoint;
+        List<Point2D> listOfPoints = new ArrayList<>();
+        for (int x = (int) rectangle.get().getMinX(); x < rectangle.get().getMaxX(); x++) {
+            worldPoint = screenToWorld.get().transform(x, 0);
+            screenPoint = worldToScreen.get().transform(x, elevationProfile.get().elevationAt(worldPoint.getX()));
+            listOfPoints.add(screenPoint);
+        }
+        polygon.getPoints().setAll(listOfPoints);
+
+
+    }
+
+    public Pane pane() {
+        return borderPane;
     }
 }

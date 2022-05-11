@@ -71,6 +71,7 @@ public final class BaseMapManager {
                 double zoomY = Math.scalb(y, (int) zoomDelta);
                 this.parameters.set(new MapViewParameters(newZoomLevel, zoomX - e.getX(), zoomY - e.getY()));
             }
+            System.out.println(pane.getWidth());
         });
 
         pane.setOnMousePressed(press -> {
@@ -102,7 +103,7 @@ public final class BaseMapManager {
 
     }
 
-    public Node pane() {
+    public Pane pane() {
         return pane;
     }
 

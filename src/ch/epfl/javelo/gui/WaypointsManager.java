@@ -189,7 +189,7 @@ public class WaypointsManager {
     }
 
 
-    public Node pane() {
+    public Pane pane() {
         return pane;
     }
 }
