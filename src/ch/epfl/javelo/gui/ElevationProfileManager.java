@@ -25,15 +25,17 @@ public final class ElevationProfileManager {
     private final BorderPane borderPane = new BorderPane();
     private final Pane pane = new Pane();
     private final VBox vBox = new VBox();
-    private Line line;
-    private Polygon polygon;
+    private final ObjectProperty<Line> line = new SimpleObjectProperty<>();
+    private final ObjectProperty<Polygon> polygon = new SimpleObjectProperty<>();
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfile;
-    ReadOnlyDoubleProperty position = new SimpleDoubleProperty();
-    ObjectProperty<Transform> screenToWorld = new SimpleObjectProperty<>();
-    ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
-    ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
+    private final ReadOnlyDoubleProperty position = new SimpleDoubleProperty();
+    private final ObjectProperty<Transform> screenToWorld = new SimpleObjectProperty<>();
+    private final ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
+    private final ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
 
-    public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty position) {
+    private final static int KM_TO_M = 1000;
+
+    public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
         pane.setPrefSize(600, 300);
         this.elevationProfile = elevationProfile;
         scaleManager();
@@ -50,11 +52,22 @@ public final class ElevationProfileManager {
         borderPane.setBottom(vBox);
 
 
-        Bindings.createDoubleBinding(() -> { return  });
-        line.layoutXProperty().bind();
+        line.get().layoutXProperty().bind(
+                Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0).getX(), highlightedPosition));
 
-        ;
+        line.get().startYProperty().bind(Bindings.select(rectangle.get().getMinY()));
+
+        line.get().endYProperty().bind(Bindings.select(rectangle.get().getMaxY()));
+
+        line.get().visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
+
+        pane.setOnMouseMoved(e -> {
+            screenToWorld.get().transform(e.getX() * KM_TO_M, 0);
+        });
+
     }
+
+
 
     public ReadOnlyDoubleProperty mousePositionOnProfileProperty() {
         return null;
@@ -100,9 +113,8 @@ public final class ElevationProfileManager {
         for (int x = (int) rectangle.get().getMinX(); x < rectangle.get().getMaxX(); x++) {
             worldPoint = screenToWorld.get().transform(x, 0);
             screenPoint = worldToScreen.get().transform(x, elevationProfile.get().elevationAt(worldPoint.getX()));
-            listOfPoints.add(screenPoint);
+            polygon.get().getPoints().add(x, screenPoint.getY());
         }
-        polygon.getPoints().setAll(listOfPoints);
 
 
     }
