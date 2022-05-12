@@ -15,9 +15,6 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public final class ElevationProfileManager {
 
@@ -36,20 +33,26 @@ public final class ElevationProfileManager {
     private final static int KM_TO_M = 1000;
 
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
-        pane.setPrefSize(600, 300);
         this.elevationProfile = elevationProfile;
-        scaleManager();
 
-        pane.widthProperty().addListener(e -> {
+        transformManager();
+        updateRectangle();
+
+        borderPane.getStylesheets().add("elevation_profile.css");
+        polygon.setId("profile");
+
+        pane.widthProperty().addListener((p, oldS, newS) -> {
             updateRectangle();
         });
 
-        pane.heightProperty().addListener(e -> {
+        pane.heightProperty().addListener((p, oldS, newS) -> {
             updateRectangle();
         });
 
-        borderPane.setCenter(pane);
-        borderPane.setBottom(vBox);
+        elevationProfile.addListener(e -> {
+            updateRectangle();
+        });
+
 
 
         line.layoutXProperty().bind(
@@ -61,18 +64,28 @@ public final class ElevationProfileManager {
 
         line.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
 
+
+
         pane.setOnMouseMoved(e -> {
             position.set(screenToWorld.get().transform(e.getX() * KM_TO_M, 0).getX());
         });
+
         pane.setOnMouseExited(e -> {
             position.set(Double.NaN);
         });
 
+        rectangle.addListener(e -> {
+            transformManager();
+            polygonCreator();
+        });
 
-        polygonCreator();
 
         pane.getChildren().add(polygon);
         pane.getChildren().add(line);
+
+        borderPane.setCenter(pane);
+        borderPane.setBottom(vBox);
+
     }
 
 
@@ -81,37 +94,37 @@ public final class ElevationProfileManager {
         return position;
     }
 
-    private void scaleManager() {
+    private void transformManager() {
 
         updateRectangle();
         Affine scaleToWorldAffine = new Affine();
 
-        Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMaxY());
+        Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMinY());
+
 
         scaleToWorldAffine.prependTranslation(-topLeft.getX(), -topLeft.getY());
+
         scaleToWorldAffine.prependScale(
                 elevationProfile.get().length() / rectangle.get().getWidth(),
                 -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
-        scaleToWorldAffine.prependTranslation(topLeft.getX(), topLeft.getY());
+
+        scaleToWorldAffine.prependTranslation(0, elevationProfile.get().maxElevation());
 
         screenToWorld.set(scaleToWorldAffine);
-
-        System.out.println(screenToWorld.get().transform(new Point2D(40, 10)));
 
         try {
             worldToScreen.set(scaleToWorldAffine.createInverse());
         } catch (NonInvertibleTransformException e) {
             throw new Error(e); //if scaleToWorldAffine equals to 0
         }
-
     }
 
     private void updateRectangle() {
         rectangle.set(new Rectangle2D(
                 0 + distanceFromBorder.getLeft(),
                 0 + distanceFromBorder.getBottom(),
-                Math.max(0, pane.getMaxWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
-                Math.max(0, pane.getMaxHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
+                Math.max(0, pane.getWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
+                Math.max(0, pane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
     }
 
     private void polygonCreator() {
@@ -119,8 +132,9 @@ public final class ElevationProfileManager {
         Point2D screenPoint;
         for (int x = (int) rectangle.get().getMinX(); x < rectangle.get().getMaxX(); x++) {
             worldPoint = screenToWorld.get().transform(x, 0);
-            screenPoint = worldToScreen.get().transform(x, elevationProfile.get().elevationAt(worldPoint.getX()));
-            polygon.getPoints().add(x, screenPoint.getY());
+            screenPoint = worldToScreen.get().transform(0, elevationProfile.get().elevationAt(worldPoint.getX()));
+            polygon.getPoints().add((double) x);
+            polygon.getPoints().add(screenPoint.getY());
         }
 
     }
