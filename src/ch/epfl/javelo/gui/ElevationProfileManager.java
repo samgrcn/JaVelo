@@ -86,10 +86,7 @@ public final class ElevationProfileManager {
         borderPane.setCenter(pane);
         borderPane.setBottom(vBox);
 
-        System.out.println(elevationProfile.get().minElevation());
-
     }
-
 
 
     public ReadOnlyDoubleProperty mousePositionOnProfileProperty() {
