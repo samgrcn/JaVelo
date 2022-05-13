@@ -45,7 +45,7 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the waypoints list
      */
     public ObservableList<Waypoint> waypoints() {
         return waypoints;
@@ -53,7 +53,7 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the highlightedPosition property
      */
     public DoubleProperty highlightedPositionProperty() {
         return highlightedPosition;
@@ -61,15 +61,15 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the highlightedPosition
      */
     public double highlightedPosition() {
         return highlightedPosition.get();
     }
 
     /**
-     *
-     * @param value
+     * Sets a new value to the highlightedPosition property.
+     * @param value the value to set
      */
     public void setHighlightedPosition(double value) {
         highlightedPosition.set(value);
@@ -77,7 +77,7 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the route property
      */
     public ReadOnlyObjectProperty<Route> routeProperty() {
         return route;
@@ -85,7 +85,7 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the route
      */
     public Route route() {
         return route.get();
@@ -93,7 +93,7 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the elevationProfile property
      */
     public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
         return elevationProfile;
@@ -101,14 +101,15 @@ public final class RouteBean {
 
     /**
      *
-     * @return
+     * @return the elevationProfile
      */
     public ElevationProfile elevationProfile() {
         return elevationProfile.get();
     }
 
     /**
-     *
+     * Called if there is no route found (bestRouteBetween() returns null or the size of waypoints is lower than 2).
+     * Will set the route and elevationProfile properties to null.
      */
     private void noRoute() {
         route.set(null);
@@ -116,7 +117,8 @@ public final class RouteBean {
     }
 
     /**
-     *
+     * Called when the waypoints list is updated. Will calculate the new route with the waypoints and
+     * set the route and elevationProfile properties.
      */
     private void update() {
         int fromNode;

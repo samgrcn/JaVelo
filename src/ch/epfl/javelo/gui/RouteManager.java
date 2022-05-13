@@ -4,10 +4,13 @@ import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import ch.epfl.javelo.routing.Route;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 
+import javafx.scene.input.MouseEvent;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -29,6 +32,8 @@ public final class RouteManager {
     private final Circle disk = new Circle();
     private final Polyline polyline = new Polyline();
     private Route route;
+    private final ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>();
+    private final ObjectProperty<Point2D> pointer = new SimpleObjectProperty<>();
 
     /**
      * @param bean the route bean
@@ -66,15 +71,26 @@ public final class RouteManager {
             update();
         });
 
+//        pane.setOnMousePressed(press -> {
+//            System.out.println("test");
+//            mousePosition.set(new Point2D(press.getSceneX(), press.getSceneY()));
+//            pointer.set(new Point2D(pane.getLayoutX(), pane.getLayoutY()));
+//
+//        });
+//
+//        pane.setOnMouseDragged(this::setPolylineOnDrag);
+
         disk.setOnMouseClicked(click -> {
-            int closestNode = route.nodeClosestTo(bean.highlightedPosition());
+            PointCh pointCh = parameters.get().pointAt(click.getSceneX(), click.getSceneY()).toPointCh();
+            double position = route.pointClosestTo(pointCh).position();
+            int closestNode = route.nodeClosestTo(position);
             for (Waypoint point : bean.waypoints()) {
                 if (point.closestNodeId() == closestNode) {
                     errorConsumer.accept("Un point de passage est déjà présent à cet endroit !");
                     return;
                 }
             }
-            Waypoint waypoint = new Waypoint(route.pointAt(bean.highlightedPosition()), closestNode);
+            Waypoint waypoint = new Waypoint(pointCh, closestNode);
             bean.waypoints().add(bean.waypoints().size() / 2, waypoint);
         });
     }
@@ -97,7 +113,6 @@ public final class RouteManager {
             return;
         }
 
-        disk.setVisible(true);
         PointCh pointCh = route.pointAt(bean.highlightedPosition());
         PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
         double x = parameters.get().viewX(webMercatorPoint);
@@ -105,6 +120,7 @@ public final class RouteManager {
 
         disk.setLayoutX(x);
         disk.setLayoutY(y);
+        disk.setVisible(true);
     }
 
     /**
@@ -116,7 +132,6 @@ public final class RouteManager {
             return;
         }
 
-        polyline.setVisible(true);
         List<PointCh> pointsList = route.points();
         Double[] points = new Double[pointsList.size() * 2];
         int index = 0;
@@ -126,6 +141,14 @@ public final class RouteManager {
             index += 2;
         }
         polyline.getPoints().setAll(points);
+        polyline.setVisible(true);
+    }
+
+    private void setPolylineOnDrag(MouseEvent drag) {
+        double differenceX = mousePosition.get().getX() - pointer.get().getX();
+        double differenceY = mousePosition.get().getY() - pointer.get().getY();
+        polyline.setLayoutX(drag.getSceneX() - differenceX);
+        polyline.setLayoutY(drag.getSceneY() - differenceY);
     }
 
     /**
@@ -133,7 +156,20 @@ public final class RouteManager {
      */
     private void update() {
         route = bean.route();
-        setDisk();
+//        pane.setOnMouseDragged(drag -> {
+//            System.out.println("yoo");
+//            double differenceX = mousePosition.get().getX() - pointer.get().getX();
+//            double differenceY = mousePosition.get().getY() - pointer.get().getY();
+//
+//            pane.setOnMouseReleased(release -> {
+//                double newX = release.getSceneX() - differenceX;
+//                double newY = release.getSceneY() - differenceY;
+//
+//                polyline.setLayoutX(newX);
+//                polyline.setLayoutY(newY);
+//            });
+//        });
         setPolyline();
+        setDisk();
     }
 }
