@@ -25,7 +25,8 @@ public final class ElevationProfileManager {
     private final Line line = new Line();
     private final Polygon polygon = new Polygon();
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfile;
-    private final DoubleProperty position = new SimpleDoubleProperty();
+    private final ReadOnlyDoubleProperty highlightedPosition;
+    private final DoubleProperty position = new SimpleDoubleProperty(Double.NaN);
     private final ObjectProperty<Transform> screenToWorld = new SimpleObjectProperty<>();
     private final ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
     private final ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
@@ -34,54 +35,15 @@ public final class ElevationProfileManager {
 
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
         this.elevationProfile = elevationProfile;
+        this.highlightedPosition = highlightedPosition;
 
         transformManager();
         updateRectangle();
 
-        borderPane.getStylesheets().add("elevation_profile.css");
-        polygon.setId("profile");
-        centerPane.widthProperty().addListener((p, oldS, newS) -> {
-            updateRectangle();
-        });
-
-        centerPane.heightProperty().addListener((p, oldS, newS) -> {
-            updateRectangle();
-        });
-
-        elevationProfile.addListener(e -> {
-            updateRectangle();
-        });
-
-
-        line.layoutXProperty().bind(
-                Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0).getX(), highlightedPosition, worldToScreen));
-
-        line.startYProperty().bind(Bindings.select(rectangle.get(), "minY"));
-
-        line.endYProperty().bind(Bindings.select(rectangle.get(), "maxY"));
-
-        line.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
-
-
-        centerPane.setOnMouseMoved(e -> {
-            position.set(screenToWorld.get().transform(e.getX() * KM_TO_M, 0).getX());
-        });
-
-        centerPane.setOnMouseExited(e -> {
-            position.set(Double.NaN);
-        });
-
-        rectangle.addListener(e -> {
-            transformManager();
-            polygonCreator();
-        });
-
-
-        centerPane.getChildren().add(polygon);
-
-        borderPane.setCenter(centerPane);
-        borderPane.setBottom(vBox);
-
+        setupJavaFX();
+        lineBindings();
+        addListeners();
+        addHandlers();
     }
 
 
@@ -90,7 +52,6 @@ public final class ElevationProfileManager {
     }
 
     private void transformManager() {
-
         updateRectangle();
         Affine scaleToWorldAffine = new Affine();
 
@@ -141,6 +102,61 @@ public final class ElevationProfileManager {
         polygon.getPoints().add(rectangle.get().getMaxY());
 
 
+    }
+
+    private void lineBindings() {
+        line.layoutXProperty().bind(
+                Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0).getX(), highlightedPosition, worldToScreen));
+        line.startYProperty().bind(Bindings.select(rectangle, "minY"));
+
+        line.endYProperty().bind(Bindings.select(rectangle, "maxY"));
+        line.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
+    }
+
+    private void addListeners() {
+        centerPane.widthProperty().addListener((p, oldS, newS) -> {
+            updateRectangle();
+        });
+
+        centerPane.heightProperty().addListener((p, oldS, newS) -> {
+            updateRectangle();
+            System.out.println(rectangle.get().getMaxY());
+        });
+
+        elevationProfile.addListener(e -> {
+            updateRectangle();
+        });
+
+    }
+
+    private void addHandlers() {
+        centerPane.setOnMouseMoved(e -> {
+            if (rectangle.get().contains(e.getX(), e.getY())) {
+                position.set(screenToWorld.get().transform(e.getX(), 0).getX());
+            } else {
+                position.set(Double.NaN);
+            }
+        });
+
+        centerPane.setOnMouseExited(e -> {
+            position.set(Double.NaN);
+        });
+
+        rectangle.addListener(e -> {
+            transformManager();
+            polygonCreator();
+        });
+    }
+
+    private void setupJavaFX() {
+        borderPane.getStylesheets().add("elevation_profile.css");
+        polygon.setId("profile");
+
+        centerPane.getChildren().add(polygon);
+        centerPane.getChildren().add(line);
+
+        borderPane.setCenter(centerPane);
+        borderPane.setBottom(vBox);
     }
 
     public Pane pane() {
