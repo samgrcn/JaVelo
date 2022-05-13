@@ -128,6 +128,7 @@ public final class RouteBean {
         for (int i = 0; i < waypoints.size() - 1; ++i) {
             fromNode = waypoints.get(i).closestNodeId();
             toNode = waypoints.get(i + 1).closestNodeId();
+            if (fromNode == toNode) continue;
             Pair<Integer, Integer> key = new Pair<>(fromNode, toNode);
             if (bestRoute.containsKey(key)) {
                 routes.add(bestRoute.get(key));
@@ -143,5 +144,20 @@ public final class RouteBean {
         }
         route.set(new MultiRoute(routes));
         elevationProfile.set(ElevationProfileComputer.elevationProfile(route(), MAX_STEP_LENGTH));
+    }
+
+    /**
+     *
+     * @param position
+     * @return
+     */
+    public int indexOfNonEmptySegmentAt(double position) {
+        int index = route().indexOfSegmentAt(position);
+        for (int i = 0; i <= index; i += 1) {
+            int n1 = waypoints.get(i).closestNodeId();
+            int n2 = waypoints.get(i + 1).closestNodeId();
+            if (n1 == n2) index += 1;
+        }
+        return index;
     }
 }

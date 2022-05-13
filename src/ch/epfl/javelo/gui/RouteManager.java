@@ -28,7 +28,6 @@ public final class RouteManager {
     private final Pane pane = new Pane();
     private final RouteBean bean;
     private final ObjectProperty<MapViewParameters> parameters;
-    private final Consumer<String> errorConsumer;
     private final Circle disk = new Circle();
     private final Polyline polyline = new Polyline();
     private Route route;
@@ -38,12 +37,10 @@ public final class RouteManager {
     /**
      * @param bean the route bean
      * @param parameters a JavaFX property, read-only, containing the parameters of the displayed map
-     * @param errorConsumer the "error consumer" for reporting an error
      */
-    public RouteManager(RouteBean bean, ObjectProperty<MapViewParameters> parameters, Consumer<String> errorConsumer) {
+    public RouteManager(RouteBean bean, ObjectProperty<MapViewParameters> parameters) {
         this.bean = bean;
         this.parameters = parameters;
-        this.errorConsumer = errorConsumer;
 
         init();
     }
@@ -84,14 +81,8 @@ public final class RouteManager {
             PointCh pointCh = parameters.get().pointAt(click.getSceneX(), click.getSceneY()).toPointCh();
             double position = route.pointClosestTo(pointCh).position();
             int closestNode = route.nodeClosestTo(position);
-            for (Waypoint point : bean.waypoints()) {
-                if (point.closestNodeId() == closestNode) {
-                    errorConsumer.accept("Un point de passage est déjà présent à cet endroit !");
-                    return;
-                }
-            }
             Waypoint waypoint = new Waypoint(pointCh, closestNode);
-            bean.waypoints().add(bean.waypoints().size() / 2, waypoint);
+            bean.waypoints().add(bean.indexOfNonEmptySegmentAt(position) + 1, waypoint);
         });
     }
 

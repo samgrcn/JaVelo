@@ -41,7 +41,7 @@ public final class Stage9Test extends Application {
 
         Consumer<String> errorConsumer = new Stage9Test.ErrorConsumer();
 
-        RouteManager routeManager = new RouteManager(routeBean, mapViewParametersP, errorConsumer);
+        RouteManager routeManager = new RouteManager(routeBean, mapViewParametersP);
 
         WaypointsManager waypointsManager =
                 new WaypointsManager(graph,
