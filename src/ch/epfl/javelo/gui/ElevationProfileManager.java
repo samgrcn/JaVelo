@@ -1,6 +1,5 @@
 package ch.epfl.javelo.gui;
 
-import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -21,7 +20,7 @@ public final class ElevationProfileManager {
 
     private final Insets distanceFromBorder = new Insets(10, 10, 20, 40);
     private final BorderPane borderPane = new BorderPane();
-    private final Pane pane = new Pane();
+    private final Pane centerPane = new Pane();
     private final VBox vBox = new VBox();
     private final Line line = new Line();
     private final Polygon polygon = new Polygon();
@@ -41,12 +40,11 @@ public final class ElevationProfileManager {
 
         borderPane.getStylesheets().add("elevation_profile.css");
         polygon.setId("profile");
-
-        pane.widthProperty().addListener((p, oldS, newS) -> {
+        centerPane.widthProperty().addListener((p, oldS, newS) -> {
             updateRectangle();
         });
 
-        pane.heightProperty().addListener((p, oldS, newS) -> {
+        centerPane.heightProperty().addListener((p, oldS, newS) -> {
             updateRectangle();
         });
 
@@ -65,12 +63,11 @@ public final class ElevationProfileManager {
         line.visibleProperty().bind(highlightedPosition.greaterThanOrEqualTo(0));
 
 
-
-        pane.setOnMouseMoved(e -> {
+        centerPane.setOnMouseMoved(e -> {
             position.set(screenToWorld.get().transform(e.getX() * KM_TO_M, 0).getX());
         });
 
-        pane.setOnMouseExited(e -> {
+        centerPane.setOnMouseExited(e -> {
             position.set(Double.NaN);
         });
 
@@ -80,10 +77,9 @@ public final class ElevationProfileManager {
         });
 
 
-        pane.getChildren().add(polygon);
-        pane.getChildren().add(line);
+        centerPane.getChildren().add(polygon);
 
-        borderPane.setCenter(pane);
+        borderPane.setCenter(centerPane);
         borderPane.setBottom(vBox);
 
     }
@@ -122,13 +118,19 @@ public final class ElevationProfileManager {
         rectangle.set(new Rectangle2D(
                 0 + distanceFromBorder.getLeft(),
                 0 + distanceFromBorder.getTop(),
-                Math.max(0, pane.getWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
-                Math.max(0, pane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
+                Math.max(0, centerPane.getWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
+                Math.max(0, centerPane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
     }
 
     private void polygonCreator() {
         Point2D worldPoint;
         Point2D screenPoint;
+
+        polygon.getPoints().clear();
+
+        polygon.getPoints().add(rectangle.get().getMinX());
+        polygon.getPoints().add(rectangle.get().getMaxY());
+
         for (int x = (int) rectangle.get().getMinX(); x < rectangle.get().getMaxX(); x++) {
             worldPoint = screenToWorld.get().transform(x, 0);
             screenPoint = worldToScreen.get().transform(0, elevationProfile.get().elevationAt(worldPoint.getX()));
@@ -137,8 +139,8 @@ public final class ElevationProfileManager {
         }
         polygon.getPoints().add(rectangle.get().getMaxX());
         polygon.getPoints().add(rectangle.get().getMaxY());
-        polygon.getPoints().add(rectangle.get().getMinX());
-        polygon.getPoints().add(rectangle.get().getMaxY());
+
+
     }
 
     public Pane pane() {
