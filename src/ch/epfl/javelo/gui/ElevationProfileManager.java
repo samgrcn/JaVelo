@@ -9,8 +9,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
+import javafx.scene.shape.*;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
@@ -23,6 +22,7 @@ public final class ElevationProfileManager {
     private final Pane centerPane = new Pane();
     private final VBox vBox = new VBox();
     private final Line line = new Line();
+    private final Path gridNode = new Path();
     private final Polygon polygon = new Polygon();
     private final ReadOnlyObjectProperty<ElevationProfile> elevationProfile;
     private final ReadOnlyDoubleProperty highlightedPosition;
@@ -31,7 +31,11 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
     private final ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
 
-    private final static int KM_TO_M = 1000;
+    private final static int[] POS_STEPS = { 1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000 };
+    private final static int[] ELE_STEPS = { 5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000 };
+    private final static int HORIZONTAL_LINES_MIN = 25;
+    private final static int VERTICAL_LINES_MIN = 50;
+
 
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
         this.elevationProfile = elevationProfile;
@@ -39,6 +43,7 @@ public final class ElevationProfileManager {
 
         transformManager();
         updateRectangle();
+        gridManager();
 
         setupJavaFX();
         lineBindings();
@@ -116,15 +121,17 @@ public final class ElevationProfileManager {
     private void addListeners() {
         centerPane.widthProperty().addListener((p, oldS, newS) -> {
             updateRectangle();
+            gridManager();
         });
 
         centerPane.heightProperty().addListener((p, oldS, newS) -> {
             updateRectangle();
-            System.out.println(rectangle.get().getMaxY());
+            gridManager();
         });
 
         elevationProfile.addListener(e -> {
             updateRectangle();
+            gridManager();
         });
 
     }
@@ -154,9 +161,53 @@ public final class ElevationProfileManager {
 
         centerPane.getChildren().add(polygon);
         centerPane.getChildren().add(line);
+        centerPane.getChildren().add(gridNode);
 
         borderPane.setCenter(centerPane);
         borderPane.setBottom(vBox);
+    }
+
+    private void gridManager() {
+        gridNode.getElements().clear();
+
+        double minEle = elevationProfile.get().minElevation();
+        double maxEle = elevationProfile.get().maxElevation();
+        System.out.println(minEle + " " + maxEle);
+
+        int posDiff = 100_000;
+        for (int el : POS_STEPS) {
+            if (worldToScreen.get().deltaTransform(el, 0).getX() >= VERTICAL_LINES_MIN) {
+                posDiff = el;
+                break;
+            }
+        }
+        int eleDiff = 1_000;
+        for (int el : ELE_STEPS) {
+            System.out.println(screenToWorld.get().deltaTransform(0, -el));
+            if (worldToScreen.get().deltaTransform(0, -el).getY() >= HORIZONTAL_LINES_MIN) {
+                eleDiff = el;
+                break;
+            }
+        }
+
+        int firstStepEle = (int) Math.round(minEle/eleDiff) * eleDiff;
+        int lastStepEle = (int) Math.round(maxEle/eleDiff) * eleDiff;
+        int numberOfHorizontalLines = (lastStepEle - firstStepEle) / eleDiff;
+        int numberOfVerticalLines = (int) (elevationProfile.get().length() / posDiff);
+
+        for (int i = 1; i <= 6; ++i) {
+            double y = rectangle.get().getMinY() + i * 50;
+            gridNode.getElements().add(new MoveTo(rectangle.get().getMinX(), worldToScreen.get().deltaTransform(0, -y).getY()));
+            gridNode.getElements().add(new LineTo(rectangle.get().getMaxX(), worldToScreen.get().deltaTransform(0, -y).getY()));
+        }
+        for (int i = 1; i <= 10; ++i) {
+            double x = rectangle.get().getMinX() + i * posDiff;
+            gridNode.getElements().add(new MoveTo(worldToScreen.get().deltaTransform(x, 0).getX(), rectangle.get().getMinY()));
+            gridNode.getElements().add(new LineTo(worldToScreen.get().deltaTransform(x, 0).getX(), rectangle.get().getMaxY()));
+        }
+
+        System.out.println(posDiff + " " + eleDiff);
+        System.out.println(firstStepEle + " " + lastStepEle + " " + numberOfHorizontalLines + " " + numberOfVerticalLines);
     }
 
     public Pane pane() {
