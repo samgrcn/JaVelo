@@ -1,5 +1,6 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -54,9 +55,8 @@ public final class ElevationProfileManager {
         });
 
 
-
         line.layoutXProperty().bind(
-                Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0).getX(), highlightedPosition));
+                Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0).getX(), highlightedPosition, worldToScreen));
 
         line.startYProperty().bind(Bindings.select(rectangle.get(), "minY"));
 
@@ -85,6 +85,8 @@ public final class ElevationProfileManager {
 
         borderPane.setCenter(pane);
         borderPane.setBottom(vBox);
+
+        System.out.println(elevationProfile.get().minElevation());
 
     }
 
@@ -122,7 +124,7 @@ public final class ElevationProfileManager {
     private void updateRectangle() {
         rectangle.set(new Rectangle2D(
                 0 + distanceFromBorder.getLeft(),
-                0 + distanceFromBorder.getBottom(),
+                0 + distanceFromBorder.getTop(),
                 Math.max(0, pane.getWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
                 Math.max(0, pane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
     }
@@ -136,7 +138,10 @@ public final class ElevationProfileManager {
             polygon.getPoints().add((double) x);
             polygon.getPoints().add(screenPoint.getY());
         }
-
+        polygon.getPoints().add(rectangle.get().getMaxX());
+        polygon.getPoints().add(rectangle.get().getMaxY());
+        polygon.getPoints().add(rectangle.get().getMinX());
+        polygon.getPoints().add(rectangle.get().getMaxY());
     }
 
     public Pane pane() {
