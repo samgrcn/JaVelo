@@ -18,11 +18,17 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
-import javax.xml.transform.Source;
 import java.util.Locale;
 
 
 public final class ElevationProfileManager {
+
+    private final static int[] POS_STEPS = { 1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000 };
+    private final static int[] ELE_STEPS = { 5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000 };
+    private final static int HORIZONTAL_LINES_MIN = 25;
+    private final static int VERTICAL_LINES_MIN = 50;
+    private final static int NB_OF_METERS_PER_KM = 1000;
+    private final static Font font = Font.font("Avenir", 10);
 
     private final Insets distanceFromBorder = new Insets(10, 10, 20, 40);
     private final BorderPane borderPane = new BorderPane();
@@ -38,12 +44,6 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Transform> screenToWorld = new SimpleObjectProperty<>();
     private final ObjectProperty<Transform> worldToScreen = new SimpleObjectProperty<>();
     private final ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
-
-    private final static int[] POS_STEPS = { 1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000 };
-    private final static int[] ELE_STEPS = { 5, 10, 20, 25, 50, 100, 200, 250, 500, 1_000 };
-    private final static int HORIZONTAL_LINES_MIN = 25;
-    private final static int VERTICAL_LINES_MIN = 50;
-    private final static Font font = Font.font("Avenir", 10);
 
 
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
@@ -92,8 +92,8 @@ public final class ElevationProfileManager {
 
     private void updateRectangle() {
         rectangle.set(new Rectangle2D(
-                0 + distanceFromBorder.getLeft(),
-                0 + distanceFromBorder.getTop(),
+                distanceFromBorder.getLeft(),
+                distanceFromBorder.getTop(),
                 Math.max(0, centerPane.getWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
                 Math.max(0, centerPane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
     }
@@ -194,7 +194,6 @@ public final class ElevationProfileManager {
         }
         int eleDiff = 1_000;
         for (int el : ELE_STEPS) {
-            System.out.println(screenToWorld.get().deltaTransform(0, -el));
             if (worldToScreen.get().deltaTransform(0, -el).getY() >= HORIZONTAL_LINES_MIN) {
                 eleDiff = el;
                 break;
@@ -221,9 +220,6 @@ public final class ElevationProfileManager {
             gridNode.getElements().add(new LineTo(x, rectangle.get().getMaxY()));
             setTagPos(i, posDiff, x);
         }
-
-        System.out.println(posDiff + " " + eleDiff);
-        System.out.println(firstStepEle + " " + lastStepEle + " " + numberOfHorizontalLines + " " + numberOfVerticalLines);
     }
 
     private void setTagEle(int firstStepEle, int index, int eleDiff, double y) {
@@ -238,7 +234,7 @@ public final class ElevationProfileManager {
     }
 
     private void setTagPos(int index, int posDiff, double x) {
-        Text tag = new Text(String.valueOf((index * posDiff)/1000));
+        Text tag = new Text(String.valueOf((index * posDiff)/NB_OF_METERS_PER_KM));
         tag.textOriginProperty().set(VPos.TOP);
         tag.setId("grid_label");
         tag.getStyleClass().add("horizontal");
@@ -253,7 +249,7 @@ public final class ElevationProfileManager {
         String text = String.format(Locale.ROOT, "Longueur : %.1f km" +
                 "     Montée : %.0f m" +
                 "     Descente : %.0f m" +
-                "     Altitude : de %.0f m à %.0f m", elevationProfileAttribute.length()/1000,
+                "     Altitude : de %.0f m à %.0f m", elevationProfileAttribute.length()/NB_OF_METERS_PER_KM,
                 elevationProfileAttribute.totalAscent(), elevationProfileAttribute.totalDescent(),
                 elevationProfileAttribute.minElevation(), elevationProfileAttribute.maxElevation());
         Text stats = new Text(text);

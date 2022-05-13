@@ -147,9 +147,11 @@ public final class RouteBean {
     }
 
     /**
+     * Takes as argument a position along the route and returns the index of the segment containing it,
+     * ignoring empty segments.
      *
-     * @param position
-     * @return
+     * @param position the position along the route
+     * @return the index of the segment containing the position
      */
     public int indexOfNonEmptySegmentAt(double position) {
         int index = route().indexOfSegmentAt(position);
