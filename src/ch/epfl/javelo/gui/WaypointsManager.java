@@ -37,6 +37,7 @@ public class WaypointsManager {
         this.waypoints = waypoints;
         this.parameters = parameters;
         this.graph = graph;
+
         this.errorConsumer = errorConsumer;
 
         pane.setPrefSize(PREF_WIDTH,PREF_HEIGHT);
@@ -97,7 +98,7 @@ public class WaypointsManager {
                 try {
                     this.parameters.get().pointAt(release.getX(), release.getY()).toPointCh();
                 } catch (NullPointerException ignored) {
-                    errorConsumer.accept("Point en dehors de la Suisse !");
+                    errorConsumer.accept("Aucune route à proximité !");
                     pins.setLayoutX(pointer.get().getX());
                     pins.setLayoutY(pointer.get().getX());
                 }

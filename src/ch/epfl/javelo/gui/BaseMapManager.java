@@ -6,6 +6,7 @@ import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -94,10 +95,13 @@ public final class BaseMapManager {
     }
 
     private void paneHandlersAndListeners() {
+        SimpleLongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {
-            double zoomDelta = e.getDeltaY();
-
-            zoomDelta = zoomDelta / Math.abs(zoomDelta);
+            if (e.getDeltaY() == 0d) return;
+            long currentTime = System.currentTimeMillis();
+            if (currentTime < minScrollTime.get()) return;
+            minScrollTime.set(currentTime + 200);
+            int zoomDelta = (int) Math.signum(e.getDeltaY());
 
             int newZoomLevel = this.parameters.get().zoomAt() + (int) zoomDelta;
             newZoomLevel = Math2.clamp(8, newZoomLevel, 19);
@@ -106,11 +110,10 @@ public final class BaseMapManager {
 
                 double x = this.parameters.get().topLeft().getX() + e.getX();
                 double y = this.parameters.get().topLeft().getY() + e.getY();
-                double zoomX = Math.scalb(x, (int) zoomDelta);
-                double zoomY = Math.scalb(y, (int) zoomDelta);
+                double zoomX = Math.scalb(x, zoomDelta);
+                double zoomY = Math.scalb(y, zoomDelta);
                 this.parameters.set(new MapViewParameters(newZoomLevel, zoomX - e.getX(), zoomY - e.getY()));
             }
-            System.out.println(pane.getWidth());
         });
 
         pane.setOnMousePressed(press -> {

@@ -3,11 +3,11 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.data.Graph;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
 public final class AnnotatedMapManager {
@@ -41,11 +41,11 @@ public final class AnnotatedMapManager {
         stackPane.getStylesheets().add("map.css");
 
         stackPane.setOnMouseMoved(mouse -> {
-            actualMousePosition.get().setLocation(mouse.getSceneX(), mouse.getSceneY());
+            actualMousePosition.set(new Point2D(mouse.getSceneX(), mouse.getSceneY()));
         });
 
         stackPane.setOnMouseExited(mouse -> {
-            actualMousePosition.get().setLocation(Double.NaN, Double.NaN);
+            actualMousePosition.set(new Point2D(Double.NaN, Double.NaN));
         });
     }
 
