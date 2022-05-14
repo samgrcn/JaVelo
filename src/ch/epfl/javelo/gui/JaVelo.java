@@ -54,6 +54,11 @@ public final class JaVelo extends Application {
         menu.getItems().add(menuItem);
         menuBar.setUseSystemMenuBar(true);
 
+        Menu menuPoints = new Menu("Points");
+        MenuItem menuPointsItem = new Menu("Supprimer tous les points");
+        menuBar.getMenus().add(menuPoints);
+        menuPoints.getItems().add(menuPointsItem);
+        menuBar.setUseSystemMenuBar(true);
 
         menuItem.setOnAction(click -> {
             try {
@@ -62,40 +67,42 @@ public final class JaVelo extends Application {
             }
         });
 
-        SplitPane splitPaneWithoutProfile = new SplitPane(stackMap.pane());
-        StackPane mainPane = new StackPane(errorManager.pane(), splitPaneWithoutProfile, menuBar);
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
-        show(primaryStage, mainPane);
-
-        routeBean.elevationProfileProperty().addListener(e -> {
-            if (routeBean.elevationProfile() != null) {
-                ElevationProfile profile = ElevationProfileComputer
-                        .elevationProfile(routeBean.route(), 5);
-                ObjectProperty<ElevationProfile> profileProperty =
-                        new SimpleObjectProperty<>(profile);
-                DoubleProperty highlightProperty =
-                        new SimpleDoubleProperty(1500);
-                ElevationProfileManager profileManager =
-                        new ElevationProfileManager(profileProperty,
-                                highlightProperty);
-
-                SplitPane.setResizableWithParent(profileManager.pane(), false);
-
-                SplitPane splitPane = new SplitPane(stackMap.pane(), profileManager.pane());
-                splitPane.setOrientation(Orientation.VERTICAL);
-                StackPane stackPane = new StackPane(errorManager.pane(), splitPane, menuBar);
-                show(primaryStage, stackPane);
-
-                routeBean.highlightedPositionProperty().bind(Bindings.when(new SimpleBooleanProperty(
-                                profileManager.mousePositionOnProfileProperty().get() >= 0))
-                        .then(stackMap.mousePositionOnRouteProperty().get())
-                        .otherwise(profileManager.mousePositionOnProfileProperty().get()));
-            }
+        menuPointsItem.setOnAction(click -> {
+            routeBean.waypoints().clear();
         });
 
+        ElevationProfile profile = ElevationProfileComputer
+                .elevationProfile(routeBean.route(), 5);
+        ObjectProperty<ElevationProfile> profileProperty =
+                new SimpleObjectProperty<>(profile);
+        DoubleProperty highlightProperty =
+                new SimpleDoubleProperty(1500);
+        ElevationProfileManager profileManager =
+                new ElevationProfileManager(profileProperty,
+                        highlightProperty);
 
+        SplitPane.setResizableWithParent(profileManager.pane(), false);
 
+        SplitPane splitPane = new SplitPane(stackMap.pane());
+        splitPane.setOrientation(Orientation.VERTICAL);
+        StackPane stackPane = new StackPane(errorManager.pane(), stackMap.pane(), menuBar);
+        primaryStage.setMinWidth(800);
+        primaryStage.setMinHeight(600);
+        show(primaryStage, stackPane);
+
+        routeBean.highlightedPositionProperty().bind(Bindings.when(new SimpleBooleanProperty(
+                        profileManager.mousePositionOnProfileProperty().get() >= 0))
+                .then(stackMap.mousePositionOnRouteProperty().get())
+                .otherwise(profileManager.mousePositionOnProfileProperty().get()));
+
+        routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
+            if (oldValue == null && newValue != null) {
+                splitPane.getItems().add(profileManager.pane());
+            }
+            if (oldValue != null && newValue == null) {
+                splitPane.getItems().remove(profileManager.pane());
+            }
+        });
     }
 
     private void show(Stage primaryStage, Pane pane) {

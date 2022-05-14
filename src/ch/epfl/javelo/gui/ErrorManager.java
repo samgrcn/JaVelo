@@ -27,9 +27,8 @@ public final class ErrorManager {
     }
 
     public void displayError(String errorMessage) {
-        if (oldTransition != null) {
-            oldTransition.get().stop();
-        }
+        oldTransition.get().stop();
+
         Toolkit.getDefaultToolkit().beep();
         text.setText(errorMessage);
 

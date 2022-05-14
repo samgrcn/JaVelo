@@ -126,6 +126,7 @@ public final class ElevationProfileComputer {
 
         Preconditions.checkArgument(maxStepLength > 0);
 
+        if(route != null) {
         int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
         float[] elevationSamples = new float[samplesNumber];
 
@@ -138,5 +139,7 @@ public final class ElevationProfileComputer {
         fillingArray(elevationSamples);
 
         return new ElevationProfile(route.length(), elevationSamples);
+    }
+        return null;
     }
 }

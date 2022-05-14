@@ -50,15 +50,19 @@ public final class ElevationProfileManager {
         this.elevationProfile = elevationProfile;
         this.highlightedPosition = highlightedPosition;
 
-        transformManager();
+        if(this.elevationProfile.get() != null) {
+            transformManager();
+            gridManager();
+            stats();
+            addListeners();
+            lineBindings();
+        }
         updateRectangle();
-        gridManager();
 
         setupJavaFX();
-        lineBindings();
         addListeners();
         addHandlers();
-        stats();
+
     }
 
 
@@ -140,8 +144,10 @@ public final class ElevationProfileManager {
         });
 
         elevationProfile.addListener(e -> {
-            updateRectangle();
-            gridManager();
+            if(elevationProfile.get() != null) {
+                updateRectangle();
+                gridManager();
+            }
         });
 
     }

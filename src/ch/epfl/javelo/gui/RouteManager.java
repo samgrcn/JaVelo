@@ -65,7 +65,9 @@ public final class RouteManager {
         });
 
         bean.routeProperty().addListener(change -> {
-            update();
+            if(bean.route() != null) {
+                update();
+            }
         });
 
 //        pane.setOnMousePressed(press -> {
@@ -120,19 +122,18 @@ public final class RouteManager {
     private void setPolyline() {
         if (route == null) {
             polyline.setVisible(false);
-            return;
+        } else {
+            List<PointCh> pointsList = route.points();
+            Double[] points = new Double[pointsList.size() * 2];
+            int index = 0;
+            for (PointCh point : pointsList) {
+                points[index] = parameters.get().viewX(PointWebMercator.ofPointCh(point));
+                points[index + 1] = parameters.get().viewY(PointWebMercator.ofPointCh(point));
+                index += 2;
+            }
+            polyline.getPoints().setAll(points);
+            polyline.setVisible(true);
         }
-
-        List<PointCh> pointsList = route.points();
-        Double[] points = new Double[pointsList.size() * 2];
-        int index = 0;
-        for (PointCh point : pointsList) {
-            points[index] = parameters.get().viewX(PointWebMercator.ofPointCh(point));
-            points[index + 1] = parameters.get().viewY(PointWebMercator.ofPointCh(point));
-            index += 2;
-        }
-        polyline.getPoints().setAll(points);
-        polyline.setVisible(true);
     }
 
     private void setPolylineOnDrag(MouseEvent drag) {
