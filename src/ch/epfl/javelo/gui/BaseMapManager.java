@@ -2,22 +2,17 @@ package ch.epfl.javelo.gui;
 
 
 import ch.epfl.javelo.Math2;
-import ch.epfl.javelo.projection.PointCh;
-import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 
-import java.awt.*;
 import java.io.IOException;
 
-import static ch.epfl.javelo.Math2.clamp;
 
 public final class BaseMapManager {
 

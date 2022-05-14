@@ -61,11 +61,15 @@ public final class AnnotatedMapManager {
             PointWebMercator point = mapViewParameters.pointAt(
                     actualMousePosition.get().getX(), actualMousePosition.get().getY());
             PointCh pointCh = point.toPointCh();
-            RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
-            if (pointCh.distanceTo(pointClosestTo.point()) <= 15) {
-                mousePositionOnRoute.set(pointClosestTo.position());
-            } else {
+            if (pointCh == null) {
                 mousePositionOnRoute.set(Double.NaN);
+            } else {
+                RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
+                if (pointCh.distanceTo(pointClosestTo.point()) <= 15) {
+                    mousePositionOnRoute.set(pointClosestTo.position());
+                } else {
+                    mousePositionOnRoute.set(Double.NaN);
+                }
             }
         });
     }

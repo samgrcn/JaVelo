@@ -3,16 +3,16 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.routing.*;
 import javafx.application.Application;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -54,6 +54,7 @@ public final class JaVelo extends Application {
         menu.getItems().add(menuItem);
         menuBar.setUseSystemMenuBar(true);
 
+
         menuItem.setOnAction(click -> {
             try {
                 GpxGenerator.writeGpx("javelo.gpx", routeBean.route(), routeBean.elevationProfile());
@@ -67,34 +68,33 @@ public final class JaVelo extends Application {
         primaryStage.setMinHeight(600);
         show(primaryStage, mainPane);
 
-        /*routeBean.elevationProfileProperty().addListener(e -> {
+        routeBean.elevationProfileProperty().addListener(e -> {
+            if (routeBean.elevationProfile() != null) {
+                ElevationProfile profile = ElevationProfileComputer
+                        .elevationProfile(routeBean.route(), 5);
+                ObjectProperty<ElevationProfile> profileProperty =
+                        new SimpleObjectProperty<>(profile);
+                DoubleProperty highlightProperty =
+                        new SimpleDoubleProperty(1500);
+                ElevationProfileManager profileManager =
+                        new ElevationProfileManager(profileProperty,
+                                highlightProperty);
 
-        });*/
+                SplitPane.setResizableWithParent(profileManager.pane(), false);
 
-        //
-        if (routeBean.elevationProfile() != null) {
-            ElevationProfile profile = ElevationProfileComputer
-                    .elevationProfile(routeBean.route(), 5);
-            ObjectProperty<ElevationProfile> profileProperty =
-                    new SimpleObjectProperty<>(profile);
-            DoubleProperty highlightProperty =
-                    new SimpleDoubleProperty(1500);
-            ElevationProfileManager profileManager =
-                    new ElevationProfileManager(profileProperty,
-                            highlightProperty);
+                SplitPane splitPane = new SplitPane(stackMap.pane(), profileManager.pane());
+                splitPane.setOrientation(Orientation.VERTICAL);
+                StackPane stackPane = new StackPane(errorManager.pane(), splitPane, menuBar);
+                show(primaryStage, stackPane);
 
-            SplitPane.setResizableWithParent(profileManager.pane(), false);
+                routeBean.highlightedPositionProperty().bind(Bindings.when(new SimpleBooleanProperty(
+                                profileManager.mousePositionOnProfileProperty().get() >= 0))
+                        .then(stackMap.mousePositionOnRouteProperty().get())
+                        .otherwise(profileManager.mousePositionOnProfileProperty().get()));
+            }
+        });
 
-            SplitPane splitPane = new SplitPane(stackMap.pane(), profileManager.pane());
-            splitPane.setOrientation(Orientation.VERTICAL);
-            StackPane stackPane = new StackPane(errorManager.pane(), splitPane, menuBar);
-            show(primaryStage, stackPane);
-//
 
-            if (profileManager.mousePositionOnProfileProperty().get() >= 0) {
-                routeBean.setHighlightedPosition(profileManager.mousePositionOnProfileProperty().get());
-            } else routeBean.setHighlightedPosition(stackMap.mousePositionOnRouteProperty().get());
-        }
 
     }
 
