@@ -1,7 +1,12 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.data.Graph;
+import ch.epfl.javelo.projection.PointCh;
+import ch.epfl.javelo.projection.PointWebMercator;
+import ch.epfl.javelo.routing.RoutePoint;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.StackPane;
@@ -22,6 +27,7 @@ public final class AnnotatedMapManager {
 
     private final StackPane stackPane = new StackPane();
     private final ObjectProperty<Point2D> actualMousePosition = new SimpleObjectProperty<>();
+    private final DoubleProperty mousePositionOnRoute = new SimpleDoubleProperty();
 
     /**
      * @param graph the road network graph
@@ -50,6 +56,18 @@ public final class AnnotatedMapManager {
         stackPane.setOnMouseExited(mouse -> {
             actualMousePosition.set(new Point2D(Double.NaN, Double.NaN));
         });
+
+        actualMousePosition.addListener(change -> {
+            PointWebMercator point = mapViewParameters.pointAt(
+                    actualMousePosition.get().getX(), actualMousePosition.get().getY());
+            PointCh pointCh = point.toPointCh();
+            RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
+            if (pointCh.distanceTo(pointClosestTo.point()) <= 15) {
+                mousePositionOnRoute.set(pointClosestTo.position());
+            } else {
+                mousePositionOnRoute.set(Double.NaN);
+            }
+        });
     }
 
     /**
@@ -66,7 +84,7 @@ public final class AnnotatedMapManager {
      *
      * @return the property containing the position of the mouse pointer
      */
-    public ObjectProperty<Point2D> mousePositionOnRouteProperty() {
-        return actualMousePosition;
+    public DoubleProperty mousePositionOnRouteProperty() {
+        return mousePositionOnRoute;
     }
 }

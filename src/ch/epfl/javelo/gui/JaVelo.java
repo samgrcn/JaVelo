@@ -67,27 +67,34 @@ public final class JaVelo extends Application {
         primaryStage.setMinHeight(600);
         show(primaryStage, mainPane);
 
-        routeBean.elevationProfileProperty().addListener(e -> {
-            if (routeBean.elevationProfile() != null) {
-                ElevationProfile profile = ElevationProfileComputer
-                        .elevationProfile(routeBean.route(), 5);
-                ObjectProperty<ElevationProfile> profileProperty =
-                        new SimpleObjectProperty<>(profile);
-                DoubleProperty highlightProperty =
-                        new SimpleDoubleProperty(1500);
-                ElevationProfileManager profileManager =
-                        new ElevationProfileManager(profileProperty,
-                                highlightProperty);
+        /*routeBean.elevationProfileProperty().addListener(e -> {
 
-                SplitPane.setResizableWithParent(profileManager.pane(), false);
+        });*/
 
-                SplitPane splitPane = new SplitPane(stackMap.pane(), profileManager.pane());
-                splitPane.setOrientation(Orientation.VERTICAL);
-                StackPane stackPane = new StackPane(errorManager.pane(), splitPane, menuBar);
-                show(primaryStage, stackPane);
+        //
+        if (routeBean.elevationProfile() != null) {
+            ElevationProfile profile = ElevationProfileComputer
+                    .elevationProfile(routeBean.route(), 5);
+            ObjectProperty<ElevationProfile> profileProperty =
+                    new SimpleObjectProperty<>(profile);
+            DoubleProperty highlightProperty =
+                    new SimpleDoubleProperty(1500);
+            ElevationProfileManager profileManager =
+                    new ElevationProfileManager(profileProperty,
+                            highlightProperty);
 
-            }
-        });
+            SplitPane.setResizableWithParent(profileManager.pane(), false);
+
+            SplitPane splitPane = new SplitPane(stackMap.pane(), profileManager.pane());
+            splitPane.setOrientation(Orientation.VERTICAL);
+            StackPane stackPane = new StackPane(errorManager.pane(), splitPane, menuBar);
+            show(primaryStage, stackPane);
+//
+
+            if (profileManager.mousePositionOnProfileProperty().get() >= 0) {
+                routeBean.setHighlightedPosition(profileManager.mousePositionOnProfileProperty().get());
+            } else routeBean.setHighlightedPosition(stackMap.mousePositionOnRouteProperty().get());
+        }
 
     }
 
