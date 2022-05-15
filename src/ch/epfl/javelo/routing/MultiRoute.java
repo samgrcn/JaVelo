@@ -112,10 +112,12 @@ public class MultiRoute implements Route {
      */
     @Override
     public PointCh pointAt(double position) {
+        System.out.println(position);
         position = Math2.clamp(0, position, length());
         int index = dichotomousSearch(position);
         position -= route[index];
 
+        System.out.println(position);
         return edges.get(index).pointAt(position);
     }
 

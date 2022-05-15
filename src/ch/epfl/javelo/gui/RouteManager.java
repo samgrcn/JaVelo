@@ -106,6 +106,7 @@ public final class RouteManager {
             return;
         }
 
+        if (Double.isNaN(bean.highlightedPosition())) return;
         PointCh pointCh = route.pointAt(bean.highlightedPosition());
         PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
         double x = parameters.get().viewX(webMercatorPoint);
