@@ -58,7 +58,8 @@ public final class AnnotatedMapManager {
         });
 
         actualMousePosition.addListener(change -> {
-            if (routeBean.route() != null) {
+            if (routeBean.route() != null && !Double.isNaN(actualMousePosition.get().getX()) &&
+                    !Double.isNaN(actualMousePosition.get().getY())) {
                 PointWebMercator point = mapViewParameters.pointAt(
                         actualMousePosition.get().getX(), actualMousePosition.get().getY());
                 PointCh pointCh = point.toPointCh();

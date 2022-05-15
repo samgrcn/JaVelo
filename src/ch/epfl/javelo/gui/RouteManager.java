@@ -101,12 +101,11 @@ public final class RouteManager {
      *
      */
     private void setDisk() {
-        if (route == null) {
+        if (route == null || Double.isNaN(bean.highlightedPosition())) {
             disk.setVisible(false);
             return;
         }
 
-        if (Double.isNaN(bean.highlightedPosition())) return;
         PointCh pointCh = route.pointAt(bean.highlightedPosition());
         PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
         double x = parameters.get().viewX(webMercatorPoint);
