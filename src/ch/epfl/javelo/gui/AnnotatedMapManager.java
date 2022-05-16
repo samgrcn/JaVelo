@@ -59,8 +59,7 @@ public final class AnnotatedMapManager {
         });
 
         actualMousePosition.addListener(change -> {
-            System.out.println("AnnotatedMapManager : " + change);
-            System.out.println("AnnotatedMapManager : " + actualMousePosition);
+            actualMousePosition.get();
             if (routeBean.route() != null && !Double.isNaN(actualMousePosition.get().getX()) &&
                     !Double.isNaN(actualMousePosition.get().getY())) {
                 PointWebMercator point = mapViewParameters.pointAt(
@@ -76,7 +75,6 @@ public final class AnnotatedMapManager {
                     double distance = Math2.norm(x, y);
                     if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
                     else mousePositionOnRoute.set(Double.NaN);
-                    System.out.println("AnnotatedMapManager : " + mousePositionOnRoute.get());
                 }
             }
         });

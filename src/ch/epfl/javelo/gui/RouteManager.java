@@ -61,8 +61,6 @@ public final class RouteManager {
         pane.getChildren().add(disk);
 
         bean.highlightedPositionProperty().addListener(change -> {
-            System.out.println("RouteManager : " + change);
-            System.out.println("RouteManager : " + bean.highlightedPosition());
             setDisk();
         });
 
@@ -108,15 +106,11 @@ public final class RouteManager {
      */
     private void setDisk() {
         if (route == null || Double.isNaN(bean.highlightedPosition())) {
-            System.out.println("RouteManager : " + "hello");
             disk.setVisible(false);
             return;
         }
 
-        System.out.println("RouteManager : " + bean.highlightedPosition());
-        System.out.println("RouteManager : " + "test3");
         PointCh pointCh = route.pointAt(bean.highlightedPosition());
-        System.out.println("RouteManager : " + "cc2");
         PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
         double x = parameters.get().viewX(webMercatorPoint);
         double y = parameters.get().viewY(webMercatorPoint);
