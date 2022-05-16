@@ -60,17 +60,23 @@ public final class RouteManager {
         pane.getChildren().add(polyline);
         pane.getChildren().add(disk);
 
+        bean.highlightedPositionProperty().addListener(change -> {
+            System.out.println("RouteManager : " + change);
+            System.out.println("RouteManager : " + bean.highlightedPosition());
+            setDisk();
+        });
+
         parameters.addListener(change -> {
             update();
         });
 
         bean.routeProperty().addListener(change -> {
-            if(bean.route() != null) {
+            //if(bean.route() != null) {
                 update();
-            }
+            //}
         });
 
-//        pane.setOnMousePressed(press -> {
+        //        pane.setOnMousePressed(press -> {
 //            System.out.println("test");
 //            mousePosition.set(new Point2D(press.getSceneX(), press.getSceneY()));
 //            pointer.set(new Point2D(pane.getLayoutX(), pane.getLayoutY()));
@@ -102,11 +108,15 @@ public final class RouteManager {
      */
     private void setDisk() {
         if (route == null || Double.isNaN(bean.highlightedPosition())) {
+            System.out.println("RouteManager : " + "hello");
             disk.setVisible(false);
             return;
         }
 
+        System.out.println("RouteManager : " + bean.highlightedPosition());
+        System.out.println("RouteManager : " + "test3");
         PointCh pointCh = route.pointAt(bean.highlightedPosition());
+        System.out.println("RouteManager : " + "cc2");
         PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
         double x = parameters.get().viewX(webMercatorPoint);
         double y = parameters.get().viewY(webMercatorPoint);

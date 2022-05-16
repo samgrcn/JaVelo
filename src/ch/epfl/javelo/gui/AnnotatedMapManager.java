@@ -1,5 +1,6 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
@@ -58,6 +59,8 @@ public final class AnnotatedMapManager {
         });
 
         actualMousePosition.addListener(change -> {
+            System.out.println("AnnotatedMapManager : " + change);
+            System.out.println("AnnotatedMapManager : " + actualMousePosition);
             if (routeBean.route() != null && !Double.isNaN(actualMousePosition.get().getX()) &&
                     !Double.isNaN(actualMousePosition.get().getY())) {
                 PointWebMercator point = mapViewParameters.pointAt(
@@ -67,11 +70,13 @@ public final class AnnotatedMapManager {
                     mousePositionOnRoute.set(Double.NaN);
                 } else {
                     RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
-                    if (pointCh.distanceTo(pointClosestTo.point()) <= 15) {
-                        mousePositionOnRoute.set(pointClosestTo.position());
-                    } else {
-                        mousePositionOnRoute.set(Double.NaN);
-                    }
+                    PointWebMercator webMercatorPointClosestTo = PointWebMercator.ofPointCh(pointClosestTo.point());
+                    double x = mapViewParameters.viewX(point) - mapViewParameters.viewX(webMercatorPointClosestTo);
+                    double y = mapViewParameters.viewY(point) - mapViewParameters.viewY(webMercatorPointClosestTo);
+                    double distance = Math2.norm(x, y);
+                    if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
+                    else mousePositionOnRoute.set(Double.NaN);
+                    System.out.println("AnnotatedMapManager : " + mousePositionOnRoute.get());
                 }
             }
         });
@@ -93,5 +98,9 @@ public final class AnnotatedMapManager {
      */
     public DoubleProperty mousePositionOnRouteProperty() {
         return mousePositionOnRoute;
+    }
+
+    public double mousePositionOnRoute() {
+        return mousePositionOnRoute.get();
     }
 }

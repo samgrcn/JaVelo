@@ -90,10 +90,10 @@ public final class JaVelo extends Application {
         primaryStage.setMinHeight(600);
         show(primaryStage, stackPane);
 
-        routeBean.highlightedPositionProperty().bind(Bindings.when(new SimpleBooleanProperty(
-                        profileManager.mousePositionOnProfileProperty().get() >= 0))
-                .then(stackMap.mousePositionOnRouteProperty().get())
-                .otherwise(profileManager.mousePositionOnProfileProperty().get()));
+        routeBean.highlightedPositionProperty().bind(Bindings.when(
+                        stackMap.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                .then(stackMap.mousePositionOnRouteProperty())
+                .otherwise(profileManager.mousePositionOnProfileProperty()));
 
         routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
             if (oldValue == null && newValue != null) {
