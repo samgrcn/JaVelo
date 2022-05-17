@@ -50,7 +50,7 @@ public final class AnnotatedMapManager {
         stackPane.getChildren().addAll(baseMapManager.pane(), routeManager.pane(), waypointsManager.pane());
         stackPane.getStylesheets().add("map.css");
 
-        stackPane.setOnMouseMoved(mouse -> {
+        /*stackPane.setOnMouseMoved(mouse -> {
             actualMousePosition.set(new Point2D(mouse.getSceneX(), mouse.getSceneY()));
         });
 
@@ -62,9 +62,11 @@ public final class AnnotatedMapManager {
             actualMousePosition.get();
             if (routeBean.route() != null && !Double.isNaN(actualMousePosition.get().getX()) &&
                     !Double.isNaN(actualMousePosition.get().getY())) {
+                //System.out.println(actualMousePosition);
                 PointWebMercator point = mapViewParameters.pointAt(
                         actualMousePosition.get().getX(), actualMousePosition.get().getY());
                 PointCh pointCh = point.toPointCh();
+                //System.out.println(pointCh);
                 if (pointCh == null) {
                     mousePositionOnRoute.set(Double.NaN);
                 } else {
@@ -77,6 +79,31 @@ public final class AnnotatedMapManager {
                     else mousePositionOnRoute.set(Double.NaN);
                 }
             }
+        });*/
+
+        stackPane.setOnMouseMoved(mouse -> {
+            if (routeBean.route() != null) {
+                PointWebMercator point = mapViewParameters.pointAt(
+                        mouse.getSceneX(), mouse.getSceneY());
+                PointCh pointCh = point.toPointCh();
+                //System.out.println(pointCh);
+                if (pointCh == null) {
+                    mousePositionOnRoute.set(Double.NaN);
+                } else {
+                    RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
+                    PointWebMercator webMercatorPointClosestTo = PointWebMercator.ofPointCh(pointClosestTo.point());
+                    double x = mapViewParameters.viewX(point) - mapViewParameters.viewX(webMercatorPointClosestTo);
+                    double y = mapViewParameters.viewY(point) - mapViewParameters.viewY(webMercatorPointClosestTo);
+                    double distance = Math2.norm(x, y);
+                    System.out.println(mapViewParameters);
+                    if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
+                    else mousePositionOnRoute.set(Double.NaN);
+                }
+            }
+        });
+
+        stackPane.setOnMouseExited(mouse -> {
+            mousePositionOnRoute.set(Double.NaN);
         });
     }
 
@@ -96,9 +123,5 @@ public final class AnnotatedMapManager {
      */
     public DoubleProperty mousePositionOnRouteProperty() {
         return mousePositionOnRoute;
-    }
-
-    public double mousePositionOnRoute() {
-        return mousePositionOnRoute.get();
     }
 }
