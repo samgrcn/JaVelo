@@ -125,21 +125,20 @@ public final class ElevationProfileComputer {
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
 
         Preconditions.checkArgument(maxStepLength > 0);
-
         if(route != null) {
-        int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
-        float[] elevationSamples = new float[samplesNumber];
+            int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
+            float[] elevationSamples = new float[samplesNumber];
 
-        for (int i = 0; i < samplesNumber; i++) {
-            double position = i * route.length() / (samplesNumber - 1);
-            elevationSamples[i] = (float) route.elevationAt(position);
+            for (int i = 0; i < samplesNumber; i++) {
+                double position = i * route.length() / (samplesNumber - 1);
+                elevationSamples[i] = (float) route.elevationAt(position);
+            }
+
+            checkSpecialCases(elevationSamples);
+            fillingArray(elevationSamples);
+
+            return new ElevationProfile(route.length(), elevationSamples);
         }
-
-        checkSpecialCases(elevationSamples);
-        fillingArray(elevationSamples);
-
-        return new ElevationProfile(route.length(), elevationSamples);
-    }
         return null;
     }
 }

@@ -49,16 +49,14 @@ public final class ElevationProfileManager {
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
         this.elevationProfile = elevationProfile;
         this.highlightedPosition = highlightedPosition;
-
         if(this.elevationProfile.get() != null) {
             transformManager();
             gridManager();
             stats();
-            addListeners();
             lineBindings();
         }
-        updateRectangle();
 
+        updateRectangle();
         setupJavaFX();
         addListeners();
         addHandlers();
@@ -134,13 +132,17 @@ public final class ElevationProfileManager {
 
     private void addListeners() {
         centerPane.widthProperty().addListener((p, oldS, newS) -> {
-            updateRectangle();
-            gridManager();
+            if(elevationProfile.get() != null) {
+                updateRectangle();
+                gridManager();
+            }
         });
 
         centerPane.heightProperty().addListener((p, oldS, newS) -> {
-            updateRectangle();
-            gridManager();
+            if(elevationProfile.get() != null) {
+                updateRectangle();
+                gridManager();
+            }
         });
 
         elevationProfile.addListener(e -> {

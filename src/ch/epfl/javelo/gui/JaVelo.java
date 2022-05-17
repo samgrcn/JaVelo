@@ -11,7 +11,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -20,9 +19,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
 public final class JaVelo extends Application {
+
+    private final ObjectProperty<ElevationProfileManager> profileManager = new SimpleObjectProperty<>();
 
     public JaVelo() {
     }
@@ -47,6 +47,8 @@ public final class JaVelo extends Application {
 
         AnnotatedMapManager stackMap = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
 
+
+
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("Fichier");
         MenuItem menuItem = new MenuItem("Exporter GPX");
@@ -54,60 +56,61 @@ public final class JaVelo extends Application {
         menu.getItems().add(menuItem);
         menuBar.setUseSystemMenuBar(true);
 
-        Menu menuPoints = new Menu("Points");
-        MenuItem menuPointsItem = new Menu("Supprimer tous les points");
-        menuBar.getMenus().add(menuPoints);
-        menuPoints.getItems().add(menuPointsItem);
-        menuBar.setUseSystemMenuBar(true);
-
         menuItem.setOnAction(click -> {
             try {
                 GpxGenerator.writeGpx("javelo.gpx", routeBean.route(), routeBean.elevationProfile());
-            } catch (UncheckedIOException | IOException ignored) {
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
         });
 
-        menuPointsItem.setOnAction(click -> {
-            routeBean.waypoints().clear();
+        setProfile(routeBean);
+
+        routeBean.highlightedPositionProperty().bind(Bindings.when(
+                        stackMap.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                .then(stackMap.mousePositionOnRouteProperty())
+                .otherwise(profileManager.get().mousePositionOnProfileProperty()));
+
+        SplitPane splitPane = new SplitPane(stackMap.pane());
+        splitPane.setOrientation(Orientation.VERTICAL);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(menuBar);
+        borderPane.setCenter(splitPane);
+
+
+
+        routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
+            setProfile(routeBean);
+            if (oldValue == null && newValue != null) {
+                splitPane.getItems().add(profileManager.get().pane());
+
+            }
+            if (oldValue != null && newValue == null) {
+                splitPane.getItems().remove(profileManager.get().pane());
+            }
         });
 
+        StackPane stackPane = new StackPane(errorManager.pane(), borderPane);
+        primaryStage.setMinWidth(800);
+        primaryStage.setMinHeight(600);
+        show(primaryStage, stackPane);
+    }
+
+    private void show(Stage primaryStage, Pane pane) {
+        primaryStage.setScene(new Scene(pane));
+        primaryStage.show();
+    }
+
+    private void setProfile(RouteBean routeBean) {
+        if(routeBean.route() != null) System.out.println(routeBean.route().toString());
         ElevationProfile profile = ElevationProfileComputer
                 .elevationProfile(routeBean.route(), 5);
         ObjectProperty<ElevationProfile> profileProperty =
                 new SimpleObjectProperty<>(profile);
         DoubleProperty highlightProperty =
                 new SimpleDoubleProperty(1500);
-        ElevationProfileManager profileManager =
-                new ElevationProfileManager(profileProperty,
-                        highlightProperty);
-
-        SplitPane.setResizableWithParent(profileManager.pane(), false);
-
-        SplitPane splitPane = new SplitPane(stackMap.pane());
-        splitPane.setOrientation(Orientation.VERTICAL);
-        StackPane stackPane = new StackPane(errorManager.pane(), stackMap.pane(), menuBar);
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
-        show(primaryStage, stackPane);
-
-        routeBean.highlightedPositionProperty().bind(Bindings.when(
-                        stackMap.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
-                .then(stackMap.mousePositionOnRouteProperty())
-                .otherwise(profileManager.mousePositionOnProfileProperty()));
-
-        routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
-            if (oldValue == null && newValue != null) {
-                splitPane.getItems().add(profileManager.pane());
-            }
-            if (oldValue != null && newValue == null) {
-                splitPane.getItems().remove(profileManager.pane());
-            }
-        });
-    }
-
-    private void show(Stage primaryStage, Pane pane) {
-        primaryStage.setScene(new Scene(pane));
-        primaryStage.show();
+        profileManager.set(new ElevationProfileManager(profileProperty, highlightProperty));
+        SplitPane.setResizableWithParent(profileManager.get().pane(), false);
     }
 
 
