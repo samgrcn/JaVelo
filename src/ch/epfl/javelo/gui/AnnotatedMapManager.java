@@ -95,7 +95,7 @@ public final class AnnotatedMapManager {
                     double x = mapViewParameters.viewX(point) - mapViewParameters.viewX(webMercatorPointClosestTo);
                     double y = mapViewParameters.viewY(point) - mapViewParameters.viewY(webMercatorPointClosestTo);
                     double distance = Math2.norm(x, y);
-                    System.out.println(mapViewParameters);
+                    //System.out.println(mapViewParameters);
                     if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
                     else mousePositionOnRoute.set(Double.NaN);
                 }

@@ -22,7 +22,6 @@ import java.nio.file.Path;
 
 public final class JaVelo extends Application {
 
-    private final ObjectProperty<ElevationProfileManager> profileManager = new SimpleObjectProperty<>();
 
     public JaVelo() {
     }
@@ -48,7 +47,6 @@ public final class JaVelo extends Application {
         AnnotatedMapManager stackMap = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
 
 
-
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("Fichier");
         MenuItem menuItem = new MenuItem("Exporter GPX");
@@ -64,12 +62,14 @@ public final class JaVelo extends Application {
             }
         });
 
-        setProfile(routeBean);
+        ElevationProfileManager profileManager = new ElevationProfileManager(
+                routeBean.elevationProfileProperty(), routeBean.highlightedPositionProperty());
+        SplitPane.setResizableWithParent(profileManager.pane(), false);
 
         routeBean.highlightedPositionProperty().bind(Bindings.when(
                         stackMap.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
                 .then(stackMap.mousePositionOnRouteProperty())
-                .otherwise(profileManager.get().mousePositionOnProfileProperty()));
+                .otherwise(profileManager.mousePositionOnProfileProperty()));
 
         SplitPane splitPane = new SplitPane(stackMap.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
@@ -78,15 +78,12 @@ public final class JaVelo extends Application {
         borderPane.setCenter(splitPane);
 
 
-
         routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
-            setProfile(routeBean);
             if (oldValue == null && newValue != null) {
-                splitPane.getItems().add(profileManager.get().pane());
-
+                splitPane.getItems().add(profileManager.pane());
             }
             if (oldValue != null && newValue == null) {
-                splitPane.getItems().remove(profileManager.get().pane());
+                splitPane.getItems().remove(profileManager.pane());
             }
         });
 
@@ -101,17 +98,6 @@ public final class JaVelo extends Application {
         primaryStage.show();
     }
 
-    private void setProfile(RouteBean routeBean) {
-        if(routeBean.route() != null) System.out.println(routeBean.route().toString());
-        ElevationProfile profile = ElevationProfileComputer
-                .elevationProfile(routeBean.route(), 5);
-        ObjectProperty<ElevationProfile> profileProperty =
-                new SimpleObjectProperty<>(profile);
-        DoubleProperty highlightProperty =
-                new SimpleDoubleProperty(1500);
-        profileManager.set(new ElevationProfileManager(profileProperty, highlightProperty));
-        SplitPane.setResizableWithParent(profileManager.get().pane(), false);
-    }
 
 
 }

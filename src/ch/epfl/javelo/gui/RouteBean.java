@@ -121,6 +121,7 @@ public final class RouteBean {
      * set the route and elevationProfile properties.
      */
     private void update() {
+        System.out.println("update");
         int fromNode;
         int toNode;
         List<Route> routes = new ArrayList<>();
@@ -144,6 +145,7 @@ public final class RouteBean {
         }
         route.set(new MultiRoute(routes));
         elevationProfile.set(ElevationProfileComputer.elevationProfile(route(), MAX_STEP_LENGTH));
+        System.out.println(elevationProfile.get().toString());
     }
 
     /**

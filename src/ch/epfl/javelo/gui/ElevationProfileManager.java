@@ -69,26 +69,28 @@ public final class ElevationProfileManager {
     }
 
     private void transformManager() {
-        updateRectangle();
-        Affine scaleToWorldAffine = new Affine();
+        if(elevationProfile != null) {
+            updateRectangle();
+            Affine scaleToWorldAffine = new Affine();
 
-        Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMinY());
+            Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMinY());
 
 
-        scaleToWorldAffine.prependTranslation(-topLeft.getX(), -topLeft.getY());
+            scaleToWorldAffine.prependTranslation(-topLeft.getX(), -topLeft.getY());
 
-        scaleToWorldAffine.prependScale(
-                elevationProfile.get().length() / rectangle.get().getWidth(),
-                -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
+            scaleToWorldAffine.prependScale(
+                    elevationProfile.get().length() / rectangle.get().getWidth(),
+                    -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
 
-        scaleToWorldAffine.prependTranslation(0, elevationProfile.get().maxElevation());
+            scaleToWorldAffine.prependTranslation(0, elevationProfile.get().maxElevation());
 
-        screenToWorld.set(scaleToWorldAffine);
+            screenToWorld.set(scaleToWorldAffine);
 
-        try {
-            worldToScreen.set(scaleToWorldAffine.createInverse());
-        } catch (NonInvertibleTransformException e) {
-            throw new Error(e); //if scaleToWorldAffine equals to 0
+            try {
+                worldToScreen.set(scaleToWorldAffine.createInverse());
+            } catch (NonInvertibleTransformException e) {
+                throw new Error(e); //if scaleToWorldAffine equals to 0
+            }
         }
     }
 
@@ -146,10 +148,9 @@ public final class ElevationProfileManager {
         });
 
         elevationProfile.addListener(e -> {
-            if(elevationProfile.get() != null) {
                 updateRectangle();
                 gridManager();
-            }
+
         });
 
     }
