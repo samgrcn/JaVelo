@@ -83,19 +83,17 @@ public final class AnnotatedMapManager {
 
         stackPane.setOnMouseMoved(mouse -> {
             if (routeBean.route() != null) {
-                PointWebMercator point = mapViewParameters.pointAt(
-                        mouse.getSceneX(), mouse.getSceneY());
+                PointWebMercator point = mapViewParametersP.get().pointAt(
+                        mouse.getX(), mouse.getY());
                 PointCh pointCh = point.toPointCh();
-                //System.out.println(pointCh);
                 if (pointCh == null) {
                     mousePositionOnRoute.set(Double.NaN);
                 } else {
                     RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
                     PointWebMercator webMercatorPointClosestTo = PointWebMercator.ofPointCh(pointClosestTo.point());
-                    double x = mapViewParameters.viewX(point) - mapViewParameters.viewX(webMercatorPointClosestTo);
-                    double y = mapViewParameters.viewY(point) - mapViewParameters.viewY(webMercatorPointClosestTo);
+                    double x = mapViewParametersP.get().viewX(point) - mapViewParametersP.get().viewX(webMercatorPointClosestTo);
+                    double y = mapViewParametersP.get().viewY(point) - mapViewParametersP.get().viewY(webMercatorPointClosestTo);
                     double distance = Math2.norm(x, y);
-                    //System.out.println(mapViewParameters);
                     if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
                     else mousePositionOnRoute.set(Double.NaN);
                 }
