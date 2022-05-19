@@ -28,6 +28,7 @@ public final class ElevationProfileManager {
     private final static int HORIZONTAL_LINES_MIN = 25;
     private final static int VERTICAL_LINES_MIN = 50;
     private final static int NB_OF_METERS_PER_KM = 1000;
+    private final static int WIDTH_CORRECTION = 2;
     private final static Font font = Font.font("Avenir", 10);
 
     private final Insets distanceFromBorder = new Insets(10, 10, 20, 40);
@@ -237,7 +238,7 @@ public final class ElevationProfileManager {
         tag.setId("grid_label");
         tag.getStyleClass().add("vertical");
         tag.setFont(font);
-        tag.setLayoutX(rectangle.get().getMinX() - tag.prefWidth(0) - 2);
+        tag.setLayoutX(rectangle.get().getMinX() - tag.prefWidth(0) - WIDTH_CORRECTION);
         tag.setLayoutY(y);
         tags.getChildren().add(tag);
     }
@@ -248,7 +249,7 @@ public final class ElevationProfileManager {
         tag.setId("grid_label");
         tag.getStyleClass().add("horizontal");
         tag.setFont(font);
-        tag.setLayoutX(x - tag.prefWidth(0)/2);
+        tag.setLayoutX(x - tag.prefWidth(0) / WIDTH_CORRECTION);
         tag.setLayoutY(rectangle.get().getMaxY());
         tags.getChildren().add(tag);
     }
