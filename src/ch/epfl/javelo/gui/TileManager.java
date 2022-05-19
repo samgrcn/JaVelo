@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -51,10 +52,17 @@ public final class TileManager {
 
         Path imagePath = Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
                 .resolve(String.valueOf(tileId.x)).resolve(tileId.y + ".png");
-        if (Files.exists(imagePath)) {
-            Image image = new Image("file:" + imagePath);
-            tiles.put(tileId, image);
-            return image;
+
+        if(tiles.get(tileId) != null) return tiles.get(tileId);
+        else if (Files.exists(imagePath)) {
+            try {
+                InputStream stream = Files.newInputStream(imagePath);
+                Image image = new Image(stream);
+                tiles.put(tileId, image);
+                return image;
+            } catch (InvalidPathException e) {
+                throw new IOException(e);
+            }
         }
 
         Files.createDirectories(Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))

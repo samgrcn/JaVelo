@@ -87,7 +87,7 @@ public final class JaVelo extends Application {
             }
         });
 
-        StackPane stackPane = new StackPane(errorManager.pane(), borderPane);
+        StackPane stackPane = new StackPane(borderPane, errorManager.pane());
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         show(primaryStage, stackPane);

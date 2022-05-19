@@ -98,7 +98,7 @@ public final class BaseMapManager {
             minScrollTime.set(currentTime + 200);
             int zoomDelta = (int) Math.signum(e.getDeltaY());
 
-            int newZoomLevel = this.parameters.get().zoomAt() + (int) zoomDelta;
+            int newZoomLevel = this.parameters.get().zoomAt() + zoomDelta;
             newZoomLevel = Math2.clamp(8, newZoomLevel, 19);
 
             if (newZoomLevel != this.parameters.get().zoomAt()) {
