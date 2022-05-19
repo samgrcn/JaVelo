@@ -148,10 +148,9 @@ public final class ElevationProfileManager {
             }
         });
 
-        elevationProfile.addListener(e -> {
+        elevationProfile.addListener((e, oldV, newV) -> {
                 transformManager();
                 gridManager();
-
         });
 
     }
@@ -169,7 +168,7 @@ public final class ElevationProfileManager {
             position.set(Double.NaN);
         });
 
-        rectangle.addListener(e -> {
+        rectangle.addListener((e, oldV, newV) -> {
             transformManager();
             polygonCreator();
             gridManager();

@@ -46,13 +46,9 @@ public class WaypointsManager {
         listIterator();
         pane.getChildren().setAll(pinsList);
 
-        waypoints.addListener((Observable w) -> {
-            update();
-        });
+        waypoints.addListener((Observable w) -> update());
 
-        parameters.addListener(change -> {
-            update();
-        });
+        parameters.addListener((change, oldV, newV) -> update());
 
     }
 

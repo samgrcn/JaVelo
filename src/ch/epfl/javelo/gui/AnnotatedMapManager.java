@@ -58,7 +58,7 @@ public final class AnnotatedMapManager {
             actualMousePosition.set(new Point2D(Double.NaN, Double.NaN));
         });
 
-        actualMousePosition.addListener(change -> {
+        actualMousePosition.addListener((change, oldV, newV) -> {
             actualMousePosition.get();
             if (routeBean.route() != null && !Double.isNaN(actualMousePosition.get().getX()) &&
                     !Double.isNaN(actualMousePosition.get().getY())) {

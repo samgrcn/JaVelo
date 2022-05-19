@@ -60,15 +60,15 @@ public final class RouteManager {
         pane.getChildren().add(polyline);
         pane.getChildren().add(disk);
 
-        bean.highlightedPositionProperty().addListener(change -> {
+        bean.highlightedPositionProperty().addListener((change, oldV, newV) -> {
             setDisk();
         });
 
-        parameters.addListener(change -> {
+        parameters.addListener((change, oldV, newV) -> {
             update();
         });
 
-        bean.routeProperty().addListener(change -> {
+        bean.routeProperty().addListener((change, oldV, newV) -> {
             //if(bean.route() != null) {
                 update();
             //}
