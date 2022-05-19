@@ -70,29 +70,29 @@ public final class ElevationProfileManager {
     }
 
     private void transformManager() {
-        if(elevationProfile != null) {
-            updateRectangle();
-            Affine scaleToWorldAffine = new Affine();
+            if(elevationProfile.get() != null) {
+                updateRectangle();
+                Affine scaleToWorldAffine = new Affine();
 
-            Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMinY());
+                Point2D topLeft = new Point2D(rectangle.get().getMinX(), rectangle.get().getMinY());
 
 
-            scaleToWorldAffine.prependTranslation(-topLeft.getX(), -topLeft.getY());
+                scaleToWorldAffine.prependTranslation(-topLeft.getX(), -topLeft.getY());
 
-            scaleToWorldAffine.prependScale(
-                    elevationProfile.get().length() / rectangle.get().getWidth(),
-                    -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
+                scaleToWorldAffine.prependScale(
+                        elevationProfile.get().length() / rectangle.get().getWidth(),
+                        -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
 
-            scaleToWorldAffine.prependTranslation(0, elevationProfile.get().maxElevation());
+                scaleToWorldAffine.prependTranslation(0, elevationProfile.get().maxElevation());
 
-            screenToWorld.set(scaleToWorldAffine);
+                screenToWorld.set(scaleToWorldAffine);
 
-            try {
-                worldToScreen.set(scaleToWorldAffine.createInverse());
-            } catch (NonInvertibleTransformException e) {
-                throw new Error(e); //if scaleToWorldAffine equals to 0
+                try {
+                    worldToScreen.set(scaleToWorldAffine.createInverse());
+                } catch (NonInvertibleTransformException e) {
+                    throw new Error(e); //if scaleToWorldAffine equals to 0
+                }
             }
-        }
     }
 
     private void updateRectangle() {
@@ -136,20 +136,20 @@ public final class ElevationProfileManager {
     private void addListeners() {
         centerPane.widthProperty().addListener((p, oldS, newS) -> {
             if(elevationProfile.get() != null) {
-                updateRectangle();
+                transformManager();
                 gridManager();
             }
         });
 
         centerPane.heightProperty().addListener((p, oldS, newS) -> {
             if(elevationProfile.get() != null) {
-                updateRectangle();
+                transformManager();
                 gridManager();
             }
         });
 
         elevationProfile.addListener(e -> {
-                updateRectangle();
+                transformManager();
                 gridManager();
 
         });
@@ -189,46 +189,49 @@ public final class ElevationProfileManager {
     }
 
     private void gridManager() {
-        gridNode.getElements().clear();
-        tags.getChildren().clear();
+        if(elevationProfile.get() != null) {
 
-        double minEle = elevationProfile.get().minElevation();
-        double maxEle = elevationProfile.get().maxElevation();
+            gridNode.getElements().clear();
+            tags.getChildren().clear();
 
-        int posDiff = 100_000;
-        for (int el : POS_STEPS) {
-            if (worldToScreen.get().deltaTransform(el, 0).getX() >= VERTICAL_LINES_MIN) {
-                posDiff = el;
-                break;
+            double minEle = elevationProfile.get().minElevation();
+            double maxEle = elevationProfile.get().maxElevation();
+
+            int posDiff = 100_000;
+            for (int el : POS_STEPS) {
+                if (worldToScreen.get().deltaTransform(el, 0).getX() >= VERTICAL_LINES_MIN) {
+                    posDiff = el;
+                    break;
+                }
             }
-        }
-        int eleDiff = 1_000;
-        for (int el : ELE_STEPS) {
-            if (worldToScreen.get().deltaTransform(0, -el).getY() >= HORIZONTAL_LINES_MIN) {
-                eleDiff = el;
-                break;
+            int eleDiff = 1_000;
+            for (int el : ELE_STEPS) {
+                if (worldToScreen.get().deltaTransform(0, -el).getY() >= HORIZONTAL_LINES_MIN) {
+                    eleDiff = el;
+                    break;
+                }
             }
-        }
 
-        int firstStepEle = (int) Math.ceil(minEle/eleDiff) * eleDiff;
-        int lastStepEle = (int) (Math.ceil(maxEle/eleDiff) - 1) * eleDiff;
-        int numberOfHorizontalLines = (lastStepEle - firstStepEle) / eleDiff;
-        int numberOfVerticalLines = (int) (elevationProfile.get().length() / posDiff);
+            int firstStepEle = (int) Math.ceil(minEle / eleDiff) * eleDiff;
+            int lastStepEle = (int) (Math.ceil(maxEle / eleDiff) - 1) * eleDiff;
+            int numberOfHorizontalLines = (lastStepEle - firstStepEle) / eleDiff;
+            int numberOfVerticalLines = (int) (elevationProfile.get().length() / posDiff);
 
-        double delta = firstStepEle - minEle;
+            double delta = firstStepEle - minEle;
 
-        for (int i = 0; i <= numberOfHorizontalLines; ++i) {
-            double y = rectangle.get().getMaxY() - worldToScreen.get().deltaTransform(0, -delta).getY()
-                    - worldToScreen.get().deltaTransform(0, -i * eleDiff).getY();
-            gridNode.getElements().add(new MoveTo(rectangle.get().getMinX(), y));
-            gridNode.getElements().add(new LineTo(rectangle.get().getMaxX(), y));
-            setTagEle(firstStepEle, i, eleDiff, y);
-        }
-        for (int i = 0; i <= numberOfVerticalLines; ++i) {
-            double x = rectangle.get().getMinX() + worldToScreen.get().deltaTransform(i * posDiff, 0).getX();
-            gridNode.getElements().add(new MoveTo(x, rectangle.get().getMinY()));
-            gridNode.getElements().add(new LineTo(x, rectangle.get().getMaxY()));
-            setTagPos(i, posDiff, x);
+            for (int i = 0; i <= numberOfHorizontalLines; ++i) {
+                double y = rectangle.get().getMaxY() - worldToScreen.get().deltaTransform(0, -delta).getY()
+                        - worldToScreen.get().deltaTransform(0, -i * eleDiff).getY();
+                gridNode.getElements().add(new MoveTo(rectangle.get().getMinX(), y));
+                gridNode.getElements().add(new LineTo(rectangle.get().getMaxX(), y));
+                setTagEle(firstStepEle, i, eleDiff, y);
+            }
+            for (int i = 0; i <= numberOfVerticalLines; ++i) {
+                double x = rectangle.get().getMinX() + worldToScreen.get().deltaTransform(i * posDiff, 0).getX();
+                gridNode.getElements().add(new MoveTo(x, rectangle.get().getMinY()));
+                gridNode.getElements().add(new LineTo(x, rectangle.get().getMaxY()));
+                setTagPos(i, posDiff, x);
+            }
         }
     }
 
