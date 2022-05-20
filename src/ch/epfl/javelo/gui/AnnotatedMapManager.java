@@ -27,7 +27,7 @@ public final class AnnotatedMapManager {
     private final static int Y_START = 370650;
 
     private final StackPane stackPane = new StackPane();
-    private final ObjectProperty<Point2D> actualMousePosition = new SimpleObjectProperty<>();
+    //private final ObjectProperty<Point2D> actualMousePosition = new SimpleObjectProperty<>();
     private final DoubleProperty mousePositionOnRoute = new SimpleDoubleProperty();
 
     /**

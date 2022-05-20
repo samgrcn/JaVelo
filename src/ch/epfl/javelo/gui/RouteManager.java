@@ -10,9 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 
-import javafx.scene.input.MouseEvent;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Manages the display of the route and (part of) the interaction with it.
@@ -31,8 +29,6 @@ public final class RouteManager {
     private final Circle disk = new Circle();
     private final Polyline polyline = new Polyline();
     private Route route;
-    private final ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>();
-    private final ObjectProperty<Point2D> pointer = new SimpleObjectProperty<>();
 
     /**
      * @param bean the route bean
@@ -65,26 +61,21 @@ public final class RouteManager {
         });
 
         parameters.addListener((change, oldV, newV) -> {
-            update();
+            route = bean.route();
+            if (oldV.zoomAt() == newV.zoomAt()) setPolylineOnDrag(oldV, newV);
+            else setPolyline();
+            setDisk();
         });
 
         bean.routeProperty().addListener((change, oldV, newV) -> {
-            //if(bean.route() != null) {
-                update();
-            //}
+            route = bean.route();
+            setPolyline();
+            setDisk();
         });
 
-        //        pane.setOnMousePressed(press -> {
-//            System.out.println("test");
-//            mousePosition.set(new Point2D(press.getSceneX(), press.getSceneY()));
-//            pointer.set(new Point2D(pane.getLayoutX(), pane.getLayoutY()));
-//
-//        });
-//
-//        pane.setOnMouseDragged(this::setPolylineOnDrag);
-
         disk.setOnMouseClicked(click -> {
-            PointCh pointCh = parameters.get().pointAt(click.getSceneX(), click.getSceneY()).toPointCh();
+            PointCh pointCh = parameters.get().pointAt(disk.localToParent(click.getX(), click.getY()).getX(),
+                    disk.localToParent(click.getX(), click.getY()).getY()).toPointCh();
             double position = route.pointClosestTo(pointCh).position();
             int closestNode = route.nodeClosestTo(position);
             Waypoint waypoint = new Waypoint(pointCh, closestNode);
@@ -107,17 +98,16 @@ public final class RouteManager {
     private void setDisk() {
         if (route == null || Double.isNaN(bean.highlightedPosition())) {
             disk.setVisible(false);
-            return;
+        } else {
+            PointCh pointCh = route.pointAt(bean.highlightedPosition());
+            PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
+            double x = parameters.get().viewX(webMercatorPoint);
+            double y = parameters.get().viewY(webMercatorPoint);
+
+            disk.setLayoutX(x);
+            disk.setLayoutY(y);
+            disk.setVisible(true);
         }
-
-        PointCh pointCh = route.pointAt(bean.highlightedPosition());
-        PointWebMercator webMercatorPoint = PointWebMercator.ofPointCh(pointCh);
-        double x = parameters.get().viewX(webMercatorPoint);
-        double y = parameters.get().viewY(webMercatorPoint);
-
-        disk.setLayoutX(x);
-        disk.setLayoutY(y);
-        disk.setVisible(true);
     }
 
     /**
@@ -127,6 +117,8 @@ public final class RouteManager {
         if (route == null) {
             polyline.setVisible(false);
         } else {
+            polyline.setLayoutX(0);
+            polyline.setLayoutY(0);
             List<PointCh> pointsList = route.points();
             Double[] points = new Double[pointsList.size() * 2];
             int index = 0;
@@ -140,32 +132,21 @@ public final class RouteManager {
         }
     }
 
-    private void setPolylineOnDrag(MouseEvent drag) {
-        double differenceX = mousePosition.get().getX() - pointer.get().getX();
-        double differenceY = mousePosition.get().getY() - pointer.get().getY();
-        polyline.setLayoutX(drag.getSceneX() - differenceX);
-        polyline.setLayoutY(drag.getSceneY() - differenceY);
-    }
-
     /**
      *
+     *
+     * @param oldV the old MapViewParameters
+     * @param newV the new MapViewParameters
      */
-    private void update() {
-        route = bean.route();
-//        pane.setOnMouseDragged(drag -> {
-//            System.out.println("yoo");
-//            double differenceX = mousePosition.get().getX() - pointer.get().getX();
-//            double differenceY = mousePosition.get().getY() - pointer.get().getY();
-//
-//            pane.setOnMouseReleased(release -> {
-//                double newX = release.getSceneX() - differenceX;
-//                double newY = release.getSceneY() - differenceY;
-//
-//                polyline.setLayoutX(newX);
-//                polyline.setLayoutY(newY);
-//            });
-//        });
-        setPolyline();
-        setDisk();
+    private void setPolylineOnDrag(MapViewParameters oldV, MapViewParameters newV) {
+        if (route == null) {
+            polyline.setVisible(false);
+        } else {
+            double differenceX = newV.x() - oldV.x();
+            double differenceY = newV.y() - oldV.y();
+            polyline.setLayoutX(polyline.getLayoutX() - differenceX);
+            polyline.setLayoutY(polyline.getLayoutY() - differenceY);
+            polyline.setVisible(true);
+        }
     }
 }
