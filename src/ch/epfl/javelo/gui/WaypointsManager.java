@@ -96,7 +96,7 @@ public class WaypointsManager {
                 } catch (NullPointerException ignored) {
                     errorConsumer.accept("Aucune route à proximité !");
                     pins.setLayoutX(pointer.get().getX());
-                    pins.setLayoutY(pointer.get().getX());
+                    pins.setLayoutY(pointer.get().getY());
                 }
 
                 double newX = release.getSceneX() - differenceX;

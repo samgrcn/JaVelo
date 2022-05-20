@@ -73,9 +73,10 @@ public final class JaVelo extends Application {
 
         SplitPane splitPane = new SplitPane(stackMap.pane());
         splitPane.setOrientation(Orientation.VERTICAL);
+        StackPane stackPane = new StackPane(splitPane, errorManager.pane());
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
-        borderPane.setCenter(splitPane);
+        borderPane.setCenter(stackPane);
 
 
         routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
@@ -87,10 +88,10 @@ public final class JaVelo extends Application {
             }
         });
 
-        StackPane stackPane = new StackPane(borderPane, errorManager.pane());
+
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
-        show(primaryStage, stackPane);
+        show(primaryStage, borderPane);
     }
 
     private void show(Stage primaryStage, Pane pane) {
