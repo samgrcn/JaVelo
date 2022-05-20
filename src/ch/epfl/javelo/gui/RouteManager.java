@@ -4,8 +4,6 @@ import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import ch.epfl.javelo.routing.Route;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
@@ -42,7 +40,7 @@ public final class RouteManager {
     }
 
     /**
-     *
+     * Initialization of all components and listeners. Called in the constructor.
      */
     private void init() {
         pane.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
@@ -93,7 +91,7 @@ public final class RouteManager {
     }
 
     /**
-     *
+     * Sets the disk over the route when necessary.
      */
     private void setDisk() {
         if (route == null || Double.isNaN(bean.highlightedPosition())) {
@@ -111,7 +109,7 @@ public final class RouteManager {
     }
 
     /**
-     *
+     * Completely redraw the polyline when necessary.
      */
     private void setPolyline() {
         if (route == null) {
@@ -133,7 +131,7 @@ public final class RouteManager {
     }
 
     /**
-     *
+     * Shifts the polyline during a drag.
      *
      * @param oldV the old MapViewParameters
      * @param newV the new MapViewParameters

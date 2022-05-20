@@ -44,6 +44,7 @@ public final class RouteBean {
     }
 
     /**
+     * Returns the waypoint list as an observable list-
      *
      * @return the waypoints list
      */
@@ -52,6 +53,7 @@ public final class RouteBean {
     }
 
     /**
+     * Returns the highlighted position property.
      *
      * @return the highlightedPosition property
      */
@@ -60,6 +62,7 @@ public final class RouteBean {
     }
 
     /**
+     * Returns the highlighted position value.
      *
      * @return the highlightedPosition
      */
@@ -68,6 +71,7 @@ public final class RouteBean {
     }
 
     /**
+     * Returns the route property.
      *
      * @return the route property
      */
@@ -76,6 +80,7 @@ public final class RouteBean {
     }
 
     /**
+     * Returns the route value.
      *
      * @return the route
      */
@@ -84,6 +89,7 @@ public final class RouteBean {
     }
 
     /**
+     * Returns the elevation profile property.
      *
      * @return the elevationProfile property
      */
@@ -92,7 +98,7 @@ public final class RouteBean {
     }
 
     /**
-     *
+     * Returns the elevation profile value.
      * @return the elevationProfile
      */
     public ElevationProfile elevationProfile() {

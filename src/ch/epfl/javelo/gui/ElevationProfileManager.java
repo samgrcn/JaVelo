@@ -21,6 +21,12 @@ import javafx.scene.transform.Transform;
 import java.util.Locale;
 
 
+/**
+ * Manages the display and interaction with the longitudinal profile of a route.
+ *
+ * @author Samuel Garcin (345633)
+ * @author Quentin Chappuis (339517)
+ */
 public final class ElevationProfileManager {
 
     private final static int[] POS_STEPS = {1000, 2000, 5000, 10_000, 25_000, 50_000, 100_000};
@@ -47,6 +53,10 @@ public final class ElevationProfileManager {
     private final ObjectProperty<Rectangle2D> rectangle = new SimpleObjectProperty<>();
 
 
+    /**
+     * @param elevationProfile the elevation profile
+     * @param highlightedPosition the highlighted position
+     */
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
         this.elevationProfile = elevationProfile;
         this.highlightedPosition = highlightedPosition;
@@ -56,10 +66,18 @@ public final class ElevationProfileManager {
     }
 
 
+    /**
+     * Returns the mouse position property over the profile.
+     *
+     * @return the mouse position property
+     */
     public ReadOnlyDoubleProperty mousePositionOnProfileProperty() {
         return position;
     }
 
+    /**
+     *
+     */
     private void transformManager() {
         if (elevationProfile.get() != null) {
 
@@ -86,6 +104,9 @@ public final class ElevationProfileManager {
         }
     }
 
+    /**
+     *
+     */
     private void updateRectangle() {
         rectangle.set(new Rectangle2D(
                 distanceFromBorder.getLeft(),
@@ -94,6 +115,9 @@ public final class ElevationProfileManager {
                 Math.max(0, centerPane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
     }
 
+    /**
+     *
+     */
     private void polygonCreator() {
         Point2D worldPoint;
         Point2D screenPoint;
@@ -114,6 +138,9 @@ public final class ElevationProfileManager {
 
     }
 
+    /**
+     *
+     */
     private void lineBindings() {
         if(worldToScreen.get() != null) {
             line.layoutXProperty().bind(
@@ -125,6 +152,9 @@ public final class ElevationProfileManager {
         }
     }
 
+    /**
+     *
+     */
     private void addListeners() {
         centerPane.widthProperty().addListener((p, oldS, newS) -> {
             if (elevationProfile.get() != null) {
@@ -159,6 +189,9 @@ public final class ElevationProfileManager {
 
     }
 
+    /**
+     *
+     */
     private void addHandlers() {
         centerPane.setOnMouseMoved(e -> {
             if (rectangle.get().contains(e.getX(), e.getY())) {
@@ -175,6 +208,9 @@ public final class ElevationProfileManager {
     }
 
 
+    /**
+     *
+     */
     private void setupJavaFX() {
         borderPane.getStylesheets().add("elevation_profile.css");
         polygon.setId("profile");
@@ -187,6 +223,9 @@ public final class ElevationProfileManager {
         borderPane.setBottom(vBox);
     }
 
+    /**
+     * Manages and draws the grid and the tags.
+     */
     private void gridManager() {
         if (elevationProfile.get() != null && worldToScreen.get() != null) {
 
@@ -234,6 +273,14 @@ public final class ElevationProfileManager {
         }
     }
 
+    /**
+     * Sets all elevation tags. Called by the grid manager.
+     *
+     * @param firstStepEle the first elevation step value
+     * @param index the index
+     * @param eleDiff the elevation difference between steps
+     * @param y the y-coordinate
+     */
     private void setTagEle(int firstStepEle, int index, int eleDiff, double y) {
         Text tag = new Text(String.valueOf(firstStepEle + index * eleDiff));
         tag.textOriginProperty().set(VPos.CENTER);
@@ -245,6 +292,13 @@ public final class ElevationProfileManager {
         tags.getChildren().add(tag);
     }
 
+    /**
+     * Sets all position tags. Called by the grid manager.
+     *
+     * @param index the index
+     * @param posDiff the position difference between steps
+     * @param x the x-coordinate
+     */
     private void setTagPos(int index, int posDiff, double x) {
         Text tag = new Text(String.valueOf((index * posDiff) / NB_OF_METERS_PER_KM));
         tag.textOriginProperty().set(VPos.TOP);
@@ -256,6 +310,9 @@ public final class ElevationProfileManager {
         tags.getChildren().add(tag);
     }
 
+    /**
+     * Sets the statistics in the vBox.
+     */
     private void stats() {
         if (elevationProfile.get() != null) {
             vBox.getChildren().clear();
@@ -272,6 +329,11 @@ public final class ElevationProfileManager {
         }
     }
 
+    /**
+     * Returns the panel containing the profile drawing.
+     *
+     * @return the panel
+     */
     public Pane pane() {
         return borderPane;
     }
