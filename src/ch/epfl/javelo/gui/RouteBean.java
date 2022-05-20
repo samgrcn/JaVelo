@@ -68,14 +68,6 @@ public final class RouteBean {
     }
 
     /**
-     * Sets a new value to the highlightedPosition property.
-     * @param value the value to set
-     */
-    public void setHighlightedPosition(double value) {
-        highlightedPosition.set(value);
-    }
-
-    /**
      *
      * @return the route property
      */
@@ -142,8 +134,11 @@ public final class RouteBean {
                 bestRoute.put(key, route);
             }
         }
-        route.set(new MultiRoute(routes));
-        elevationProfile.set(ElevationProfileComputer.elevationProfile(route(), MAX_STEP_LENGTH));
+        if (routes.size() == 0) noRoute();
+        else {
+            route.set(new MultiRoute(routes));
+            elevationProfile.set(ElevationProfileComputer.elevationProfile(route(), MAX_STEP_LENGTH));
+        }
     }
 
     /**
