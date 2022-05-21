@@ -92,7 +92,7 @@ public class MultiRoute implements Route {
     }
 
     /**
-     * Dichotomously searches for the position in a list of lengths.
+     * Dichotomous searches for the position in a list of lengths.
      *
      * @param position the given position
      * @return the index

@@ -60,6 +60,7 @@ public final class ElevationProfileManager {
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
         this.elevationProfile = elevationProfile;
         this.highlightedPosition = highlightedPosition;
+
         setupJavaFX();
         addListeners();
         addHandlers();
@@ -180,11 +181,9 @@ public final class ElevationProfileManager {
                 transformManager();
                 polygonCreator();
                 gridManager();
-                stats();
             }
-            if(oldV == null && newV != null) {
-                lineBindings();
-            }
+            if(oldV == null && newV != null) { lineBindings(); }
+            if(oldV != newV) { stats(); }
         });
 
     }
@@ -201,9 +200,7 @@ public final class ElevationProfileManager {
             }
         });
 
-        centerPane.setOnMouseExited(e -> {
-            position.set(Double.NaN);
-        });
+        centerPane.setOnMouseExited(e -> position.set(Double.NaN));
 
     }
 

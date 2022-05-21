@@ -167,21 +167,19 @@ public class WaypointsManager {
 
 
     public void addWaypoint(double x, double y) {
+        PointCh point;
+        int closestNode;
         try {
-            this.parameters.get().pointAt(x, y).toPointCh();
+            point = this.parameters.get().pointAt(x, y).toPointCh();
+            closestNode = graph.nodeClosestTo(point, 500);
         } catch (NullPointerException ignored) {
             errorConsumer.accept("Aucune route à proximité !");
             return;
         }
-
-        PointCh point = this.parameters.get().pointAt(x, y).toPointCh();
-        int closestNode = graph.nodeClosestTo(point, 500);
-
         if (closestNode == NO_NODE) {
             errorConsumer.accept("Aucune route à proximité !");
             return;
         }
-
         waypoints.add(new Waypoint(point, closestNode));
     }
 
