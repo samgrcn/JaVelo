@@ -4,7 +4,6 @@ import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.routing.*;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;

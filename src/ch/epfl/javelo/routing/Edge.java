@@ -56,7 +56,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
     /**
      * Returns the elevation, in metres, at the given position on the edge.
      *
-     * @param position the given position
+     * @param position the given positionS
      * @return the elevation
      */
     public double elevationAt(double position) {
