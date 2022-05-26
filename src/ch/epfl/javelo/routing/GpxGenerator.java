@@ -22,10 +22,20 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Locale;
 
+/**
+ * GpwGenerator is a route generator in GPX format
+ *
+ * @author Samuel Garcin (345633)
+ */
 public class GpxGenerator {
 
     private GpxGenerator() {} //non-instantiable
 
+    /**
+     * Private method just to create the document
+     * @return the document.
+     * @throws Error (error that should never happen)
+     */
     private static Document newDocument() {
         try {
             return DocumentBuilderFactory
@@ -36,6 +46,15 @@ public class GpxGenerator {
             throw new Error(e); // Should never happen
         }
     }
+
+    /**
+     * The method createGpx takes as arguments a route and the profile of this route
+     * and returns the corresponding GPX document.
+     * @param route the route we want for the GPX
+     * @param profile and its profile.
+     * @return a document with the corresponding gpx.
+     * @throws Error while creating the document (should never happen)
+     */
 
     public static Document createGpx(Route route, ElevationProfile profile) {
 
@@ -87,7 +106,14 @@ public class GpxGenerator {
         return doc;
     }
 
-
+    /**
+     * takes as arguments a file name, a route and the profile of this route and writes
+     * the corresponding GPX document to the file
+     * @param fileName the name you want for the file
+     * @param route the route for the file
+     * @param profile and its profile (for the file)
+     * @throws IOException in case of an input/output error.
+     */
     public static void writeGpx(String fileName, Route route, ElevationProfile profile) throws IOException {
 
         Document doc = createGpx(route, profile);

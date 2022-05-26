@@ -19,16 +19,31 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
+/**
+ * JaVelo is the main class of the application
+ *
+ * @author Samuel Garcin (345633)
+ */
 public final class JaVelo extends Application {
 
-
+    private static final int PREF_WIDTH = 800;
+    private static final int PREF_HEIGHT = 600;
     public JaVelo() {
     }
 
+    /**
+     * Main method
+     * @param args the program arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Builds the final GUI by combining the parts managed by the previously written classes and adding a menu.
+     * @param primaryStage the primary stage
+     * @throws IOException in case of an input/output error
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
         Graph graph = Graph.loadFrom(Path.of("javelo-data"));
@@ -88,8 +103,8 @@ public final class JaVelo extends Application {
         });
 
 
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinWidth(PREF_WIDTH);
+        primaryStage.setMinHeight(PREF_HEIGHT);
         show(primaryStage, borderPane);
     }
 

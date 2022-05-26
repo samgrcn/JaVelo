@@ -106,7 +106,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     *
+     * Set the rectangle with the correct dimensions of the pane.
      */
     private void updateRectangle() {
         rectangle.set(new Rectangle2D(
@@ -117,7 +117,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     *
+     * Creates the polygon depending on the profile.
      */
     private void polygonCreator() {
         Point2D worldPoint;
@@ -140,7 +140,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     *
+     * Creates the bindings of the vertical line, so it moves with the mouse if it's on the rectangle.
      */
     private void lineBindings() {
         if(worldToScreen.get() != null) {
@@ -154,7 +154,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     *
+     * Adds the listeners for the pane and the profile, updating the profile when they change.
      */
     private void addListeners() {
         centerPane.widthProperty().addListener((p, oldS, newS) -> {
@@ -189,7 +189,7 @@ public final class ElevationProfileManager {
     }
 
     /**
-     *
+     * Adds handlers, so it detects when the mouse is on the rectangle.
      */
     private void addHandlers() {
         centerPane.setOnMouseMoved(e -> {
@@ -206,7 +206,7 @@ public final class ElevationProfileManager {
 
 
     /**
-     *
+     * Sets up the java fx, so it displays correctly on the screen.
      */
     private void setupJavaFX() {
         borderPane.getStylesheets().add("elevation_profile.css");

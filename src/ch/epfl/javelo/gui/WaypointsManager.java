@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
 
@@ -32,6 +31,13 @@ public class WaypointsManager {
     private final List<Group> pinsList = new ArrayList<>();
 
 
+    /**
+     * Creates the waypoints manager and its listeners.
+     * @param graph the graph of the area
+     * @param parameters the map parameters
+     * @param waypoints the list of waypoints
+     * @param errorConsumer the error consumer
+     */
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters, ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
         this.waypoints = waypoints;
@@ -47,13 +53,21 @@ public class WaypointsManager {
         pane.getChildren().setAll(pinsList);
 
         waypoints.addListener((Observable w) -> update());
-
         parameters.addListener((change, oldV, newV) -> update());
 
     }
 
 
-    private void WaypointCreator(String status, double x, double y, int indexInList) {
+    /**
+     * Private method that handles one point. It sets up its javaFX and add its listeners including the addition
+     * drag and removal.
+     * @param status String for the style class: "first" if it's the first point of the route,
+     *               "last" if it's the last and else "middle"
+     * @param x x coordinates
+     * @param y y coordinates
+     * @param indexInList the index of the pin in the list of all pins
+     */
+    private void waypointCreator(String status, double x, double y, int indexInList) {
 
         ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>();
         ObjectProperty<Point2D> pointer = new SimpleObjectProperty<>();
@@ -126,6 +140,9 @@ public class WaypointsManager {
         });
     }
 
+    /**
+     * Scans the list and manages each waypoint in the list of every waypoint
+     */
     private void listIterator() {
 
         if (waypoints.size() == 0) return;
@@ -137,15 +154,15 @@ public class WaypointsManager {
 
         for (int i = 0; i < waypoints.size(); i++) {
             if (i == 0) {
-                WaypointCreator("first", x, y, i);
+                waypointCreator("first", x, y, i);
                 if (waypoints.size() == 1) {
                     break;
                 }
             } else if (i == waypoints.size() - 1) {
-                WaypointCreator("last", x, y, i);
+                waypointCreator("last", x, y, i);
                 break;
             } else {
-                WaypointCreator("middle", x, y, i);
+                waypointCreator("middle", x, y, i);
             }
             position = waypoints.get(i + 1).position();
             pointWeb = PointWebMercator.ofPointCh(position);
@@ -154,6 +171,9 @@ public class WaypointsManager {
         }
     }
 
+    /**
+     * Updates so the only existing points are the one in the list of waypoints.
+     */
     private void update() {
         pane.getChildren().clear();
         pinsList.clear();
@@ -161,6 +181,10 @@ public class WaypointsManager {
         pane.getChildren().setAll(pinsList);
     }
 
+    /**
+     * Removes a waypoint from the list.
+     * @param indexInList the index of the waypoint in the list
+     */
     private void remove(int indexInList) {
         waypoints.remove(indexInList);
     }
@@ -183,7 +207,9 @@ public class WaypointsManager {
         waypoints.add(new Waypoint(point, closestNode));
     }
 
-
+    /**
+     * @return the pane containing the waypoints.
+     */
     public Pane pane() {
         return pane;
     }
