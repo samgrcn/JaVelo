@@ -48,12 +48,11 @@ public final class TileManager {
     public Image imageForTileAt(TileId tileId) throws IOException {
         Preconditions.checkArgument(TileId.isValid(tileId.zoomAt, tileId.x, tileId.y));
 
-        if (tiles.containsKey(tileId)) return tiles.get(tileId);
-
         Path imagePath = Path.of(path.toString()).resolve(String.valueOf(tileId.zoomAt))
                 .resolve(String.valueOf(tileId.x)).resolve(tileId.y + ".png");
 
-        if(tiles.get(tileId) != null) return tiles.get(tileId);
+        Image imageForTileId = tiles.get(tileId);
+        if (imageForTileId != null) return imageForTileId;
         else if (Files.exists(imagePath)) {
             try {
                 InputStream stream = Files.newInputStream(imagePath);

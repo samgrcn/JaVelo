@@ -24,9 +24,9 @@ public final class AnnotatedMapManager {
     private final static int ZOOM_AT_START = 12;
     private final static int X_START = 543200;
     private final static int Y_START = 370650;
+    private final static int MAXIMAL_DISTANCE = 15;
 
     private final StackPane stackPane = new StackPane();
-    //private final ObjectProperty<Point2D> actualMousePosition = new SimpleObjectProperty<>();
     private final DoubleProperty mousePositionOnRoute = new SimpleDoubleProperty();
 
     /**
@@ -49,51 +49,22 @@ public final class AnnotatedMapManager {
         stackPane.getChildren().addAll(baseMapManager.pane(), routeManager.pane(), waypointsManager.pane());
         stackPane.getStylesheets().add("map.css");
 
-        /*stackPane.setOnMouseMoved(mouse -> {
-            actualMousePosition.set(new Point2D(mouse.getSceneX(), mouse.getSceneY()));
-        });
-
-        stackPane.setOnMouseExited(mouse -> {
-            actualMousePosition.set(new Point2D(Double.NaN, Double.NaN));
-        });
-
-        actualMousePosition.addListener((change, oldV, newV) -> {
-            actualMousePosition.get();
-            if (routeBean.route() != null && !Double.isNaN(actualMousePosition.get().getX()) &&
-                    !Double.isNaN(actualMousePosition.get().getY())) {
-                //System.out.println(actualMousePosition);
-                PointWebMercator point = mapViewParameters.pointAt(
-                        actualMousePosition.get().getX(), actualMousePosition.get().getY());
-                PointCh pointCh = point.toPointCh();
-                //System.out.println(pointCh);
-                if (pointCh == null) {
-                    mousePositionOnRoute.set(Double.NaN);
-                } else {
-                    RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
-                    PointWebMercator webMercatorPointClosestTo = PointWebMercator.ofPointCh(pointClosestTo.point());
-                    double x = mapViewParameters.viewX(point) - mapViewParameters.viewX(webMercatorPointClosestTo);
-                    double y = mapViewParameters.viewY(point) - mapViewParameters.viewY(webMercatorPointClosestTo);
-                    double distance = Math2.norm(x, y);
-                    if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
-                    else mousePositionOnRoute.set(Double.NaN);
-                }
-            }
-        });*/
-
         stackPane.setOnMouseMoved(mouse -> {
             if (routeBean.route() != null) {
-                PointWebMercator point = mapViewParametersP.get().pointAt(
-                        mouse.getX(), mouse.getY());
+                MapViewParameters mapViewParametersValue = mapViewParametersP.get();
+                PointWebMercator point = mapViewParametersValue.pointAt(mouse.getX(), mouse.getY());
                 PointCh pointCh = point.toPointCh();
                 if (pointCh == null) {
                     mousePositionOnRoute.set(Double.NaN);
                 } else {
                     RoutePoint pointClosestTo = routeBean.route().pointClosestTo(pointCh);
                     PointWebMercator webMercatorPointClosestTo = PointWebMercator.ofPointCh(pointClosestTo.point());
-                    double x = mapViewParametersP.get().viewX(point) - mapViewParametersP.get().viewX(webMercatorPointClosestTo);
-                    double y = mapViewParametersP.get().viewY(point) - mapViewParametersP.get().viewY(webMercatorPointClosestTo);
+                    double x = mapViewParametersValue.viewX(point)
+                            - mapViewParametersValue.viewX(webMercatorPointClosestTo);
+                    double y = mapViewParametersValue.viewY(point)
+                            - mapViewParametersValue.viewY(webMercatorPointClosestTo);
                     double distance = Math2.norm(x, y);
-                    if (distance <= 15) mousePositionOnRoute.set(pointClosestTo.position());
+                    if (distance <= MAXIMAL_DISTANCE) mousePositionOnRoute.set(pointClosestTo.position());
                     else mousePositionOnRoute.set(Double.NaN);
                 }
             }

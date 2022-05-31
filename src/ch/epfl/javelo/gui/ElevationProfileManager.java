@@ -57,7 +57,8 @@ public final class ElevationProfileManager {
      * @param elevationProfile the elevation profile
      * @param highlightedPosition the highlighted position
      */
-    public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile, ReadOnlyDoubleProperty highlightedPosition) {
+    public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile,
+                                   ReadOnlyDoubleProperty highlightedPosition) {
         this.elevationProfile = elevationProfile;
         this.highlightedPosition = highlightedPosition;
 
@@ -91,7 +92,8 @@ public final class ElevationProfileManager {
 
             scaleToWorldAffine.prependScale(
                     elevationProfile.get().length() / rectangle.get().getWidth(),
-                    -(elevationProfile.get().maxElevation() - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
+                    -(elevationProfile.get().maxElevation()
+                            - elevationProfile.get().minElevation()) / rectangle.get().getHeight());
 
             scaleToWorldAffine.prependTranslation(0, elevationProfile.get().maxElevation());
 
@@ -145,7 +147,8 @@ public final class ElevationProfileManager {
     private void lineBindings() {
         if(worldToScreen.get() != null) {
             line.layoutXProperty().bind(
-                    Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0).getX(), highlightedPosition, worldToScreen));
+                    Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0)
+                            .getX(), highlightedPosition, worldToScreen));
             line.startYProperty().bind(Bindings.select(rectangle, "minY"));
 
             line.endYProperty().bind(Bindings.select(rectangle, "maxY"));
@@ -317,7 +320,8 @@ public final class ElevationProfileManager {
             String text = String.format(Locale.ROOT, "Longueur : %.1f km" +
                             "     Montée : %.0f m" +
                             "     Descente : %.0f m" +
-                            "     Altitude : de %.0f m à %.0f m", elevationProfileAttribute.length() / NB_OF_METERS_PER_KM,
+                            "     Altitude : de %.0f m à %.0f m",
+                    elevationProfileAttribute.length() / NB_OF_METERS_PER_KM,
                     elevationProfileAttribute.totalAscent(), elevationProfileAttribute.totalDescent(),
                     elevationProfileAttribute.minElevation(), elevationProfileAttribute.maxElevation());
             Text stats = new Text(text);
