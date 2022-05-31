@@ -107,7 +107,7 @@ public class GpxGenerator {
     }
 
     /**
-     * takes as arguments a file name, a route and the profile of this route and writes
+     * Takes as arguments a file name, a route and the profile of this route and writes
      * the corresponding GPX document to the file
      * @param fileName the name you want for the file
      * @param route the route for the file

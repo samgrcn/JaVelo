@@ -19,8 +19,8 @@ import java.util.Map;
  */
 public final class RouteBean {
 
-    private final static double MAX_STEP_LENGTH = 5d;
-    private final static double INITIAL_HIGHLIGHTED_POSITION = 1000d;
+    private final static double MAX_STEP_LENGTH = 5;
+    private final static double INITIAL_HIGHLIGHTED_POSITION = 1000;
 
     private final RouteComputer routePlanner;
     private final ObservableList<Waypoint> waypoints = FXCollections.observableArrayList();
