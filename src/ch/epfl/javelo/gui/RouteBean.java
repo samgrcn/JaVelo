@@ -127,9 +127,11 @@ public final class RouteBean {
             fromNode = waypoints.get(i).closestNodeId();
             toNode = waypoints.get(i + 1).closestNodeId();
             if (fromNode == toNode) continue;
+
             Pair<Integer, Integer> key = new Pair<>(fromNode, toNode);
-            if (bestRoute.containsKey(key)) {
-                routes.add(bestRoute.get(key));
+            Route bestRouteFor = bestRoute.get(key);
+            if (bestRouteFor != null) {
+                routes.add(bestRouteFor);
             } else {
                 Route route = routePlanner.bestRouteBetween(fromNode, toNode);
                 if (route == null) {
@@ -140,6 +142,7 @@ public final class RouteBean {
                 bestRoute.put(key, route);
             }
         }
+
         if (routes.size() == 0) noRoute();
         else {
             route.set(new MultiRoute(routes));

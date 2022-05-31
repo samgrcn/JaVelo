@@ -195,7 +195,7 @@ public class WaypointsManager {
         int closestNode;
         try {
             point = this.parameters.get().pointAt(x, y).toPointCh();
-            closestNode = graph.nodeClosestTo(point, 500);
+            closestNode = graph.nodeClosestTo(point, SEARCH_DISTANCE);
         } catch (NullPointerException ignored) {
             errorConsumer.accept("Aucune route à proximité !");
             return;
