@@ -119,7 +119,7 @@ public class WaypointsManager {
                 PointCh newPoint = this.parameters.get().pointAt(newX, newY).toPointCh();
                 int closestNode = graph.nodeClosestTo(newPoint, SEARCH_DISTANCE);
 
-                if (closestNode == -1) {
+                if (closestNode == NO_NODE) {
                     errorConsumer.accept("Aucune route à proximité !");
                     pins.setLayoutX(pointer.get().getX());
                     pins.setLayoutY(pointer.get().getY());
