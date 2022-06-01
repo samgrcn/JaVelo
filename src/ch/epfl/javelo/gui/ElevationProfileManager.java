@@ -157,34 +157,27 @@ public final class ElevationProfileManager {
     }
 
     /**
+     * Private method to update the profile
+     */
+    private void update() {
+        if (elevationProfile.get() != null) {
+            updateRectangle();
+            transformManager();
+            polygonCreator();
+            gridManager();
+        }
+    }
+
+    /**
      * Adds the listeners for the pane and the profile, updating the profile when they change.
      */
     private void addListeners() {
-        centerPane.widthProperty().addListener((p, oldS, newS) -> {
-            if (elevationProfile.get() != null) {
-                updateRectangle();
-                transformManager();
-                polygonCreator();
-                gridManager();
-            }
-        });
+        centerPane.widthProperty().addListener((p, oldS, newS) -> update());
 
-        centerPane.heightProperty().addListener((p, oldS, newS) -> {
-            if (elevationProfile.get() != null) {
-                updateRectangle();
-                transformManager();
-                polygonCreator();
-                gridManager();
-            }
-        });
+        centerPane.heightProperty().addListener((p, oldS, newS) -> update());
 
         elevationProfile.addListener((e, oldV, newV) -> {
-            if(elevationProfile.get() != null) {
-                updateRectangle();
-                transformManager();
-                polygonCreator();
-                gridManager();
-            }
+            update();
             if(oldV == null && newV != null) { lineBindings(); }
             if(oldV != newV) { stats(); }
         });
