@@ -1,6 +1,5 @@
 package ch.epfl.javelo.gui;
 
-import ch.epfl.javelo.MemoryCacheHashMap;
 import ch.epfl.javelo.routing.*;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
@@ -9,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,13 +21,21 @@ public final class RouteBean {
 
     private final static double MAX_STEP_LENGTH = 5;
     private final static double INITIAL_HIGHLIGHTED_POSITION = 1000;
+    private static final int MAX_ENTRIES = 50;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final boolean ACCESS_ORDER = true;
 
     private final RouteComputer routePlanner;
     private final ObservableList<Waypoint> waypoints = FXCollections.observableArrayList();
     private final ObjectProperty<Route> route = new SimpleObjectProperty<>();
     private final DoubleProperty highlightedPosition = new SimpleDoubleProperty(INITIAL_HIGHLIGHTED_POSITION);
     private final ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
-    private final Map<Pair<Integer, Integer>, Route> bestRoute = new MemoryCacheHashMap<>();
+    private final Map<Pair<Integer, Integer>, Route> bestRoute = new LinkedHashMap<>(MAX_ENTRIES, LOAD_FACTOR, ACCESS_ORDER) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > MAX_ENTRIES;
+        }
+    };
 
     /**
      * @param routePlanner the route planner of type RouteComputer

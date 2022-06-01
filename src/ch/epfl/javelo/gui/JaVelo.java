@@ -20,7 +20,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
 /**
- * JaVelo is the main class of the application
+ * JaVelo is the main class of the application.
  *
  * @author Samuel Garcin (345633)
  */
@@ -28,11 +28,12 @@ public final class JaVelo extends Application {
 
     private static final int PREF_WIDTH = 800;
     private static final int PREF_HEIGHT = 600;
-    public JaVelo() {
-    }
+
+    public JaVelo() {}
 
     /**
-     * Main method
+     * Main method.
+     *
      * @param args the program arguments
      */
     public static void main(String[] args) {
@@ -41,6 +42,7 @@ public final class JaVelo extends Application {
 
     /**
      * Builds the final GUI by combining the parts managed by the previously written classes and adding a menu.
+     *
      * @param primaryStage the primary stage
      * @throws IOException in case of an input/output error
      */
@@ -112,11 +114,14 @@ public final class JaVelo extends Application {
         show(primaryStage, borderPane);
     }
 
+    /**
+     * Shows the given primary stage and pane.
+     *
+     * @param primaryStage the primary stage
+     * @param pane the pane to show
+     */
     private void show(Stage primaryStage, Pane pane) {
         primaryStage.setScene(new Scene(pane));
         primaryStage.show();
     }
-
-
-
 }

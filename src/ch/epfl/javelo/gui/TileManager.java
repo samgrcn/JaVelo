@@ -1,6 +1,5 @@
 package ch.epfl.javelo.gui;
 
-import ch.epfl.javelo.MemoryCacheHashMap;
 import ch.epfl.javelo.Preconditions;
 
 import java.io.*;
@@ -10,8 +9,8 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import javafx.scene.image.Image;
 
@@ -22,10 +21,19 @@ import javafx.scene.image.Image;
  */
 public final class TileManager {
 
+    private static final int POWER_TWO_BIT_SHIFT = 1;
+    private static final int MAX_ENTRIES = 100;
+    private static final float LOAD_FACTOR = 0.75f;
+    private static final boolean ACCESS_ORDER = true;
+
     private final Path path;
     private final String name;
-    private final Map<TileId, Image> tiles = new MemoryCacheHashMap<>();
-    private static final int POWER_TWO_BIT_SHIFT = 1;
+    private final Map<TileId, Image> tiles = new LinkedHashMap<>(MAX_ENTRIES, LOAD_FACTOR, ACCESS_ORDER) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > MAX_ENTRIES;
+        }
+    };
 
     /**
      * @param path the path to the directory containing the disk cache
