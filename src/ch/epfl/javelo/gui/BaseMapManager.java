@@ -59,7 +59,7 @@ public final class BaseMapManager {
 
     /**
      * Private method that redraws only the tiles required in the range of the pane.
-     * @throws IOException ignored exception in case of an IOException
+     * May throw an IOException that is ignored.
      */
     private void redrawIfNeeded() {
         if (!redrawNeeded) return;
@@ -140,20 +140,18 @@ public final class BaseMapManager {
             }
         });
 
-        pane.setOnMousePressed(press -> {
-            point2d.set(new Point2D(press.getX(), press.getY()));
-        });
+        pane.setOnMousePressed(press -> point2d.set(new Point2D(press.getX(), press.getY())));
 
 
         pane.setOnMouseDragged(drag -> {
-            double oldX = point2d.get().getX();
-            double oldY = point2d.get().getY();
-            point2d.set(new Point2D(drag.getX(), drag.getY()));
-            parameters.set(new MapViewParameters(parameters.get().zoomAt(),
-                    parameters.get().topLeft().getX() + (oldX - point2d.get().getX()),
-                    parameters.get().topLeft().getY() + (oldY - point2d.get().getY())));
-        });
+                    double oldX = point2d.get().getX();
+                    double oldY = point2d.get().getY();
+                    point2d.set(new Point2D(drag.getX(), drag.getY()));
+                    parameters.set(parameters.get().withMinXY(
+                            parameters.get().topLeft().getX() + (oldX - point2d.get().getX()),
+                            parameters.get().topLeft().getY() + (oldY - point2d.get().getY())));
 
+                });
 
         pane.setOnMouseClicked(click -> {
             if (click.isStillSincePress()) {

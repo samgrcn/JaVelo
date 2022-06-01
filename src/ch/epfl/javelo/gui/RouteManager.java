@@ -54,9 +54,7 @@ public final class RouteManager {
         pane.getChildren().add(polyline);
         pane.getChildren().add(disk);
 
-        bean.highlightedPositionProperty().addListener((change, oldV, newV) -> {
-            setDisk();
-        });
+        bean.highlightedPositionProperty().addListener((change, oldV, newV) -> setDisk());
 
         parameters.addListener((change, oldV, newV) -> {
             route = bean.route();

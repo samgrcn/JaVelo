@@ -78,7 +78,8 @@ public final class ElevationProfileManager {
     }
 
     /**
-     *
+     * Manages the two transform screenToWorld and worldToScreen, allowing to convert coordinates from
+     * a system to another
      */
     private void transformManager() {
         if (elevationProfile.get() != null) {
