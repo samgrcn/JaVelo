@@ -68,6 +68,8 @@ public final class JaVelo extends Application {
         menu.getItems().add(menuItem);
         menuBar.setUseSystemMenuBar(true);
 
+        menuItem.setDisable(true);
+
         menuItem.setOnAction(click -> {
             try {
                 GpxGenerator.writeGpx("javelo.gpx", routeBean.route(), routeBean.elevationProfile());
@@ -95,9 +97,11 @@ public final class JaVelo extends Application {
 
         routeBean.elevationProfileProperty().addListener((e, oldValue, newValue) -> {
             if (oldValue == null && newValue != null) {
+                menuItem.setDisable(false);
                 splitPane.getItems().add(profileManager.pane());
             }
             if (oldValue != null && newValue == null) {
+                menuItem.setDisable(true);
                 splitPane.getItems().remove(profileManager.pane());
             }
         });

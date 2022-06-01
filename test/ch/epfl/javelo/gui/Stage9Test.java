@@ -53,6 +53,7 @@ public final class Stage9Test extends Application {
                         waypointsManager,
                         mapViewParametersP);
 
+
         StackPane mainPane =
                 new StackPane(baseMapManager.pane(),
                         waypointsManager.pane());
