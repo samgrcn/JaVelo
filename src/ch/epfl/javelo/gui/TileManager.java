@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import javafx.scene.image.Image;
 

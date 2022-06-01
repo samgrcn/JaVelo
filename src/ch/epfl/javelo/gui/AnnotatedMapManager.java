@@ -70,9 +70,7 @@ public final class AnnotatedMapManager {
             }
         });
 
-        stackPane.setOnMouseExited(mouse -> {
-            mousePositionOnRoute.set(Double.NaN);
-        });
+        stackPane.setOnMouseExited(mouse -> mousePositionOnRoute.set(Double.NaN));
     }
 
     /**
