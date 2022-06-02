@@ -20,6 +20,7 @@ import java.io.IOException;
  */
 public final class BaseMapManager {
 
+    private static final int NO_ZOOM = 0;
     private static final int MIN_ZOOM = 8;
     private static final int MAX_ZOOM = 19;
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
@@ -117,7 +118,6 @@ public final class BaseMapManager {
 
         pane.getChildren().add(canvas);
         pane.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
-
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
     }
@@ -129,7 +129,7 @@ public final class BaseMapManager {
 
         SimpleLongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {
-            if (e.getDeltaY() == 0d) return;
+            if (e.getDeltaY() == NO_ZOOM) return;
             long currentTime = System.currentTimeMillis();
             if (currentTime < minScrollTime.get()) return;
             minScrollTime.set(currentTime + MIN_SCROLL_TIME);
