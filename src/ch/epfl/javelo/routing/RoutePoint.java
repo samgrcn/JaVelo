@@ -40,8 +40,8 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
      * Returns this if its distance to the reference is less than or equal to thatDistanceToReference,
      * and a new instance of RoutePoint whose attributes are the arguments passed to min otherwise.
      *
-     * @param thatPoint another route point
-     * @param thatPosition new position
+     * @param thatPoint               another route point
+     * @param thatPosition            new position
      * @param thatDistanceToReference the distance to compare
      * @return this or a new route point
      */

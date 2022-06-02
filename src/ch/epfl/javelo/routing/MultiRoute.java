@@ -71,7 +71,9 @@ public class MultiRoute implements Route {
      * @return the length
      */
     @Override
-    public double length() { return route[route.length - 1]; }
+    public double length() {
+        return route[route.length - 1];
+    }
 
     /**
      * Returns all the edges of the route.
@@ -79,7 +81,9 @@ public class MultiRoute implements Route {
      * @return all the edges
      */
     @Override
-    public List<Edge> edges() { return List.copyOf(edges); }
+    public List<Edge> edges() {
+        return List.copyOf(edges);
+    }
 
     /**
      * Returns all the points located at the ends of the edges of the route.

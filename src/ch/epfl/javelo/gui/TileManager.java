@@ -51,7 +51,7 @@ public final class TileManager {
      * @param tileId the tile identity
      * @return the image of the tile
      * @throws IOException signals that an I/O exception of some sort has occurred
-     * while creating a folder or by transferring the flow
+     *                     while creating a folder or by transferring the flow
      */
     public Image imageForTileAt(TileId tileId) throws IOException {
         Preconditions.checkArgument(TileId.isValid(tileId.zoomAt, tileId.x, tileId.y));
@@ -101,6 +101,7 @@ public final class TileManager {
 
     /**
      * Download the tile from the server and return an input flow.
+     *
      * @param tileId the tile identity
      * @return the image input flow
      * @throws IOException signals that an I/O exception to some sort has occurred
@@ -121,7 +122,7 @@ public final class TileManager {
 
         /**
          * @throws IllegalArgumentException if the zoom is negative, x or y is negative or x or y is greater than
-         * two power the zoom
+         *                                  two power the zoom
          */
         public TileId {
             Preconditions.checkArgument(isValid(zoomAt, x, y));
@@ -130,9 +131,10 @@ public final class TileManager {
         /**
          * Takes as argument three attributes (zoom and X/Y index) and returns true if - and only if -
          * they constitute a valid tile identity.
+         *
          * @param zoomAt the zoom
-         * @param x the x-coordinate
-         * @param y the y-coordinate
+         * @param x      the x-coordinate
+         * @param y      the y-coordinate
          * @return true or false
          */
         public static boolean isValid(int zoomAt, int x, int y) {

@@ -29,7 +29,7 @@ public final class RouteManager {
     private Route route;
 
     /**
-     * @param bean the route bean
+     * @param bean       the route bean
      * @param parameters a JavaFX property, read-only, containing the parameters of the displayed map
      */
     public RouteManager(RouteBean bean, ObjectProperty<MapViewParameters> parameters) {

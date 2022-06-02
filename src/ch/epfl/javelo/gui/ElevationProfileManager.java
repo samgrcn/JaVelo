@@ -54,7 +54,7 @@ public final class ElevationProfileManager {
 
 
     /**
-     * @param elevationProfile the elevation profile
+     * @param elevationProfile    the elevation profile
      * @param highlightedPosition the highlighted position
      */
     public ElevationProfileManager(ReadOnlyObjectProperty<ElevationProfile> elevationProfile,
@@ -146,7 +146,7 @@ public final class ElevationProfileManager {
      * Creates the bindings of the vertical line, so it moves with the mouse if it's on the rectangle.
      */
     private void lineBindings() {
-        if(worldToScreen.get() != null) {
+        if (worldToScreen.get() != null) {
             line.layoutXProperty().bind(
                     Bindings.createDoubleBinding(() -> worldToScreen.get().transform(highlightedPosition.get(), 0)
                             .getX(), highlightedPosition, worldToScreen));
@@ -179,8 +179,12 @@ public final class ElevationProfileManager {
 
         elevationProfile.addListener((e, oldV, newV) -> {
             update();
-            if(oldV == null && newV != null) { lineBindings(); }
-            if(oldV != newV) { stats(); }
+            if (oldV == null && newV != null) {
+                lineBindings();
+            }
+            if (oldV != newV) {
+                stats();
+            }
         });
 
     }
@@ -271,9 +275,9 @@ public final class ElevationProfileManager {
      * Sets all elevation tags. Called by the grid manager.
      *
      * @param firstStepEle the first elevation step value
-     * @param index the index
-     * @param eleDiff the elevation difference between steps
-     * @param y the y-coordinate
+     * @param index        the index
+     * @param eleDiff      the elevation difference between steps
+     * @param y            the y-coordinate
      */
     private void setTagEle(int firstStepEle, int index, int eleDiff, double y) {
         Text tag = new Text(String.valueOf(firstStepEle + index * eleDiff));
@@ -289,9 +293,9 @@ public final class ElevationProfileManager {
     /**
      * Sets all position tags. Called by the grid manager.
      *
-     * @param index the index
+     * @param index   the index
      * @param posDiff the position difference between steps
-     * @param x the x-coordinate
+     * @param x       the x-coordinate
      */
     private void setTagPos(int index, int posDiff, double x) {
         Text tag = new Text(String.valueOf((index * posDiff) / NB_OF_METERS_PER_KM));

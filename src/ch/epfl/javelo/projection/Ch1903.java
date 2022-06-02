@@ -6,7 +6,8 @@ package ch.epfl.javelo.projection;
  * @author Quentin Chappuis (339517)
  */
 public final class Ch1903 {
-    private Ch1903() {}
+    private Ch1903() {
+    }
 
     /**
      * Returns the E (east) coordinate of the longitude lon and latitude lat point in the WGS84 system.

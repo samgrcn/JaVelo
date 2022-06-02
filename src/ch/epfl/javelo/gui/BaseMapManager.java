@@ -39,9 +39,10 @@ public final class BaseMapManager {
 
     /**
      * Constructor for BaseMapManager
-     * @param tileManager the tile manager
+     *
+     * @param tileManager      the tile manager
      * @param waypointsManager the waypoint manager
-     * @param parameters the map view parameters (in a property)
+     * @param parameters       the map view parameters (in a property)
      */
     public BaseMapManager(TileManager tileManager, WaypointsManager waypointsManager, ObjectProperty<MapViewParameters> parameters) {
 
@@ -119,8 +120,6 @@ public final class BaseMapManager {
 
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
-
-        pane.setPickOnBounds(false);
     }
 
     /**
@@ -152,14 +151,14 @@ public final class BaseMapManager {
 
 
         pane.setOnMouseDragged(drag -> {
-                    double oldX = point2d.get().getX();
-                    double oldY = point2d.get().getY();
-                    point2d.set(new Point2D(drag.getX(), drag.getY()));
-                    parameters.set(parameters.get().withMinXY(
-                            parameters.get().topLeft().getX() + (oldX - point2d.get().getX()),
-                            parameters.get().topLeft().getY() + (oldY - point2d.get().getY())));
+            double oldX = point2d.get().getX();
+            double oldY = point2d.get().getY();
+            point2d.set(new Point2D(drag.getX(), drag.getY()));
+            parameters.set(parameters.get().withMinXY(
+                    parameters.get().topLeft().getX() + (oldX - point2d.get().getX()),
+                    parameters.get().topLeft().getY() + (oldY - point2d.get().getY())));
 
-                });
+        });
 
         pane.setOnMouseClicked(click -> {
             if (click.isStillSincePress()) {

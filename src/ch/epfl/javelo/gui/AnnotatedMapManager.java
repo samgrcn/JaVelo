@@ -30,9 +30,9 @@ public final class AnnotatedMapManager {
     private final DoubleProperty mousePositionOnRoute = new SimpleDoubleProperty();
 
     /**
-     * @param graph the road network graph
-     * @param tileManager the OpenStreetMap tile manager
-     * @param routeBean the route bean
+     * @param graph         the road network graph
+     * @param tileManager   the OpenStreetMap tile manager
+     * @param routeBean     the route bean
      * @param errorConsumer an "error consumer" to report an error
      */
     public AnnotatedMapManager(Graph graph, TileManager tileManager, RouteBean routeBean,

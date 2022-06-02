@@ -7,7 +7,8 @@ package ch.epfl.javelo;
  */
 public final class Bits {
 
-    private Bits() {}
+    private Bits() {
+    }
 
     /**
      * Extracts from the 32-bit value vector the length bit range starting at the start index bit, which it interprets as a two's complement signed value.

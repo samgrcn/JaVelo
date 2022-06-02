@@ -9,7 +9,8 @@ public final class Q28_4 {
 
     private final static int NUMBER_OF_DECIMAL_BITS = 4;
 
-    private Q28_4(){}
+    private Q28_4() {
+    }
 
     /**
      * Returns the value Q28.4 corresponding to the given integer.
