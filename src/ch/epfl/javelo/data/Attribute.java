@@ -2,6 +2,9 @@ package ch.epfl.javelo.data;
 
 import java.util.List;
 
+/**
+ * Attribute is an enum for the different attribute possible for a road.
+ */
 public enum Attribute {
     // See https://wiki.openstreetmap.org/wiki/Map_features
     // and https://taginfo.openstreetmap.ch/

@@ -1,6 +1,5 @@
 package ch.epfl.javelo.gui;
 
-
 import ch.epfl.javelo.Math2;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
