@@ -4,7 +4,9 @@ import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -31,13 +33,16 @@ public class WaypointsManager {
     private final Graph graph;
     private final Consumer<String> errorConsumer;
     private final List<Group> pinsList = new ArrayList<>();
+    private final DoubleProperty differenceX = new SimpleDoubleProperty();
+    private final DoubleProperty differenceY = new SimpleDoubleProperty();
 
 
     /**
      * Creates the waypoints manager and its listeners.
-     * @param graph the graph of the area
-     * @param parameters the map parameters
-     * @param waypoints the list of waypoints
+     *
+     * @param graph         the graph of the area
+     * @param parameters    the map parameters
+     * @param waypoints     the list of waypoints
      * @param errorConsumer the error consumer
      */
     public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters,
@@ -49,7 +54,7 @@ public class WaypointsManager {
 
         this.errorConsumer = errorConsumer;
 
-        pane.setPrefSize(PREF_WIDTH,PREF_HEIGHT);
+        pane.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
         pane.setPickOnBounds(false);
 
         listIterator();
@@ -60,14 +65,38 @@ public class WaypointsManager {
 
     }
 
+    public void addWaypoint(double x, double y) {
+        PointCh point;
+        int closestNode;
+        try {
+            point = this.parameters.get().pointAt(x, y).toPointCh();
+            closestNode = graph.nodeClosestTo(point, SEARCH_DISTANCE);
+        } catch (NullPointerException ignored) {
+            errorConsumer.accept(NO_ROAD_NEARBY);
+            return;
+        }
+        if (closestNode == NO_NODE) {
+            errorConsumer.accept(NO_ROAD_NEARBY);
+            return;
+        }
+        waypoints.add(new Waypoint(point, closestNode));
+    }
+
+    /**
+     * @return the pane containing the waypoints.
+     */
+    public Pane pane() {
+        return pane;
+    }
 
     /**
      * Private method that handles one point. It sets up its javaFX and add its listeners including the addition
      * drag and removal.
-     * @param status String for the style class: "first" if it's the first point of the route,
-     *               "last" if it's the last and else "middle"
-     * @param x x coordinates
-     * @param y y coordinates
+     *
+     * @param status      String for the style class: "first" if it's the first point of the route,
+     *                    "last" if it's the last and else "middle"
+     * @param x           x coordinates
+     * @param y           y coordinates
      * @param indexInList the index of the pin in the list of all pins
      */
     private void waypointCreator(String status, double x, double y, int indexInList) {
@@ -97,17 +126,17 @@ public class WaypointsManager {
         pins.setOnMousePressed(press -> {
             mousePosition.set(new Point2D(press.getSceneX(), press.getSceneY()));
             pointer.set(new Point2D(pins.getLayoutX(), pins.getLayoutY()));
+            differenceX.set(mousePosition.get().getX() - pointer.get().getX());
+            differenceY.set(mousePosition.get().getY() - pointer.get().getY());
         });
 
         pins.setOnMouseDragged(drag -> {
+            pins.setLayoutX(drag.getSceneX() - differenceX.get());
+            pins.setLayoutY(drag.getSceneY() - differenceY.get());
+        });
 
-            double differenceX = mousePosition.get().getX() - pointer.get().getX();
-            double differenceY = mousePosition.get().getY() - pointer.get().getY();
-            pins.setLayoutX(drag.getSceneX() - differenceX);
-            pins.setLayoutY(drag.getSceneY() - differenceY);
-
-            pins.setOnMouseReleased(release -> {
-
+        pins.setOnMouseReleased(release -> {
+            if (!release.isStillSincePress()) {
                 try {
                     this.parameters.get().pointAt(release.getX(), release.getY()).toPointCh();
                 } catch (NullPointerException ignored) {
@@ -116,8 +145,8 @@ public class WaypointsManager {
                     pins.setLayoutY(pointer.get().getY());
                 }
 
-                double newX = release.getSceneX() - differenceX;
-                double newY = release.getSceneY() - differenceY;
+                double newX = release.getSceneX() - differenceX.get();
+                double newY = release.getSceneY() - differenceY.get();
 
                 PointCh newPoint = this.parameters.get().pointAt(newX, newY).toPointCh();
                 int closestNode = graph.nodeClosestTo(newPoint, SEARCH_DISTANCE);
@@ -132,8 +161,7 @@ public class WaypointsManager {
                 pointer.set(new Point2D(newX, newY));
                 Waypoint newWaypoint = new Waypoint(newPoint, closestNode);
                 waypoints.set(indexInList, newWaypoint);
-
-            });
+            }
         });
 
         pins.setOnMouseClicked(click -> {
@@ -186,34 +214,10 @@ public class WaypointsManager {
 
     /**
      * Removes a waypoint from the list.
+     *
      * @param indexInList the index of the waypoint in the list
      */
     private void remove(int indexInList) {
         waypoints.remove(indexInList);
-    }
-
-
-    public void addWaypoint(double x, double y) {
-        PointCh point;
-        int closestNode;
-        try {
-            point = this.parameters.get().pointAt(x, y).toPointCh();
-            closestNode = graph.nodeClosestTo(point, SEARCH_DISTANCE);
-        } catch (NullPointerException ignored) {
-            errorConsumer.accept(NO_ROAD_NEARBY);
-            return;
-        }
-        if (closestNode == NO_NODE) {
-            errorConsumer.accept(NO_ROAD_NEARBY);
-            return;
-        }
-        waypoints.add(new Waypoint(point, closestNode));
-    }
-
-    /**
-     * @return the pane containing the waypoints.
-     */
-    public Pane pane() {
-        return pane;
     }
 }

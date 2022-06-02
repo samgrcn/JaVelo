@@ -69,7 +69,7 @@ public final class ElevationProfileComputer {
             if (i == 0) {
                 Arrays.fill(elevationSamples, 0, samplesNumber, 0);
             }
-            if(j == 0) {
+            if (j == 0) {
                 Arrays.fill(elevationSamples, 1, samplesNumber, elevationSamples[1]);
             }
             //only if some of the first values are NaN, but not the entire array
@@ -125,7 +125,7 @@ public final class ElevationProfileComputer {
     public static ElevationProfile elevationProfile(Route route, double maxStepLength) {
 
         Preconditions.checkArgument(maxStepLength > 0);
-        if(route != null) {
+        if (route != null) {
             int samplesNumber = (int) Math.ceil(route.length() / maxStepLength) + 1;
             float[] elevationSamples = new float[samplesNumber];
 

@@ -6,7 +6,8 @@ package ch.epfl.javelo;
  * @author Samuel Garcin (345633)
  */
 public final class Preconditions {
-    private Preconditions() {}
+    private Preconditions() {
+    }
 
     /**
      * Throws the IllegalArgumentException if its argument is false, and does nothing otherwise.

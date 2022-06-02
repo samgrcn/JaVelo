@@ -49,7 +49,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return the integer of his N coordinates for the given node, in Q28_4 representation.
      */
     public double nodeN(int nodeId) {
-        return buffer.capacity() == 0 ? 0 :  Q28_4.asDouble(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_N));
+        return buffer.capacity() == 0 ? 0 : Q28_4.asDouble(buffer.get(nodeId * NUMBER_PER_NODE + OFFSET_N));
     }
 
     /**

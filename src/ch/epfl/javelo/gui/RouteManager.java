@@ -29,7 +29,7 @@ public final class RouteManager {
     private Route route;
 
     /**
-     * @param bean the route bean
+     * @param bean       the route bean
      * @param parameters a JavaFX property, read-only, containing the parameters of the displayed map
      */
     public RouteManager(RouteBean bean, ObjectProperty<MapViewParameters> parameters) {
@@ -37,6 +37,15 @@ public final class RouteManager {
         this.parameters = parameters;
 
         init();
+    }
+
+    /**
+     * Returns the JavaFX panel containing the route line and the highlighting disk.
+     *
+     * @return the JavaFX panel
+     */
+    public Pane pane() {
+        return pane;
     }
 
     /**
@@ -79,14 +88,6 @@ public final class RouteManager {
         });
     }
 
-    /**
-     * Returns the JavaFX panel containing the route line and the highlighting disk.
-     *
-     * @return the JavaFX panel
-     */
-    public Pane pane() {
-        return pane;
-    }
 
     /**
      * Sets the disk over the route when necessary.

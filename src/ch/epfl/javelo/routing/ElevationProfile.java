@@ -2,7 +2,6 @@ package ch.epfl.javelo.routing;
 
 import ch.epfl.javelo.Functions;
 
-import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.function.DoubleUnaryOperator;
 
@@ -14,7 +13,6 @@ import java.util.function.DoubleUnaryOperator;
 public final class ElevationProfile {
 
     private final double length;
-    private final float[] elevationSamples;
     private final DoubleUnaryOperator function;
     private final double totalAscent;
     private final double totalDescent;
@@ -33,7 +31,6 @@ public final class ElevationProfile {
     public ElevationProfile(double length, float[] elevationSamples) {
         this.function = Functions.sampled(elevationSamples, length);
         this.length = length;
-        this.elevationSamples = Arrays.copyOf(elevationSamples, elevationSamples.length);
 
         double totalAscent = 0;
         double totalDescent = 0;
@@ -60,7 +57,7 @@ public final class ElevationProfile {
 
     /**
      * Private method to give the statistics of the array using DoubleSummaryStatistics, in order to either get
-     * the minimum or the maximum of the array..
+     * the minimum or the maximum of the array.
      *
      * @param elevationSamples given array
      * @return the statistics of the array
@@ -120,4 +117,5 @@ public final class ElevationProfile {
     public double elevationAt(double position) {
         return function.applyAsDouble(position);
     }
+
 }

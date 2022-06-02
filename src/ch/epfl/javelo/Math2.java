@@ -8,7 +8,8 @@ import static java.lang.Math.*;
  * @author Quentin Chappuis (339517)
  */
 public final class Math2 {
-    private Math2() {}
+    private Math2() {
+    }
 
     /**
      * Returns the excess integer part of the division of x by y, or raises IllegalArgumentException if x is negative or if y is negative or zero.
