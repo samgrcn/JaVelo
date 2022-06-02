@@ -60,7 +60,8 @@ public final class JaVelo extends Application {
         RouteBean routeBean = new RouteBean(routeComputer);
         ErrorManager errorManager = new ErrorManager();
 
-        AnnotatedMapManager stackMap = new AnnotatedMapManager(graph, tileManager, routeBean, errorManager::displayError);
+        AnnotatedMapManager stackMap = new AnnotatedMapManager(graph, tileManager,
+                routeBean, errorManager::displayError);
 
 
         MenuBar menuBar = new MenuBar();

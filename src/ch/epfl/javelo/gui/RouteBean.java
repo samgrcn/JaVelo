@@ -30,7 +30,8 @@ public final class RouteBean {
     private final ObjectProperty<Route> route = new SimpleObjectProperty<>();
     private final DoubleProperty highlightedPosition = new SimpleDoubleProperty(INITIAL_HIGHLIGHTED_POSITION);
     private final ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
-    private final Map<Pair<Integer, Integer>, Route> bestRoute = new LinkedHashMap<>(MAX_ENTRIES, LOAD_FACTOR, ACCESS_ORDER) {
+    private final Map<Pair<Integer, Integer>, Route> bestRoute = new LinkedHashMap<>(MAX_ENTRIES,
+            LOAD_FACTOR, ACCESS_ORDER) {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
             return size() > MAX_ENTRIES;
