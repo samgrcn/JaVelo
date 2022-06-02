@@ -40,6 +40,15 @@ public final class RouteManager {
     }
 
     /**
+     * Returns the JavaFX panel containing the route line and the highlighting disk.
+     *
+     * @return the JavaFX panel
+     */
+    public Pane pane() {
+        return pane;
+    }
+
+    /**
      * Initialization of all components and listeners. Called in the constructor.
      */
     private void init() {
@@ -79,14 +88,6 @@ public final class RouteManager {
         });
     }
 
-    /**
-     * Returns the JavaFX panel containing the route line and the highlighting disk.
-     *
-     * @return the JavaFX panel
-     */
-    public Pane pane() {
-        return pane;
-    }
 
     /**
      * Sets the disk over the route when necessary.

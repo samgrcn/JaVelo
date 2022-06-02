@@ -20,21 +20,22 @@ import java.io.IOException;
  */
 public final class BaseMapManager {
 
-    private final WaypointsManager waypointsManager;
-    private final Pane pane;
-    private final Canvas canvas;
-    private final GraphicsContext graphicsContext;
-    private final TileManager tileManager;
-    private final ObjectProperty<MapViewParameters> parameters;
-    private boolean redrawNeeded;
-    private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
-
     private static final int MIN_ZOOM = 8;
     private static final int MAX_ZOOM = 19;
     private static final int TILE_WIDTH_AND_HEIGHT = 256;
     private static final int PREF_WIDTH = 600;
     private static final int PREF_HEIGHT = 300;
     private static final int MIN_SCROLL_TIME = 200;
+
+    private final WaypointsManager waypointsManager;
+    private final Pane pane;
+    private final Canvas canvas;
+    private final GraphicsContext graphicsContext;
+    private final TileManager tileManager;
+    private final ObjectProperty<MapViewParameters> parameters;
+    private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
+    private boolean redrawNeeded;
+
 
     /**
      * Constructor for BaseMapManager
@@ -55,6 +56,13 @@ public final class BaseMapManager {
 
         setupPaneAndCanvas();
         paneHandlersAndListeners();
+    }
+
+    /**
+     * @return the panel of the map.
+     */
+    public Pane pane() {
+        return pane;
     }
 
     /**
@@ -166,12 +174,6 @@ public final class BaseMapManager {
         });
     }
 
-    /**
-     * @return the pane of the base map.
-     */
-    public Pane pane() {
-        return pane;
-    }
 
 }
 
