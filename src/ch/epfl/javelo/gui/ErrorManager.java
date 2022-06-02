@@ -19,14 +19,14 @@ import java.awt.*;
  */
 public final class ErrorManager {
 
-    private final VBox vBox = new VBox();
-    private final Text text = new Text();
     public static final double MAX_FADE = 0.8;
     public static final double MIN_FADE = 0;
     public static final double DURATION_FIRST_FADE = 200;
     public static final double DURATION_SECOND_FADE = 500;
     public static final double DURATION_PAUSE = 2000;
 
+    private final VBox vBox = new VBox();
+    private final Text text = new Text();
 
     private final ObjectProperty<SequentialTransition> oldTransition = new SimpleObjectProperty<>();
 

@@ -25,6 +25,7 @@ public class WaypointsManager {
     private final static int NO_NODE = -1;
     private final static int PREF_WIDTH = 600;
     private final static int PREF_HEIGHT = 300;
+    private final static String NO_ROAD_NEARBY = "Aucune route à proximité !";
 
     private final Pane pane = new Pane();
     private final ObservableList<Waypoint> waypoints;
@@ -44,7 +45,8 @@ public class WaypointsManager {
      * @param waypoints     the list of waypoints
      * @param errorConsumer the error consumer
      */
-    public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters, ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
+    public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> parameters,
+                            ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
         this.waypoints = waypoints;
         this.parameters = parameters;
@@ -70,11 +72,11 @@ public class WaypointsManager {
             point = this.parameters.get().pointAt(x, y).toPointCh();
             closestNode = graph.nodeClosestTo(point, SEARCH_DISTANCE);
         } catch (NullPointerException ignored) {
-            errorConsumer.accept("Aucune route à proximité !");
+            errorConsumer.accept(NO_ROAD_NEARBY);
             return;
         }
         if (closestNode == NO_NODE) {
-            errorConsumer.accept("Aucune route à proximité !");
+            errorConsumer.accept(NO_ROAD_NEARBY);
             return;
         }
         waypoints.add(new Waypoint(point, closestNode));
@@ -138,7 +140,7 @@ public class WaypointsManager {
                 try {
                     this.parameters.get().pointAt(release.getX(), release.getY()).toPointCh();
                 } catch (NullPointerException ignored) {
-                    errorConsumer.accept("Aucune route à proximité !");
+                    errorConsumer.accept(NO_ROAD_NEARBY);
                     pins.setLayoutX(pointer.get().getX());
                     pins.setLayoutY(pointer.get().getY());
                 }
@@ -150,7 +152,7 @@ public class WaypointsManager {
                 int closestNode = graph.nodeClosestTo(newPoint, SEARCH_DISTANCE);
 
                 if (closestNode == NO_NODE) {
-                    errorConsumer.accept("Aucune route à proximité !");
+                    errorConsumer.accept(NO_ROAD_NEARBY);
                     pins.setLayoutX(pointer.get().getX());
                     pins.setLayoutY(pointer.get().getY());
                     return;
@@ -218,5 +220,4 @@ public class WaypointsManager {
     private void remove(int indexInList) {
         waypoints.remove(indexInList);
     }
-
 }
