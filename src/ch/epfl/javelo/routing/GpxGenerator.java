@@ -27,7 +27,7 @@ import java.util.Locale;
  *
  * @author Samuel Garcin (345633)
  */
-public class GpxGenerator {
+public final class GpxGenerator {
 
     private GpxGenerator() {} //non-instantiable
 

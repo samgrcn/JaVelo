@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class WaypointsManager {
+public final class WaypointsManager {
 
     private final static int SEARCH_DISTANCE = 500;
     private final static int NO_NODE = -1;

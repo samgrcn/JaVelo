@@ -10,13 +10,17 @@ import java.util.*;
  *
  * @author Samuel Garcin (345633)
  */
-public class RouteComputer {
+public final class RouteComputer {
 
+    private final static float NODE_EXPLORED = Float.NEGATIVE_INFINITY;
 
     private final Graph graph;
     private final CostFunction costFunction;
 
-
+    /**
+     * @param graph the graph
+     * @param costFunction the cost function
+     */
     public RouteComputer(Graph graph, CostFunction costFunction) {
         this.graph = graph;
         this.costFunction = costFunction;
@@ -26,7 +30,7 @@ public class RouteComputer {
      * Record used to store in the list exploration a WeightedNode, including an id of the node and its distance.
      * Is defined outside bestRouteBetween, in order to be used in explorationFiller
      */
-    record WeightedNode(int nodeId, float distance)
+    private record WeightedNode(int nodeId, float distance)
             implements Comparable<WeightedNode> {
 
         @Override
@@ -45,7 +49,6 @@ public class RouteComputer {
      * @param exploration list of WeightedNode
      */
     private void explorationFiller(int n, int endNodeId, float[] distance, int[] predecessor, PriorityQueue<WeightedNode> exploration) {
-
         for (int i = 0; i < graph.nodeOutDegree(n); i++) {
             int edgeId = graph.nodeOutEdgeId(n, i);
             double costFactor = costFunction.costFactor(n, edgeId);
@@ -55,10 +58,8 @@ public class RouteComputer {
                 distance[n2] = d;
                 predecessor[n2] = n;
                 exploration.add(
-                        new WeightedNode(
-                                n2,
-                                (float) (distance[n2] + graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
-
+                        new WeightedNode(n2, (float) (distance[n2] +
+                                graph.nodePoint(n2).distanceTo(graph.nodePoint(endNodeId)))));
             }
         }
     }
@@ -133,7 +134,7 @@ public class RouteComputer {
                 }
                 n = exploration.remove().nodeId;
 
-            } while (distance[n] == Float.NEGATIVE_INFINITY);
+            } while (distance[n] == NODE_EXPLORED);
 
 
             if (n == endNodeId) {
@@ -143,7 +144,7 @@ public class RouteComputer {
 
             explorationFiller(n, endNodeId, distance, predecessor, exploration);
 
-            distance[n] = Float.NEGATIVE_INFINITY;
+            distance[n] = NODE_EXPLORED;
         }
         return null; //if there's no more node to explore, and it has not reached the last node.
     }

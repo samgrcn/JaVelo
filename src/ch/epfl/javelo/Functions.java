@@ -74,7 +74,8 @@ public final class Functions {
         public Sampled(float[] samples, double xMax) {
             Preconditions.checkArgument(xMax > 0);
             Preconditions.checkArgument(samples.length >= 2);
-            this.samples = samples.clone();
+            this.samples = new float[samples.length];
+            System.arraycopy(samples, 0, this.samples, 0, samples.length);
             this.xMax = xMax;
         }
 

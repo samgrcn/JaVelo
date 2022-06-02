@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,12 +118,10 @@ public final class RouteManager {
             polyline.setLayoutX(0);
             polyline.setLayoutY(0);
             List<PointCh> pointsList = route.points();
-            Double[] points = new Double[pointsList.size() * 2];
-            int index = 0;
+            List<Double> points = new ArrayList<>();
             for (PointCh point : pointsList) {
-                points[index] = parameters.get().viewX(PointWebMercator.ofPointCh(point));
-                points[index + 1] = parameters.get().viewY(PointWebMercator.ofPointCh(point));
-                index += 2;
+                points.add(parameters.get().viewX(PointWebMercator.ofPointCh(point)));
+                points.add(parameters.get().viewY(PointWebMercator.ofPointCh(point)));
             }
             polyline.getPoints().setAll(points);
             polyline.setVisible(true);

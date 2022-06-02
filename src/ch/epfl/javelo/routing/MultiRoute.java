@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Quentin Chappuis (339517)
  */
-public class MultiRoute implements Route {
+public final class MultiRoute implements Route {
     private final List<Route> segments;
     private final double[] route;
     private final List<Edge> edges = new ArrayList<>();
