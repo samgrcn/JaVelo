@@ -36,7 +36,6 @@ public final class BaseMapManager {
     private final ObjectProperty<Point2D> point2d = new SimpleObjectProperty<>();
     private boolean redrawNeeded;
 
-
     /**
      * Constructor for BaseMapManager
      *
@@ -117,6 +116,7 @@ public final class BaseMapManager {
 
         pane.getChildren().add(canvas);
         pane.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
+
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
     }

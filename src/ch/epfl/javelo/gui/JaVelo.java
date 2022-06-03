@@ -112,6 +112,7 @@ public final class JaVelo extends Application {
 
         primaryStage.setMinWidth(PREF_WIDTH);
         primaryStage.setMinHeight(PREF_HEIGHT);
+        primaryStage.setTitle("JaVelo");
         show(primaryStage, borderPane);
     }
 
