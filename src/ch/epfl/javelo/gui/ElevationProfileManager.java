@@ -35,9 +35,13 @@ public final class ElevationProfileManager {
     private final static int VERTICAL_LINES_MIN = 50;
     private final static int NB_OF_METERS_PER_KM = 1000;
     private final static int WIDTH_CORRECTION = 2;
-    private final static Font font = Font.font("Avenir", 10);
+    private final static Font FONT = Font.font("Avenir", 10);
+    private final static int INSET_TOP = 10;
+    private final static int INSET_RIGHT = 10;
+    private final static int INSET_BOTTOM = 20;
+    private final static int INSET_LEFT = 40;
+    private final static Insets DISTANCE_FROM_BORDER = new Insets(INSET_TOP, INSET_RIGHT, INSET_BOTTOM, INSET_LEFT);
 
-    private final Insets distanceFromBorder = new Insets(10, 10, 20, 40);
     private final BorderPane borderPane = new BorderPane();
     private final Pane centerPane = new Pane();
     private final VBox vBox = new VBox();
@@ -113,10 +117,10 @@ public final class ElevationProfileManager {
      */
     private void updateRectangle() {
         rectangle.set(new Rectangle2D(
-                distanceFromBorder.getLeft(),
-                distanceFromBorder.getTop(),
-                Math.max(0, centerPane.getWidth() - (distanceFromBorder.getRight() + distanceFromBorder.getLeft())),
-                Math.max(0, centerPane.getHeight() - (distanceFromBorder.getTop() + distanceFromBorder.getBottom()))));
+                DISTANCE_FROM_BORDER.getLeft(),
+                DISTANCE_FROM_BORDER.getTop(),
+                Math.max(0, centerPane.getWidth() - (DISTANCE_FROM_BORDER.getRight() + DISTANCE_FROM_BORDER.getLeft())),
+                Math.max(0, centerPane.getHeight() - (DISTANCE_FROM_BORDER.getTop() + DISTANCE_FROM_BORDER.getBottom()))));
     }
 
     /**
@@ -284,7 +288,7 @@ public final class ElevationProfileManager {
         tag.textOriginProperty().set(VPos.CENTER);
         tag.setId("grid_label");
         tag.getStyleClass().add("vertical");
-        tag.setFont(font);
+        tag.setFont(FONT);
         tag.setLayoutX(rectangle.get().getMinX() - tag.prefWidth(0) - WIDTH_CORRECTION);
         tag.setLayoutY(y);
         tags.getChildren().add(tag);
@@ -302,7 +306,7 @@ public final class ElevationProfileManager {
         tag.textOriginProperty().set(VPos.TOP);
         tag.setId("grid_label");
         tag.getStyleClass().add("horizontal");
-        tag.setFont(font);
+        tag.setFont(FONT);
         tag.setLayoutX(x - tag.prefWidth(0) / WIDTH_CORRECTION);
         tag.setLayoutY(rectangle.get().getMaxY());
         tags.getChildren().add(tag);
@@ -323,7 +327,7 @@ public final class ElevationProfileManager {
                     elevationProfileAttribute.totalAscent(), elevationProfileAttribute.totalDescent(),
                     elevationProfileAttribute.minElevation(), elevationProfileAttribute.maxElevation());
             Text stats = new Text(text);
-            stats.setFont(font);
+            stats.setFont(FONT);
             vBox.getChildren().add(stats);
         }
     }
