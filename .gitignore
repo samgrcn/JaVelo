@@ -19,6 +19,7 @@ out/
 *.png
 ch_west/
 lausanne/
+!resources/javelo-gui.png
 
 ##############################
 ## Eclipse
